@@ -1,0 +1,10 @@
+**/build
+**/target
+**/output
+**/demo
+
+**/*.out
+**/*.bin
+**/*.so
+**/*.o
+**/*.a
