@@ -2,23 +2,25 @@
 #define __END_POINT_H_
 
 #include "logic_core.h"
+#include "task/task_coordinator.h"
 
 class Endpoint
 {
-private:
+protected:
+    std::shared_ptr<NetworkAdapter> na_;
     LogicCore core_;
-    NetworkAdapter ad_;
 
 public:
-    Endpoint() : core_(ad_)
+    Endpoint() :na_(std::make_shared<NetworkAdapter>()), core_(na_)
     {
         auto f = bind(&LogicCore::recv, &core_, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        ad_.setLogicRecvFunc(f);
+        na_->setLogicRecvFunc(f);
     };
     
-    ~Endpoint() {}
+    virtual ~Endpoint() {}
 
     void run();
+
 };
 
 #endif

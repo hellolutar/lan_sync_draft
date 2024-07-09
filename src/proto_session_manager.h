@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "road_maintainer.h"
-#include "net/net_framework_engine.h"
+#include "framework/net/net_framework.h"
 #include "proto/lan_share_protocol.h"
 
 class ProtoSessionManagerLogic : public Logic
@@ -47,7 +47,7 @@ private:
 public:
     ProtoSessionManager(logicRecvCB logic_recv_f, NetAddr port) : logic_recv_f_(logic_recv_f)
     {
-        auto net = NetframeworkEngine::getEngine();
+        auto net = Netframework::getEngine();
         auto v = std::make_shared<std::vector<std::shared_ptr<RoadMaintainer>>>(roads_);
         logic_ = std::make_shared<ProtoSessionManagerLogic>(id_, v);
 

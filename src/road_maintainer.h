@@ -8,7 +8,7 @@
 
 #include "udp_cli_trigger.h"
 #include "proto/lan_share_protocol.h"
-#include "net/net_framework_engine.h"
+#include "framework/net/net_framework.h"
 #include "buf/buf_base_on_event.h"
 
 using logicRecvCB = std::function<void(uint32_t, uint8_t *, uint64_t)>;
@@ -29,7 +29,6 @@ private:
     RoadState state_ = RoadState::DISCONNECT;
     std::uint32_t road_id_ = 0;
 
-    UdpCliTrigger trg_;
     logicRecvCB logic_recv_f_;
     sessionRecvCB session_recv_f_;
     newTcpCliCB new_tcpcli_f_;
@@ -47,12 +46,13 @@ public:
     void handleDisconnect(LanSyncPkt &pkt, const NetAddr &from);
 };
 
-class RoadMaintainer : public std::enable_shared_from_this<RoadMaintainer>
+class RoadMaintainer
 {
 private:
-    std::uint32_t id_; // session_id, road_id
+    std::uint32_t id_ = 0; // session_id, road_id
 
     std::shared_ptr<TcpCli> cli_;
+    UdpCliTrigger trg_;
 
     std::shared_ptr<RoadMaintainerLogic> logic_;
 
@@ -76,6 +76,8 @@ public:
     const std::uint16_t getId() const;
 
     void recv(const NetAddr &peer, uint8_t *data, uint64_t size);
+
+    void new_trigger(const NetAddr &peer);
 };
 
 #endif

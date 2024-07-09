@@ -71,6 +71,14 @@ std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryUdpSerNetAbility(con
     throw "not found";
 }
 
+std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryTdpCliNetAbility(const NetAddr &addr)
+{
+    if (udpcli_.find(addr) != udpcli_.end())
+        return tcpcli_.find(addr)->second;
+
+    throw "not found";
+}
+
 std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryNetAbility(const NetAddr &addr)
 {
     if (udpsrv_.find(addr) != udpsrv_.end())

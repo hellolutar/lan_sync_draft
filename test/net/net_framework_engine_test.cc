@@ -34,9 +34,9 @@ public:
 TEST(NetFrameworkEngine, tcpCli)
 {
     auto ep_ = make_shared<NetFrameworkEngineForTest>();
-    NetframeworkEngine::init(ep_);
+    Netframework::init(ep_);
 
-    auto engine = NetframeworkEngine::getEngine();
+    auto engine = Netframework::getEngine();
     auto addr = NetAddr("192.168.233.1:8080");
     auto srv = engine->addTcpServer(addr);
     auto logic = std::make_shared<TcpServerDemoLogic>();

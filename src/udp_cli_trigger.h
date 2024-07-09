@@ -3,26 +3,30 @@
 
 #include <cstdint>
 
-#include "net/transport_proto.h"
-
+#include "framework/net/transport_proto.h"
+#include "framework/net/net_framework.h"
 
 class UdpCliTrigger
 {
 private:
     std::uint16_t id_;
     std::uint32_t road_id_;
-    
-    UdpCli cli_;
+
+    std::shared_ptr<UdpCli> cli_;
     bool running_ = false;
-    
+
 public:
-    UdpCliTrigger(/* args */) {}
+    UdpCliTrigger(){};
+    UdpCliTrigger(std::uint32_t road_id, const NetAddr &peer) : road_id_(road_id)
+    {
+        auto eg = Netframework::getEngine();
+        cli_ = eg->connectWithUdp(peer);
+    }
     ~UdpCliTrigger() {}
     const bool isRunning() const;
     std::uint16_t getId() const;
 
-    const UdpCli& getUdpCli() const;
+    const std::shared_ptr<UdpCli> getUdpCli() const;
 };
-
 
 #endif

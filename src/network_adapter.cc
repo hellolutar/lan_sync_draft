@@ -37,6 +37,8 @@ void NetworkAdapter::start()
 void NetworkAdapter::connPeer(const NetAddr &p)
 {
     sess_.push_back(std::make_shared<ProtoSessionManager>(logic_recv_f_, p));
+    // todo 启动trigger
+    
 }
 
 void NetworkAdapter::write(uint32_t road_id, uint8_t *data, uint64_t size)

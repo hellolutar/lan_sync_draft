@@ -2,7 +2,7 @@
 #define __LOGIC_H_
 
 #include <cstdint>
-#include "net/net_addr.h"
+#include "framework/net/net_addr.h"
 
 class Logic
 {

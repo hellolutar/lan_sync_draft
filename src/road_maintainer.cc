@@ -25,17 +25,17 @@ void RoadMaintainerLogic::recv(const NetAddr &from, uint8_t *data, uint64_t size
 
 void RoadMaintainerLogic::handleDisconnect(LanSyncPkt &pkt, const NetAddr &from)
 {
-    if (trg_.isRunning())
-        // TriggerDispatch.unregister(trg_);
+    // if (trg_.isRunning())
+    // TriggerDispatch.unregister(trg_);
 
-        state_ = RoadState::CONNECTING;
+    state_ = RoadState::CONNECTING;
 
     if (pkt.getPayloadSize() == 0)
         return;
 
     uint16_t peer_tcp_port = *(reinterpret_cast<uint16_t *>(pkt.getPayload()));
 
-    auto eg = NetframeworkEngine::getEngine();
+    auto eg = Netframework::getEngine();
     NetAddr peer(from);
     peer.setPort(peer_tcp_port);
 
@@ -59,7 +59,7 @@ void RoadMaintainer::tcp_write(uint8_t *data, uint64_t size)
 
 std::shared_ptr<TcpCli> RoadMaintainer::new_tcp_cli(NetAddr peer)
 {
-    auto eg = NetframeworkEngine::getEngine();
+    auto eg = Netframework::getEngine();
     cli_ = eg->connectWithTcp(peer);
     cli_->bind(std::shared_ptr<Logic>(logic_));
     return cli_;
@@ -92,4 +92,9 @@ const std::uint16_t RoadMaintainer::getId() const
 void RoadMaintainer::recv(const NetAddr &peer, uint8_t *data, uint64_t size)
 {
     logic_->recv(peer, data, size);
+}
+
+void RoadMaintainer::new_trigger(const NetAddr &peer)
+{
+    UdpCliTrigger trg;
 }

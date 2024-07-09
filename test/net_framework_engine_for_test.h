@@ -6,7 +6,7 @@
 
 #include <cstring>
 
-#include "net/net_framework_engine.h"
+#include "framework/net/net_framework.h"
 
 using namespace std;
 
@@ -51,7 +51,7 @@ public:
     vector<shared_ptr<buf_data>> &getBufs();
 };
 
-class NetFrameworkEngineForTest : public NetFramework
+class NetFrameworkEngineForTest : public NetframeworkEngine
 {
 private:
     map<NetAddr, shared_ptr<TcpServer>> tcpsrv_;
@@ -76,6 +76,7 @@ public:
     std::shared_ptr<NetAbility> queryTcpSerNetAbility(const NetAddr &addr);
     std::shared_ptr<NetAbility> queryTcpCliNetAbility(const NetAddr &addr);
     std::shared_ptr<NetAbility> queryUdpSerNetAbility(const NetAddr &addr);
+    std::shared_ptr<NetAbility> queryTdpCliNetAbility(const NetAddr &addr);
     std::shared_ptr<NetAbility> queryNetAbility(const NetAddr &addr);
 };
 

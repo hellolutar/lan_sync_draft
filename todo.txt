@@ -1,0 +1,3 @@
+1. setup_road_test.udp_cli_conn()
+2. coordinator.task.networkadapter 的赋值链
+3. 测试cli发送hello后接收hello_ack

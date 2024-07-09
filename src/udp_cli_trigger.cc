@@ -10,7 +10,7 @@ std::uint16_t UdpCliTrigger::getId() const
     return id_;
 }
 
-const UdpCli &UdpCliTrigger::getUdpCli() const
+const std::shared_ptr<UdpCli> UdpCliTrigger::getUdpCli() const
 {
     return cli_;
 }

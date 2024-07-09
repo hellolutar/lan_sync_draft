@@ -2,8 +2,7 @@
 
 using namespace std;
 
-
 void Endpoint::run()
 {
-    ad_.start();
+    na_->start();
 }

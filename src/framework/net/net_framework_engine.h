@@ -3,13 +3,13 @@
 
 #include <memory>
 
-#include "net/transport_proto.h"
+#include "framework/net/transport_proto.h"
 
-class NetFramework
+class NetframeworkEngine
 {
 public:
-    NetFramework() {}
-    virtual ~NetFramework() {}
+    NetframeworkEngine() {}
+    virtual ~NetframeworkEngine() {}
     virtual std::shared_ptr<TcpServer> addTcpServer(const NetAddr &addr) = 0;
     virtual std::shared_ptr<UdpServer> addUdpServer(const NetAddr &addr) = 0;
     virtual std::shared_ptr<TcpCli> connectWithTcp(const NetAddr &addr) = 0;
