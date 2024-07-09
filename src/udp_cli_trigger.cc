@@ -1,5 +1,15 @@
 #include "udp_cli_trigger.h"
 
+void UdpCliTrigger::trigger()
+{
+    LanSyncPkt pkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_HELLO);
+    uint16_t port = 8080;
+    pkt.setPayload(&port, sizeof(uint16_t));
+    BufBaseonEvent buf;
+    pkt.writeTo(buf);
+    ctx_.write(static_cast<uint8_t *>(buf.data()), buf.size());
+}
+
 const bool UdpCliTrigger::isRunning() const
 {
     return running_;
@@ -8,9 +18,4 @@ const bool UdpCliTrigger::isRunning() const
 std::uint16_t UdpCliTrigger::getId() const
 {
     return id_;
-}
-
-const std::shared_ptr<UdpCli> UdpCliTrigger::getUdpCli() const
-{
-    return cli_;
 }

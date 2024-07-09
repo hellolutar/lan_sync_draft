@@ -32,7 +32,7 @@ public:
     void recv(const NetAddr &from, uint8_t *data, uint64_t size) override;
 };
 
-class ProtoSessionManager : public std::enable_shared_from_this<ProtoSessionManager>
+class ProtoSessionManager
 {
 private:
     std::uint16_t id_;
@@ -74,6 +74,8 @@ public:
     void write(uint32_t road_id, uint8_t *data, uint64_t size) const;
 
     const uint16_t getId() const;
+
+    uint32_t connPeer(const NetAddr& peer);
 };
 
 #endif

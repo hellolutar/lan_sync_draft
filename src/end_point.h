@@ -3,6 +3,7 @@
 
 #include "logic_core.h"
 #include "task/task_coordinator.h"
+#include "framework/timer/timer_trigger_framework.h"
 
 class Endpoint
 {

@@ -51,8 +51,7 @@ class RoadMaintainer
 private:
     std::uint32_t id_ = 0; // session_id, road_id
 
-    std::shared_ptr<TcpCli> cli_;
-    UdpCliTrigger trg_;
+    std::shared_ptr<TcpCli> t_cli_;
 
     std::shared_ptr<RoadMaintainerLogic> logic_;
 

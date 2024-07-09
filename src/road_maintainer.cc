@@ -54,15 +54,15 @@ const uint64_t RoadMaintainerLogic::isExtraAllDataNow(uint8_t *data, uint64_t da
 
 void RoadMaintainer::tcp_write(uint8_t *data, uint64_t size)
 {
-    cli_->write(data, size);
+    t_cli_->write(data, size);
 }
 
 std::shared_ptr<TcpCli> RoadMaintainer::new_tcp_cli(NetAddr peer)
 {
     auto eg = Netframework::getEngine();
-    cli_ = eg->connectWithTcp(peer);
-    cli_->bind(std::shared_ptr<Logic>(logic_));
-    return cli_;
+    t_cli_ = eg->connectWithTcp(peer);
+    t_cli_->bind(std::shared_ptr<Logic>(logic_));
+    return t_cli_;
 }
 
 void RoadMaintainer::udp_write(const NetAddr &peer, uint8_t *data, uint64_t size)
@@ -81,7 +81,7 @@ bool RoadMaintainer::isMineRoad(const NetAddr &from)
     //         return true;
     // }
 
-    return cli_->peer() == from;
+    return t_cli_->peer() == from;
 }
 
 const std::uint16_t RoadMaintainer::getId() const

@@ -26,7 +26,13 @@ public:
 
     void start();
 
-    void connPeer(const NetAddr &peer);
+    /**
+     * @brief connect peer with udp
+     * 
+     * @param peer 
+     * @return uint32_t road_id
+     */
+    uint32_t connPeer(const NetAddr &peer);
 
     void write(uint32_t road_id, uint8_t* data, uint64_t size);
 };

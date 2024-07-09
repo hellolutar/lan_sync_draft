@@ -4,6 +4,8 @@
 #include <map>
 #include <ctime>
 
+#include <sys/time.h>
+
 class Trigger;
 
 class Timer

@@ -33,6 +33,10 @@ const uint16_t ProtoSessionManager::getId() const
     return id_;
 }
 
+uint32_t ProtoSessionManager::connPeer(const NetAddr &peer)
+{
+}
+
 std::shared_ptr<RoadMaintainer> ProtoSessionManager::findRoad(uint32_t road_id) const
 {
     for (auto &&r : roads_)

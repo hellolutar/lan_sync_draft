@@ -34,10 +34,15 @@ void NetworkAdapter::start()
     }
 }
 
-void NetworkAdapter::connPeer(const NetAddr &p)
+uint32_t NetworkAdapter::connPeer(const NetAddr &p)
 {
     sess_.push_back(std::make_shared<ProtoSessionManager>(logic_recv_f_, p));
-    // todo 启动trigger
+
+    // 随便找一个session,然后创建udpcli
+    for (auto &&session : sess_)
+    {
+        session->
+    }
     
 }
 
