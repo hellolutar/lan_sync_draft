@@ -7,14 +7,13 @@ class NetworkContext
 {
 protected:
     std::shared_ptr<NetworkAdapter> na_;
-    uint32_t road_id_ = 0;
+    NetAddr peer_;
 
 public:
     NetworkContext(){};
-    NetworkContext(std::shared_ptr<NetworkAdapter> na, uint32_t road_id) : na_(na), road_id_(road_id) {}
+    NetworkContext(std::shared_ptr<NetworkAdapter> na, NetAddr peer) : na_(na), peer_(peer) {}
     virtual ~NetworkContext() {
         na_ = nullptr;
-        road_id_ = 0;
     }
 
     virtual void write(uint8_t* data, uint64_t size);

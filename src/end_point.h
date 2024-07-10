@@ -4,6 +4,7 @@
 #include "logic_core.h"
 #include "task/task_coordinator.h"
 #include "framework/timer/timer_trigger_framework.h"
+#include "udp_cli_trigger.h"
 
 class Endpoint
 {
@@ -14,8 +15,6 @@ protected:
 public:
     Endpoint() :na_(std::make_shared<NetworkAdapter>()), core_(na_)
     {
-        auto f = bind(&LogicCore::recv, &core_, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        na_->setLogicRecvFunc(f);
     };
     
     virtual ~Endpoint() {}

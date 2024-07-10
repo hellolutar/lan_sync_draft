@@ -45,7 +45,8 @@ public:
     bool isMe(const NetAddr &peer);
 
     void recv(const NetAddr &peer, uint8_t *data, uint64_t size);
-    void write(const NetAddr &peer, uint8_t *data, uint64_t size);
+    void write(uint8_t *data, uint64_t size);
+    void write(uint8_t *data, uint64_t size) const;
 
     void bind(const NetAddr &peer);
     void call(const NetAddr &peer);

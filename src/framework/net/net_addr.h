@@ -4,6 +4,10 @@
 #include <string>
 #include <cstdint>
 
+#include <arpa/inet.h>
+#include <cstdlib>
+
+
 enum class TransportType
 {
     TCP,
@@ -18,9 +22,30 @@ private:
     TransportType type_;
 
 public:
-    NetAddr(TransportType type = TransportType::UDP) : type_(type) {}
+    NetAddr(TransportType type = TransportType::UDP) : type_(type)
+    {
+    }
     NetAddr(std::string ip_port, TransportType type = TransportType::UDP)
-        : type_(type){};
+        : type_(type)
+    {
+        uint64_t pos = ip_port.find(':');
+        if (pos == 0)
+        {
+            l_addr_ = INADDR_ANY;
+        }
+        else
+        {
+            std::string ip = ip_port.substr(0, pos);
+            sockaddr_in tmp_addr;
+            inet_aton(ip.data(), &(tmp_addr.sin_addr));
+            l_addr_ = ntohl(tmp_addr.sin_addr.s_addr);
+        }
+        if (ip_port.find(":") != std::string::npos)
+        {
+            std::string port = ip_port.substr(pos + 1, ip_port.size());
+            l_port_ = std::stoi(port);
+        }
+    };
 
     NetAddr(std::uint32_t l_addr, std::uint16_t l_port, TransportType type = TransportType::UDP)
         : l_addr_(l_addr), l_port_(l_port), type_(type){};

@@ -10,17 +10,31 @@ void ProtoServerRecv::recv(const NetAddr &from, uint8_t *data, uint64_t size)
             s.recv(from, data, size);
         }
     }
-    
 
-    // auto session_recv_f = std::bind(&ProtoSessionManager::recv, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    // todo 注意区分是tcpcli 还是 udpcli ；
-    // auto r = RoadMaintainer::setupTCPCli(session_id_, from, core_logic_);
-    // r->recv(from, data, size);
-    // roads_->push_back(std::move(r));
-    throw "注意区分是tcpcli 还是 udpcli ";
+    ProtoSession s(core_logic_);
+    if (from.type() == TransportType::UDP)
+        s.call(from);
+    else if (from.type() == TransportType::TCP)
+        s.bind(from);
+    else
+        throw "the type is unknow";
+    s.recv(from, data, size);
+    sess_->push_back(s);
 }
 
 std::shared_ptr<ProtoSession> ProtoServerRecv::find(const NetAddr &from) const
 {
     //
+}
+
+const  ProtoSession& ProtoServer::findSession(const NetAddr &peer)
+{
+    for (size_t i = 0; i < sess_->size(); i++)
+    {
+        auto &s = sess_->at(i);
+        if (s.isMe(peer))
+            return s;
+    }
+
+    throw "ProtoServer::findSession can not found the peer !";
 }

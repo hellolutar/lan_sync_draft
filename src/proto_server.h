@@ -18,9 +18,13 @@ public:
     ~ProtoServerRecv() {}
 
     /**
-     * 由TcpServer、UdpServer、TcpCli、UdpCli等调用
+     * 由TcpServer、UdpServer 调用； tcpcli 直接调用的core_logic_
      */
     void recv(const NetAddr &from, uint8_t *data, uint64_t size) override;
+    const uint64_t isExtraAllDataNow(uint8_t *data, uint64_t data_len) const override
+    {
+        return core_logic_->isExtraAllDataNow(data, data_len);
+    }
 
     std::shared_ptr<ProtoSession> find(const NetAddr &from) const;
 };
@@ -55,6 +59,8 @@ public:
         core_logic_ = nullptr;
         server_logic_ = nullptr;
     }
+
+    const ProtoSession &findSession(const NetAddr &peer);
 };
 
 #endif

@@ -7,10 +7,10 @@ void NetworkContext::write(uint8_t *data, uint64_t size)
 
 void NetworkContext::write(uint8_t *data, uint64_t size) const
 {
-    na_->write(road_id_, data, size);
+    na_->write(peer_, data, size);
 }
 
 bool NetworkContext::operator==(const NetworkContext &other) const
 {
-    return road_id_ == other.road_id_;
+    return peer_ == other.peer_;
 }

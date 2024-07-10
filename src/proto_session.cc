@@ -42,7 +42,12 @@ void ProtoSession::recv(const NetAddr &peer, uint8_t *data, uint64_t size)
     }
 }
 
-void ProtoSession::write(const NetAddr &peer, uint8_t *data, uint64_t size)
+void ProtoSession::write(uint8_t *data, uint64_t size)
+{
+    static_cast<const ProtoSession &>(*this).write(data, size);
+}
+
+void ProtoSession::write(uint8_t *data, uint64_t size) const
 {
     if (tcli_ != nullptr)
         tcli_->write(data, size);
@@ -57,6 +62,7 @@ void ProtoSession::bind(const NetAddr &peer)
     auto eg = Netframework::getEngine();
     tcli_ = eg->findTcpCli(peer);
     tcli_->bind(core_logic_);
+    state_ = SessionState::ESTABLISED;
 }
 
 void ProtoSession::call(const NetAddr &peer)
@@ -65,8 +71,10 @@ void ProtoSession::call(const NetAddr &peer)
         throw "the tcli_ has already been created!";
 
     auto eg = Netframework::getEngine();
+    state_ = SessionState::CONNECTING;
     tcli_ = eg->connectWithTcp(peer);
     tcli_->bind(core_logic_);
+    state_ = SessionState::ESTABLISED;
 }
 
 void ProtoSession::handleDisconnect(LanSyncPkt &pkt, const NetAddr &from)

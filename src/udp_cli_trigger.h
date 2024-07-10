@@ -7,6 +7,7 @@
 #include "buf/buf_base_on_event.h"
 #include "framework/net/transport_proto.h"
 #include "framework/net/net_framework.h"
+#include "framework/timer/timer_trigger.h"
 
 class UdpCliTrigger : public Trigger
 {

@@ -2,22 +2,20 @@
 #define __NETWORK_ADAPTER_H_
 
 #include "framework/net/net_addr.h"
-#include "proto_session.h"
+#include "proto_server.h"
 
 class NetworkAdapter
 {
 private:
-    std::vector<std::shared_ptr<ProtoSession>> sess_;
+    std::vector<std::shared_ptr<ProtoServer>> srvs_;
 
     std::vector<NetAddr> query_local_ports();
 
-    const std::shared_ptr<ProtoSession> findSession(uint32_t road_id);
+    const ProtoSession& findSession(const NetAddr& peer);
 
 public:
     NetworkAdapter(){};
     ~NetworkAdapter(){};
-
-    void recv(uint32_t road_id, uint8_t *data, uint64_t size);
 
     void start();
 
@@ -29,7 +27,7 @@ public:
      */
     uint32_t setUpSessionWithPeer(const NetAddr &peer);
 
-    void write(uint32_t road_id, uint8_t *data, uint64_t size);
+    void write(const NetAddr& peer, uint8_t *data, uint64_t size);
 };
 
 #endif
