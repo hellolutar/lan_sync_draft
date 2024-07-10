@@ -1,15 +1,5 @@
 #include "transport_proto.h"
 
-const NetAddr &TcpCli::peer() const
-{
-    return peer_;
-}
-
-const NetAddr &UdpCli::peer() const
-{
-    return peer_;
-}
-
 const uint64_t NetAbility::isExtraAllDataNow(uint8_t *data, uint64_t size)
 {
     return logic_->isExtraAllDataNow(data, size);
@@ -48,4 +38,9 @@ void OutputStream::close()
 bool OutputStream::isClosed()
 {
     return closed_;
+}
+
+const NetAddr &ConnCli::peer() const
+{
+    return peer_;
 }

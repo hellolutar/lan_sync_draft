@@ -14,6 +14,8 @@ public:
     virtual std::shared_ptr<UdpServer> addUdpServer(const NetAddr &addr) = 0;
     virtual std::shared_ptr<TcpCli> connectWithTcp(const NetAddr &addr) = 0;
     virtual std::shared_ptr<UdpCli> connectWithUdp(const NetAddr &addr) = 0;
+
+    virtual std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) = 0;
 };
 
 #endif

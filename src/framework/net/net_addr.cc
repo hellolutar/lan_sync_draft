@@ -5,12 +5,12 @@
 
 using namespace std;
 
-NetAddr::NetAddr(std::string ip_port)
+NetAddr::NetAddr(std::string ip_port, TransportType type = TransportType::UDP) : type_(type)
 {
     uint64_t pos = ip_port.find(':');
     if (pos == 0)
     {
-        l_addr_= INADDR_ANY;
+        l_addr_ = INADDR_ANY;
     }
     else
     {
@@ -26,19 +26,12 @@ NetAddr::NetAddr(std::string ip_port)
     }
 }
 
-NetAddr::NetAddr(std::uint32_t addr, std::uint16_t port)
-{
-    l_addr_ = addr;
-    l_port_ = port;
-}
-
-NetAddr::NetAddr(const NetAddr &other)
-{
-    l_addr_ = other.l_addr_;
-    l_port_ = other.l_port_;
-}
-
 void NetAddr::setPort(uint16_t l_port)
 {
     l_port_ = l_port;
+}
+
+TransportType NetAddr::type() const
+{
+    return type_;
 }

@@ -7,7 +7,7 @@ std::vector<NetAddr> NetworkAdapter::query_local_ports()
     return {addr, addr2};
 }
 
-const std::shared_ptr<ProtoSessionManager>NetworkAdapter::findSession(uint32_t road_id)
+const std::shared_ptr<ProtoSession> NetworkAdapter::findSession(uint32_t road_id)
 {
     // todo
     uint16_t session_id = road_id >> 16;
@@ -20,34 +20,28 @@ const std::shared_ptr<ProtoSessionManager>NetworkAdapter::findSession(uint32_t r
     throw "ProtoSessionManager not found";
 }
 
-void NetworkAdapter::setLogicRecvFunc(std::function<void(uint32_t, uint8_t *, uint64_t)> f)
-{
-    logic_recv_f_ = f;
-}
-
 void NetworkAdapter::start()
 {
     auto ports = query_local_ports();
     for (auto &&p : ports)
     {
-        sess_.push_back(std::make_shared<ProtoSessionManager>(logic_recv_f_, p));
+        sess_.push_back(std::make_shared<ProtoSession>(p));
     }
 }
 
-uint32_t NetworkAdapter::connPeer(const NetAddr &p)
+uint32_t NetworkAdapter::setUpSessionWithPeer(const NetAddr &p)
 {
-    sess_.push_back(std::make_shared<ProtoSessionManager>(logic_recv_f_, p));
+    sess_.push_back(std::make_shared<ProtoSession>(p));
 
     // 随便找一个session,然后创建udpcli
     for (auto &&session : sess_)
     {
         session->
     }
-    
 }
 
 void NetworkAdapter::write(uint32_t road_id, uint8_t *data, uint64_t size)
 {
     auto session = findSession(road_id);
-    session->write(road_id, data, size);
+    session->write( data, size);
 }

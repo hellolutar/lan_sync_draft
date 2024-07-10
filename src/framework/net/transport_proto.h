@@ -44,31 +44,36 @@ public:
     std::shared_ptr<OutputStream> getOutputStream();
 };
 
-class TcpCli : public NetAbility
+class ConnCli : public NetAbility
 {
-private:
+protected:
     NetAddr peer_;
-    std::shared_ptr<Logic> logic_;
 
 public:
-    TcpCli() {}
-    TcpCli(NetAddr peer) : peer_(peer) {}
-    ~TcpCli() {}
+    ConnCli(/* args */) {}
+    ConnCli(NetAddr peer) : peer_(peer){};
+    virtual ~ConnCli() {}
 
     const NetAddr &peer() const;
 };
 
-class UdpCli : public NetAbility
+class TcpCli : public ConnCli
 {
 private:
-    NetAddr peer_;
+    std::shared_ptr<Logic> logic_;
+
+public:
+    TcpCli(NetAddr peer) : ConnCli(peer) {}
+    ~TcpCli() {}
+};
+
+class UdpCli : public ConnCli
+{
 
 public:
     UdpCli(){};
-    UdpCli(NetAddr peer) : peer_(peer) {}
+    UdpCli(NetAddr peer) : ConnCli(peer) {}
     ~UdpCli() {}
-
-    const NetAddr &peer() const;
 };
 
 class TcpServer : public NetAbility

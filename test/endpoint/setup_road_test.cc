@@ -49,7 +49,7 @@ public:
     void udp_cli_conn(NetAddr &addr)
     {
         auto na = ed_.getNetworkAdapter();
-        na->connPeer(addr);
+        na->setUpSessionWithPeer(addr);
     }
 
     void udp_srv_receive(NetAddr &peer, LanSyncPkt &pkt)
