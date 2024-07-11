@@ -16,3 +16,8 @@ void NetAddr::setType(TransportType t)
 {
     type_ = t;
 }
+
+std::string NetAddr::str()
+{
+    return l_addr_ + ":" + l_port_;
+}

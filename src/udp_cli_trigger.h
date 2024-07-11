@@ -12,8 +12,6 @@
 class UdpCliTrigger : public Trigger
 {
 private:
-    std::uint16_t id_;
-
     NetworkContext ctx_;
     bool running_ = false;
 

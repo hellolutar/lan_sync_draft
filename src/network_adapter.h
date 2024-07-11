@@ -11,25 +11,20 @@ private:
 
     std::vector<NetAddr> query_local_ports();
 
-    const ProtoSession& findSession(const NetAddr& peer);
+    const ProtoSession &findSession(const NetAddr &peer);
 
 public:
     NetworkAdapter(){};
-    ~NetworkAdapter(){
+    ~NetworkAdapter()
+    {
         srvs_.clear();
     };
 
     void start(std::shared_ptr<Logic> core);
 
-    /**
-     * @brief connect peer with udp
-     *
-     * @param peer
-     * @return uint32_t road_id
-     */
-    uint32_t setUpSessionWithPeer(const NetAddr &peer);
+    void write(const NetAddr &peer, uint8_t *data, uint64_t size);
 
-    void write(const NetAddr& peer, uint8_t *data, uint64_t size);
+    void udp_write(const NetAddr &peer, uint8_t *data, uint64_t size);
 };
 
 #endif

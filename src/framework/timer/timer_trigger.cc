@@ -1,4 +1,5 @@
 #include "framework/timer/timer_trigger.h"
+#include "timer_trigger.h"
 
 using namespace std;
 Timer::Timer(/* args */)
@@ -19,6 +20,16 @@ timeval Trigger::second(size_t s)
     tv.tv_usec = 0;
     tv.tv_sec = s;
     return tv;
+}
+
+void Trigger::setId(std::uint16_t id)
+{
+    id_ = id;
+}
+
+std::uint16_t Trigger::getId() const
+{
+    return id_;
 }
 
 struct timeval &Trigger::getPeriod()

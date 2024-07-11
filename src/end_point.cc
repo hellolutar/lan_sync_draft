@@ -2,14 +2,19 @@
 
 using namespace std;
 
+void Endpoint::registerTrg()
+{
+    NetworkContext ctx(na_, NetAddr("0.0.0.1:18080"));
+    trg_ = std::make_shared<UdpCliTrigger>(ctx, Trigger::second(2), true);
+    auto timer = TimerFramework::getEngine();
+    timer->addTrg(trg_);
+}
+
 void Endpoint::run()
 {
-    na_->start(core_);
-    // auto eg = TimerFramework::getEngine();
+    registerTrg();
 
-    // auto road_id = na_->setUpSessionWithPeer(NetAddr("192.168.0.1:38080"));
-    // NetworkContext ctx(na_,road_id);
-    // auto trg = make_shared<UdpCliTrigger>(ctx, Trigger::second(2), true);
-    // eg->addTrg(trg);
-    // eg->run();
+    na_->start(core_);
+
+    TimerFramework::getEngine()->run();
 }

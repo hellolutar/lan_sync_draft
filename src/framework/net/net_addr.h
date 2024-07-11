@@ -6,7 +6,7 @@
 
 #include <arpa/inet.h>
 #include <cstdlib>
-
+#include <iostream>
 
 enum class TransportType
 {
@@ -22,6 +22,7 @@ private:
     TransportType type_;
 
 public:
+
     NetAddr(TransportType type = TransportType::UDP) : type_(type)
     {
     }
@@ -68,6 +69,10 @@ public:
 
     TransportType type() const;
     void setType(TransportType);
+    std::string str();
+
+    friend std::ostream &operator<<(std::ostream &os, const NetAddr &addr);
+
 };
 
 #endif

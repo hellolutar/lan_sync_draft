@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "net_framework_engine_for_test.h"
+#include "framework_engine_for_test.h"
 #include "end_point.h"
 #include "proto/lan_share_protocol.h"
 #include "buf/buf_base_on_event.h"
@@ -24,14 +24,19 @@ class EndPointTestCaseSimple : public testing::Test
 {
 protected:
     EndpointForTest ed_;
-    shared_ptr<NetFrameworkEngineForTest> ep_;
+    shared_ptr<NetFrameworkEngineForTest> neg_;
+    shared_ptr<TimerFrameworkEngineForTest> teg_;
     NetAddr local_addr_;
 
     void SetUp() override
     {
         printf("SetUp \n");
-        ep_ = make_shared<NetFrameworkEngineForTest>();
-        Netframework::init(ep_);
+        neg_ = make_shared<NetFrameworkEngineForTest>();
+        Netframework::init(neg_);
+
+        teg_ = make_shared<TimerFrameworkEngineForTest>();
+        TimerFramework::init(teg_);
+
         ed_.run();
     }
 
@@ -46,15 +51,9 @@ public:
         local_addr_ = local;
     }
 
-    void udp_cli_conn(NetAddr &addr)
-    {
-        auto na = ed_.getNetworkAdapter();
-        na->setUpSessionWithPeer(addr);
-    }
-
     void udp_srv_receive(NetAddr &peer, LanSyncPkt &pkt)
     {
-        auto ed_udp_srv = ep_->queryUdpSerNetAbility(local_addr_);
+        auto ed_udp_srv = neg_->queryUdpSerNetAbility(local_addr_);
 
         BufBaseonEvent buf;
         pkt.writeTo(buf);
@@ -63,29 +62,31 @@ public:
 
     void assert_tcp_cli_sended(NetAddr &peer, LanSyncPkt &pkt)
     {
-        auto ed_tcp_cli = ep_->queryTcpCliNetAbility(peer);
-        auto os = dynamic_pointer_cast<OutputStreamForTest>(ed_tcp_cli->getOutputStream());
-        auto recvBufs = os->getBufs();
-        LanSyncPkt tcpRecvPkt(recvBufs[0]->data());
+        peer.setType(TransportType::TCP);
+        auto cli = neg_->queryTcpCliNetAbility(peer);
+        auto os = dynamic_pointer_cast<OutputStreamForTest>(cli->getOutputStream());
+        auto recvBuf = os->front();
+        LanSyncPkt recvPkt(recvBuf->data());
 
-        ASSERT_EQ(pkt, tcpRecvPkt);
+        ASSERT_EQ(pkt, recvPkt);
     }
 
     void assert_udp_cli_sended(NetAddr &peer, LanSyncPkt &pkt)
     {
-        auto ed_tcp_cli = ep_->queryUdpSerNetAbility(peer);
-        auto os = dynamic_pointer_cast<OutputStreamForTest>(ed_tcp_cli->getOutputStream());
-        auto recvBufs = os->getBufs();
-        LanSyncPkt tcpRecvPkt(recvBufs[0]->data());
+        peer.setType(TransportType::UDP);
+        auto cli = neg_->queryUdpCliNetAbility(peer);
+        auto os = dynamic_pointer_cast<OutputStreamForTest>(cli->getOutputStream());
+        auto recvBuf = os->front();
+        LanSyncPkt recvPkt(recvBuf->data());
 
-        ASSERT_EQ(pkt, tcpRecvPkt);
+        ASSERT_EQ(pkt, recvPkt);
     }
 };
 
 TEST_F(EndPointTestCaseSimple, server_recv_hello_then_reply_helloack)
 {
-    auto peerAddr = NetAddr("0.0.0.1:18080");
     env({"192.168.233.1:8080"});
+    auto peerAddr = NetAddr("0.0.0.1:18080");
 
     LanSyncPkt pkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_HELLO);
     uint16_t port = 18080;
@@ -96,16 +97,15 @@ TEST_F(EndPointTestCaseSimple, server_recv_hello_then_reply_helloack)
     assert_tcp_cli_sended(peerAddr, pkt);
 }
 
-// TEST_F(EndPointTestCaseSimple, cli_send_hello_then_recv_helloack)
-// {
-//     auto peerAddr = NetAddr("0.0.0.2:2000");
-//     env({"192.168.233.1:8080"});
+TEST_F(EndPointTestCaseSimple, trigger_send_hello_with_udp)
+{
+    env({"192.168.233.1:8080"});
+    auto peerAddr = NetAddr("0.0.0.1:18080");
 
-//     LanSyncPkt pkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_HELLO);
-//     uint16_t port = 18080;
-//     pkt.setPayload(&port, sizeof(uint16_t));
-//     udp_cli_conn(peerAddr);
+    teg_->tick(2000);
 
-//     pkt = LanSyncPkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_HELLO_ACK);
-//     assert_udp_cli_sended(peerAddr, pkt);
-// }
+    LanSyncPkt pkt{lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_HELLO};
+    uint16_t port = 8080;
+    pkt.setPayload(&port, sizeof(uint16_t));
+    assert_udp_cli_sended(peerAddr, pkt);
+}

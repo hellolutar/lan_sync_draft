@@ -9,9 +9,13 @@
 
 class Endpoint
 {
+private:
+    void registerTrg();
+
 protected:
     std::shared_ptr<NetworkAdapter> na_;
     std::shared_ptr<LogicCore> core_;
+    std::shared_ptr<UdpCliTrigger> trg_;
 
 public:
     Endpoint()

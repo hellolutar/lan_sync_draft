@@ -10,6 +10,7 @@ class TimerFrameworkEngine
 {
 protected:
     std::set<std::shared_ptr<Trigger>> trgs_;
+    uint16_t incr_ = 0;
 
 public:
     TimerFrameworkEngine(/* args */) {}
@@ -22,6 +23,9 @@ public:
 
 class TimerFramework : public Timer
 {
+protected:
+    static std::shared_ptr<TimerFrameworkEngine> engine_;
+    
 public:
     virtual ~TimerFramework() {};
 

@@ -3,6 +3,7 @@
 
 #include <map>
 #include <ctime>
+#include <cstdint>
 
 #include <sys/time.h>
 
@@ -32,12 +33,17 @@ protected:
 
     bool persist;
 
+    std::uint16_t id_;
+
 public:
     Trigger(struct timeval period, bool persist) : period(period), persist(persist){};
     virtual ~Trigger();
 
     virtual struct timeval &getPeriod();
     virtual bool &getPersist();
+
+    virtual void setId(std::uint16_t id);
+    virtual std::uint16_t getId() const;
 
     static timeval second(size_t s);
 };

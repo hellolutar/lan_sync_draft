@@ -5,6 +5,13 @@
 #include <iostream>
 #include <stdexcept>
 
+// template<typename T>
+// auto operator<<(std::ostream &os, const T &t) -> decltype(t.str(os), os)
+// {
+//     os << t.str();
+//     return os;
+// }
+
 class NotFoundException : public std::exception
 {
 protected:
@@ -15,16 +22,17 @@ protected:
     template <typename T, typename... Args>
     void print(T first, Args... rest)
     {
-        std::cerr << first;
-        print(rest...);
+        std::cout << first;
+        // print(rest...); todo
     }
 
 public:
     template <typename... Args>
     NotFoundException(Args... rest)
     {
+        std::cout << "NotFoundException:";
         print(rest...);
-        std::cerr << std::endl;
+        std::cout << std::endl;
     }
     ~NotFoundException() {}
 };
