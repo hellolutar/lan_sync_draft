@@ -38,7 +38,7 @@ public:
 
     void write(uint8_t *data, uint64_t size) override;
     std::shared_ptr<buf_data> front();
-    void pop(uint16_t size);
+    void pop(uint16_t size = 1);
     void clear();
 };
 

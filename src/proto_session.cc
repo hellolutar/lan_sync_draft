@@ -79,9 +79,9 @@ void ProtoSession::call(const NetAddr &from)
     state_ = SessionState::CONNECTING;
     tcli_ = eg->connectWithTcp(peer);
     tcli_->bind(core_logic_);
-    state_ = SessionState::ESTABLISED;
 
     reply_hello_ack();
+    state_ = SessionState::ESTABLISED;
 }
 
 void ProtoSession::handleDisconnect(LanSyncPkt &pkt, const NetAddr &from)

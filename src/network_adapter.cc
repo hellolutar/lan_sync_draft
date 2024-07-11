@@ -2,8 +2,8 @@
 
 std::vector<NetAddr> NetworkAdapter::query_local_ports()
 {
-    auto addr = NetAddr("192.168.233.1:8080");
-    auto addr2 = NetAddr("10.0.0.1:8080");
+    auto addr = NetAddr("0.0.0.10:8080");
+    auto addr2 = NetAddr("0.0.0.20:8080");
     return {addr, addr2};
 }
 

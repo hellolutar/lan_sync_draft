@@ -13,13 +13,18 @@ void ProtoServerRecv::recv(const NetAddr &from, uint8_t *data, uint64_t size)
 
     auto s = std::make_shared<ProtoSession>(core_logic_);
     if (from.type() == TransportType::UDP)
+    {
         s->call(from);
+        sess_->push_back(s);
+    }
     else if (from.type() == TransportType::TCP)
+    {
         s->bind(from);
+        sess_->push_back(s);
+        s->recv(from, data, size);
+    }
     else
         throw "the type is unknow";
-    s->recv(from, data, size);
-    sess_->push_back(s);
 }
 
 const ProtoSession &ProtoServer::findSession(const NetAddr &peer)

@@ -38,7 +38,7 @@ std::shared_ptr<buf_data> OutputStreamForTest::front()
     return bufs_.front();
 }
 
-void OutputStreamForTest::pop(uint16_t size)
+void OutputStreamForTest::pop(uint16_t size )
 {
     for (size_t i = 0; i < size; i++)
         bufs_.pop();
@@ -114,7 +114,7 @@ std::shared_ptr<TcpCli> NetFrameworkEngineForTest::findTcpCli(const NetAddr &add
 std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryTcpSerNetAbility(const NetAddr &addr)
 {
     auto iter = tcpsrv_.find(addr);
-    if ( iter != tcpsrv_.end())
+    if (iter != tcpsrv_.end())
         return iter->second;
 
     throw NotFoundException("NetFrameworkEngineForTest::queryTcpSerNetAbility(): ", addr);
