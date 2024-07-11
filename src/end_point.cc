@@ -4,8 +4,8 @@ using namespace std;
 
 void Endpoint::run()
 {
-    na_->start();
-    auto eg = TimerFramework::getEngine();
+    na_->start(core_);
+    // auto eg = TimerFramework::getEngine();
 
     // auto road_id = na_->setUpSessionWithPeer(NetAddr("192.168.0.1:38080"));
     // NetworkContext ctx(na_,road_id);

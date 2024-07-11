@@ -47,6 +47,14 @@ std::shared_ptr<UdpCli> NetFrameworkEngineForTest::connectWithUdp(const NetAddr 
     return cli;
 }
 
+std::shared_ptr<TcpCli> NetFrameworkEngineForTest::findTcpCli(const NetAddr &addr)
+{
+    auto iter = tcpcli_.find(addr);
+    if (iter != tcpcli_.end())
+        return iter->second;
+    throw "not found";
+}
+
 std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryTcpSerNetAbility(const NetAddr &addr)
 {
     if (tcpsrv_.find(addr) != tcpsrv_.end())

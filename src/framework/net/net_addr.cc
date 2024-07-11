@@ -11,3 +11,8 @@ TransportType NetAddr::type() const
 {
     return type_;
 }
+
+void NetAddr::setType(TransportType t)
+{
+    type_ = t;
+}

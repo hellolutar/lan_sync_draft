@@ -16,3 +16,9 @@ void LogicCore::recv(const NetAddr &peer, uint8_t *data, uint64_t size)
 {
     // adapter_->write()
 }
+
+void LogicCore::setNetworkAdapter(std::shared_ptr<NetworkAdapter> ad)
+{
+    adapter_ = nullptr;
+    adapter_ = ad;
+}

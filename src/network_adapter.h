@@ -15,9 +15,11 @@ private:
 
 public:
     NetworkAdapter(){};
-    ~NetworkAdapter(){};
+    ~NetworkAdapter(){
+        srvs_.clear();
+    };
 
-    void start();
+    void start(std::shared_ptr<Logic> core);
 
     /**
      * @brief connect peer with udp

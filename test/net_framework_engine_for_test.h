@@ -72,12 +72,14 @@ public:
     std::shared_ptr<UdpServer> addUdpServer(const NetAddr &addr) override;
     std::shared_ptr<TcpCli> connectWithTcp(const NetAddr &addr) override;
     std::shared_ptr<UdpCli> connectWithUdp(const NetAddr &addr) override;
+    std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) override;
 
     std::shared_ptr<NetAbility> queryTcpSerNetAbility(const NetAddr &addr);
     std::shared_ptr<NetAbility> queryTcpCliNetAbility(const NetAddr &addr);
     std::shared_ptr<NetAbility> queryUdpSerNetAbility(const NetAddr &addr);
     std::shared_ptr<NetAbility> queryTdpCliNetAbility(const NetAddr &addr);
     std::shared_ptr<NetAbility> queryNetAbility(const NetAddr &addr);
+
 };
 
 #endif

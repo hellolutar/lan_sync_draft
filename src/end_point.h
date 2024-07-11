@@ -4,23 +4,25 @@
 #include "logic_core.h"
 #include "task/task_coordinator.h"
 #include "framework/timer/timer_trigger_framework.h"
+#include "framework/net/net_framework.h"
 #include "udp_cli_trigger.h"
 
 class Endpoint
 {
 protected:
     std::shared_ptr<NetworkAdapter> na_;
-    LogicCore core_;
+    std::shared_ptr<LogicCore> core_;
 
 public:
-    Endpoint() :na_(std::make_shared<NetworkAdapter>()), core_(na_)
+    Endpoint()
+        : na_(std::make_shared<NetworkAdapter>()), core_(std::make_shared<LogicCore>())
     {
+        core_->setNetworkAdapter(na_);
     };
-    
+
     virtual ~Endpoint() {}
 
     void run();
-
 };
 
 #endif

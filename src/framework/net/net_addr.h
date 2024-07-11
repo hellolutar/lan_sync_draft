@@ -67,6 +67,7 @@ public:
     }
 
     TransportType type() const;
+    void setType(TransportType);
 };
 
 #endif

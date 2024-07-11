@@ -20,16 +20,15 @@ const ProtoSession &NetworkAdapter::findSession(const NetAddr &peer)
         {
         }
     }
-    throw "ProtoSessionManager not found";
+    throw;
 }
 
-void NetworkAdapter::start()
+void NetworkAdapter::start(std::shared_ptr<Logic> core)
 {
     auto ports = query_local_ports();
     for (auto &&p : ports)
     {
-        throw "todo NetworkAdapter::start";
-        // srvs_.push_back(std::make_shared<ProtoServer>(p,nullptr));
+        srvs_.push_back(std::make_shared<ProtoServer>(p, core));
     }
 }
 

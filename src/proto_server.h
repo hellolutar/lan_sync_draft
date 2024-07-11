@@ -10,11 +10,14 @@
 class ProtoServerRecv : public Logic
 {
 protected:
-    std::shared_ptr<std::vector<ProtoSession>> sess_;
+    std::shared_ptr<std::vector<std::shared_ptr<ProtoSession>>> sess_;
     std::shared_ptr<Logic> core_logic_;
 
 public:
-    ProtoServerRecv(std::shared_ptr<Logic> logic) : core_logic_(logic) {}
+    ProtoServerRecv(std::shared_ptr<Logic> logic)
+        : core_logic_(logic) ,
+        sess_(std::make_shared<std::vector<std::shared_ptr<ProtoSession>>>())
+        {}
     ~ProtoServerRecv() {}
 
     /**
@@ -25,8 +28,6 @@ public:
     {
         return core_logic_->isExtraAllDataNow(data, data_len);
     }
-
-    std::shared_ptr<ProtoSession> find(const NetAddr &from) const;
 };
 
 class ProtoServer
@@ -58,6 +59,8 @@ public:
         udpser_ = nullptr;
         core_logic_ = nullptr;
         server_logic_ = nullptr;
+        sess_->clear();
+        sess_ = nullptr;
     }
 
     const ProtoSession &findSession(const NetAddr &peer);

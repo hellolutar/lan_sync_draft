@@ -23,7 +23,7 @@ public:
 
 class NetAbility
 {
-private:
+protected:
     std::shared_ptr<OutputStream> os_ = nullptr;
     std::shared_ptr<Logic> logic_ = nullptr;
 
@@ -59,12 +59,11 @@ public:
 
 class TcpCli : public ConnCli
 {
-private:
-    std::shared_ptr<Logic> logic_;
-
 public:
     TcpCli(NetAddr peer) : ConnCli(peer) {}
-    ~TcpCli() {}
+    ~TcpCli() {
+        logic_ = nullptr;
+    }
 };
 
 class UdpCli : public ConnCli

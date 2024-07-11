@@ -7,6 +7,7 @@
 #include "buf/buf_base_on_event.h"
 #include "framework/net/net_framework.h"
 #include "proto/lan_share_protocol.h"
+#include "exc/not_found_exc.h"
 
 enum class SessionState
 {
@@ -26,6 +27,8 @@ private:
     std::shared_ptr<Logic> core_logic_;
 
     void handleDisconnect(LanSyncPkt &pkt, const NetAddr &from);
+
+    void reply_hello_ack();
 
 public:
     ProtoSession(std::shared_ptr<Logic> logic)
