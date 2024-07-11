@@ -14,7 +14,9 @@ protected:
 
 public:
     TimerFrameworkEngine(/* args */) {}
-    ~TimerFrameworkEngine() {}
+    virtual ~TimerFrameworkEngine() {
+        trgs_.clear();
+    }
 
     virtual bool addTrg(std::shared_ptr<Trigger> tr);
     virtual bool delTrg(std::shared_ptr<Trigger> tr);

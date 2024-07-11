@@ -71,6 +71,9 @@
         "socket": "cpp",
         "timer": "cpp",
         "future": "cpp",
-        "ranges": "cpp"
+        "ranges": "cpp",
+        "filesystem": "cpp",
+        "codecvt": "cpp",
+        "iomanip": "cpp"
     }
 }

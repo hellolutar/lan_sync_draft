@@ -1,6 +1,6 @@
-1. setup_road_test.udp_cli_conn()
-2. coordinator.task.networkadapter 的赋值链
-3. 测试cli发送hello后接收hello_ack
+1. persist_engine
+    - store: 保存资源，保存在一个临时的地方，保存完成后再放置到指定位置
+2. 
 
 
 bug
