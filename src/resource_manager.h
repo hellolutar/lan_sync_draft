@@ -37,7 +37,7 @@ private:
     std::string rsHome;
     std::map<std::string, Resource> table_;
 
-    std::vector<Resource> recur_walk(filesystem::path p);
+    std::vector<Resource> recur_walk(std::filesystem::path p);
 
 public:
     ResourceManager(/* args */) {}
@@ -55,6 +55,22 @@ public:
     std::string mapping(std::string uri);
 
     bool saveLocal(std::string uri, void *data, uint64_t offset, uint64_t data_len);
+};
+
+struct ResourceSerializerDto
+{
+    uint8_t *data;
+    uint64_t size;
+};
+
+class ResourceSerializer
+{
+public:
+    ResourceSerializer(/* args */) = delete;
+    ~ResourceSerializer() = delete;
+
+    static ResourceSerializerDto serialize(std::vector<Resource> table);
+    static std::vector<Resource> parse(uint8_t *data, uint64_t size);
 };
 
 #endif

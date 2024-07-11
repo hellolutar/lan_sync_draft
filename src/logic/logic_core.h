@@ -2,11 +2,20 @@
 #define __LOGIC_CORE_H_
 
 #include "network_adapter.h"
+#include "resource_manager.h"
 
 class LogicCore : public Logic
 {
 private:
     std::shared_ptr<NetworkAdapter> adapter_;
+    ResourceManager rm_;
+    
+
+    void reqIdx(const NetAddr &peer, const LanSyncPkt &pkt);
+    void reqRs(const NetAddr &peer, const LanSyncPkt &pkt);
+    void recvIdx(const NetAddr &peer, const LanSyncPkt &pkt);
+    void recvRs(const NetAddr &peer, const LanSyncPkt &pkt);
+    void shutdown(const NetAddr &peer, const LanSyncPkt &pkt);
 
 public:
     LogicCore(){};
