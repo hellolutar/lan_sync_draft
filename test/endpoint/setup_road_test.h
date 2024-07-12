@@ -36,6 +36,11 @@ protected:
     NetAddr my_tcp_cli_addr_{"0.0.0.10:18080", TransportType::TCP};
     NetAddr my_tcp_srv_addr_{"0.0.0.10:8080", TransportType::TCP};
 
+    NetAddr peer_udp_cli_addr{"0.0.0.1:18080", TransportType::UDP};
+    NetAddr peer_udp_srv_addr{"0.0.0.1:8080", TransportType::UDP};
+    NetAddr peer_tcp_cli_addr{"0.0.0.1:18080", TransportType::TCP};
+    NetAddr peer_tcp_srv_addr{"0.0.0.1:8080", TransportType::TCP};
+
     void SetUp() override
     {
         printf("SetUp \n");
@@ -57,7 +62,7 @@ protected:
         printf("TearDown \n");
     }
 
-    void recv(std::shared_ptr<NetAbility> net, NetAddr &peer, LanSyncPkt &pkt)
+    void recv(std::shared_ptr<NetAbility> net, const NetAddr &peer, LanSyncPkt &pkt)
     {
         BufBaseonEvent buf;
         pkt.writeTo(buf);
@@ -98,16 +103,24 @@ public:
     void assert_my_tcp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
     {
         auto cli = neg_->queryTcpCliNetAbility(peer);
-        auto rcvPkt = popPktFromOs(cli);
-        ASSERT_EQ(pkt, rcvPkt);
+        auto sentPkt = popPktFromOs(cli);
+        ASSERT_EQ(pkt, sentPkt);
     }
 
     void assert_my_udp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
     {
         auto cli = neg_->queryUdpCliNetAbility(peer);
-        auto rcvPkt = popPktFromOs(cli);
-        ASSERT_EQ(pkt, rcvPkt);
+        auto sentPkt = popPktFromOs(cli);
+        ASSERT_EQ(pkt, sentPkt);
     }
+
+    void assert_my_tcp_srv_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
+    {
+        auto srv = neg_->queryTcpSerNetAbility(my_tcp_srv_addr_);
+        auto sentPkt = popPktFromOs(srv);
+        ASSERT_EQ(pkt, sentPkt);
+    }
+
 };
 
 #endif

@@ -37,11 +37,6 @@ LanSyncPkt pkt_reply_idx(vector<Resource> tb)
  */
 TEST_F(EndPointTestCaseSimple, server_recv_hello_then_reply_helloack)
 {
-    auto peer_udp_cli_addr = NetAddr("0.0.0.1:18080", TransportType::UDP);
-    auto peer_udp_srv_addr = NetAddr("0.0.0.1:8080", TransportType::UDP);
-    auto peer_tcp_cli_addr = NetAddr("0.0.0.1:18080", TransportType::TCP);
-    auto peer_tcp_srv_addr = NetAddr("0.0.0.1:8080", TransportType::TCP);
-
     uint16_t port = 8080;
     my_udp_srv_receive_from(peer_udp_cli_addr, pkt_hello(&port, sizeof(uint16_t)));
     assert_my_tcp_cli_sended_to(peer_tcp_srv_addr, pkt_hello_ack());
@@ -52,11 +47,6 @@ TEST_F(EndPointTestCaseSimple, server_recv_hello_then_reply_helloack)
  */
 TEST_F(EndPointTestCaseSimple, trigger_send_hello_with_udp)
 {
-    auto peer_udp_cli_addr = NetAddr("0.0.0.1:18080", TransportType::UDP);
-    auto peer_udp_srv_addr = NetAddr("0.0.0.1:8080", TransportType::UDP);
-    auto peer_tcp_cli_addr = NetAddr("0.0.0.1:18080", TransportType::TCP);
-    auto peer_tcp_srv_addr = NetAddr("0.0.0.1:8080", TransportType::TCP);
-
     teg_->tick(2000);
 
     uint16_t port = 8080;
@@ -67,15 +57,10 @@ TEST_F(EndPointTestCaseSimple, trigger_send_hello_with_udp)
  * 1. me.udp_server <- hello     <-  peer.udp_cli
  * 2. me.tcp_cli    -> hello_ack ->  peer.tcp_server
  * 3. me.tcp_cli    <- req_idx   <-  peer.tcp_server
- * 4. me.tcp_cli    -> rs_table  ->  peer.tcp_server
+ * 4. me.tcp_cli    -> rply_idx  ->  peer.tcp_server
  */
-TEST_F(EndPointTestCaseSimple, communication_for_req_and_reply_idx_base_server)
+TEST_F(EndPointTestCaseSimple, communication_for_req__replyIdx_base_server)
 {
-    auto peer_udp_cli_addr = NetAddr("0.0.0.1:18080", TransportType::UDP);
-    auto peer_udp_srv_addr = NetAddr("0.0.0.1:8080", TransportType::UDP);
-    auto peer_tcp_cli_addr = NetAddr("0.0.0.1:18080", TransportType::TCP);
-    auto peer_tcp_srv_addr = NetAddr("0.0.0.1:8080", TransportType::TCP);
-
     uint16_t port = 8080;
     my_udp_srv_receive_from(peer_udp_cli_addr, pkt_hello(&port, sizeof(uint16_t)));
     assert_my_tcp_cli_sended_to(peer_tcp_srv_addr, pkt_hello_ack());
@@ -88,4 +73,28 @@ TEST_F(EndPointTestCaseSimple, communication_for_req_and_reply_idx_base_server)
     my_tcp_cli_receive_from(peer_tcp_srv_addr, pkt_req_idx());
 
     assert_my_tcp_cli_sended_to(peer_tcp_srv_addr, pkt_reply_idx(tb));
+}
+
+/**
+ * 1. me.udp_cli       -> hello     -> peer.udp_server
+ * 2. me.tcp_server    <- hello_ack <-  peer.tcp_cli
+ * 3. me.tcp_server    -> req_idx   ->  peer.tcp_cli
+ * 4. me.tcp_server    <- rply_idx  <-  peer.tcp_cli
+ */
+TEST_F(EndPointTestCaseSimple, communication_for_req__replyIdx__reqRs)
+{
+    teg_->tick(2000);
+
+    uint16_t port = 8080;
+    assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(&port, sizeof(uint16_t)));
+    my_tcp_srv_receive_from(peer_tcp_cli_addr, pkt_hello_ack());
+    assert_my_tcp_srv_sended_to(peer_tcp_srv_addr, pkt_req_idx());
+
+    vector<Resource> tb = {{"java", "java", "java.lang.string", "path", 18}, {"C++", "C++", "since 1985", "path", 1985}};
+    rm_->setIdx(tb);
+    rm_->setNeedToSync(tb);
+
+    // 对端请求索引
+    // my_tcp_srv_receive_from(peer_tcp_cli_addr, pkt_reply_idx(tb));
+    // todo
 }
