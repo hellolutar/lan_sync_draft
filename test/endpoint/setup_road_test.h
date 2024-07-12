@@ -116,8 +116,9 @@ public:
 
     void assert_my_tcp_srv_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
     {
-        auto srv = neg_->queryTcpSerNetAbility(my_tcp_srv_addr_);
-        auto sentPkt = popPktFromOs(srv);
+        // 根据peer查找session，然后session.write，故tcp_srv的send的内容，存放在peer的session的outputstream中
+        auto cli = neg_->queryTcpCliNetAbility(peer);
+        auto sentPkt = popPktFromOs(cli);
         ASSERT_EQ(pkt, sentPkt);
     }
 

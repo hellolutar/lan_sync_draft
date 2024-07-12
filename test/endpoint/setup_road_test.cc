@@ -31,6 +31,18 @@ LanSyncPkt pkt_reply_idx(vector<Resource> tb)
     return pkt;
 }
 
+LanSyncPkt pkt_req_rs(vector<Resource> tb)
+{
+    LanSyncPkt pkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_GET_RESOURCE);
+    if (tb.size() > 0)
+    {
+        auto dto = ResourceSerializer::serialize(tb);
+        pkt.setPayload(dto.data.get(), dto.size);
+    }
+
+    return pkt;
+}
+
 /**
  * 1. me.udp_server <- hello
  * 2. me.tcp_cli -> hello_ack
@@ -87,14 +99,16 @@ TEST_F(EndPointTestCaseSimple, communication_for_req__replyIdx__reqRs)
 
     uint16_t port = 8080;
     assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(&port, sizeof(uint16_t)));
+
+    neg_->connectWithTcp(peer_tcp_cli_addr); // register peer tcpcli to netframework, that we can found it in follow code.
+
     my_tcp_srv_receive_from(peer_tcp_cli_addr, pkt_hello_ack());
-    assert_my_tcp_srv_sended_to(peer_tcp_srv_addr, pkt_req_idx());
+    assert_my_tcp_srv_sended_to(peer_tcp_cli_addr, pkt_req_idx());
 
     vector<Resource> tb = {{"java", "java", "java.lang.string", "path", 18}, {"C++", "C++", "since 1985", "path", 1985}};
     rm_->setIdx(tb);
     rm_->setNeedToSync(tb);
 
-    // 对端请求索引
-    // my_tcp_srv_receive_from(peer_tcp_cli_addr, pkt_reply_idx(tb));
-    // todo
+    my_tcp_srv_receive_from(peer_tcp_cli_addr, pkt_reply_idx(tb));
+    assert_my_tcp_srv_sended_to(peer_tcp_cli_addr, pkt_req_rs({}));
 }

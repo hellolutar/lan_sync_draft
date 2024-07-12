@@ -132,7 +132,7 @@ string LanSyncPkt::queryXheader(string key)
     return xheader[key];
 }
 
-const map<string, string> LanSyncPkt::getXheaders()
+const map<string, string> LanSyncPkt::getXheaders() const
 {
     return xheader;
 }
@@ -187,24 +187,24 @@ void LanSyncPkt::setPayload(void *data_arg, uint64_t datalen)
     total_len += datalen;
 }
 
-uint16_t LanSyncPkt::getHeaderLen()
+uint16_t LanSyncPkt::getHeaderLen() const
 {
     return header_len;
 }
-uint32_t LanSyncPkt::getTotalLen()
+uint32_t LanSyncPkt::getTotalLen() const
 {
     return total_len;
 }
-uint32_t LanSyncPkt::getPayloadSize()
+uint32_t LanSyncPkt::getPayloadSize() const
 {
     return total_len - header_len;
 }
 
-enum lan_sync_version LanSyncPkt::getVersion()
+enum lan_sync_version LanSyncPkt::getVersion() const
 {
     return version;
 }
-enum lan_sync_type_enum LanSyncPkt::getType()
+enum lan_sync_type_enum LanSyncPkt::getType() const
 {
     return type;
 }

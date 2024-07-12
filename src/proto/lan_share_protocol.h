@@ -104,12 +104,12 @@ public:
 
     void setPayload(void *data, uint64_t datalen);
 
-    uint16_t getHeaderLen();
-    uint32_t getTotalLen();
-    uint32_t getPayloadSize();
-    enum lan_sync_version getVersion();
-    enum lan_sync_type_enum getType();
-    const std::map<std::string, std::string> getXheaders();
+    uint16_t getHeaderLen() const;
+    uint32_t getTotalLen() const;
+    uint32_t getPayloadSize() const;
+    enum lan_sync_version getVersion() const;
+    enum lan_sync_type_enum getType() const;
+    const std::map<std::string, std::string> getXheaders() const;
 
     bool operator==(const LanSyncPkt &p) const;
 };

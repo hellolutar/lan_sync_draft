@@ -10,6 +10,7 @@ private:
     std::shared_ptr<NetworkAdapter> adapter_;
     std::shared_ptr<ResourceManager> rm_;
 
+    void helloAck(const NetAddr &peer, const LanSyncPkt &pkt);
     void reqIdx(const NetAddr &peer, const LanSyncPkt &pkt);
     void reqRs(const NetAddr &peer, const LanSyncPkt &pkt);
     void recvIdx(const NetAddr &peer, const LanSyncPkt &pkt);

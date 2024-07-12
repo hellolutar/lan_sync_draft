@@ -68,7 +68,7 @@ public:
 
     bool validRes(std::string uri, std::string hash) const override;
 
-    std::vector<struct Resource> need_to_sync(std::vector<struct Resource> peer_table) const override;
+    std::vector<Resource> need_to_sync(std::vector<Resource> peer_table) const override;
 
     bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) override;
 };

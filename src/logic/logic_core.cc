@@ -1,5 +1,18 @@
 #include "logic_core.h"
 
+void LogicCore::helloAck(const NetAddr &peer, const LanSyncPkt &pkt)
+{
+    auto idx = rm_->idx();
+    auto dto = ResourceSerializer::serialize(idx);
+    LanSyncPkt p = {lan_sync_version::VER_0_1, LAN_SYNC_TYPE_GET_TABLE_INDEX};
+
+    BufBaseonEvent buf;
+    p.writeTo(buf);
+    adapter_->write(peer, buf.data().get(), buf.size());
+    // todo 这里存在虚假指针问题，因为outputstream是放入缓冲区，放完以后，执行到此，执行到
+    // 括号外，buf被释放，会导致buf.data被释放。
+}
+
 void LogicCore::reqIdx(const NetAddr &peer, const LanSyncPkt &pkt)
 {
     auto idx = rm_->idx();
@@ -10,18 +23,31 @@ void LogicCore::reqIdx(const NetAddr &peer, const LanSyncPkt &pkt)
 
     BufBaseonEvent buf;
     p.writeTo(buf);
-    adapter_->write(peer, buf.data().get(), buf.size()); 
+    adapter_->write(peer, buf.data().get(), buf.size());
     // todo 这里存在虚假指针问题，因为outputstream是放入缓冲区，放完以后，执行到此，执行到
     // 括号外，buf被释放，会导致buf.data被释放。
 }
 
 void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt)
 {
-    
 }
 
 void LogicCore::recvIdx(const NetAddr &peer, const LanSyncPkt &pkt)
 {
+    // todo
+    std::vector<Resource> tb = ResourceSerializer::deserialize(reinterpret_cast<uint8_t *>(pkt.getPayload()), pkt.getPayloadSize());
+    auto need_to_sync_rs = rm_->need_to_sync(tb);
+
+    // auto dto = ResourceSerializer::serialize(need_to_sync_rs);
+    LanSyncPkt p = {lan_sync_version::VER_0_1, LAN_SYNC_TYPE_GET_RESOURCE};
+
+    // todo syn rs by content-range
+
+    BufBaseonEvent buf;
+    p.writeTo(buf);
+    adapter_->write(peer, buf.data().get(), buf.size());
+    // todo 这里存在虚假指针问题，因为outputstream是放入缓冲区，放完以后，执行到此，执行到
+    // 括号外，buf被释放，会导致buf.data被释放。
 }
 
 void LogicCore::recvRs(const NetAddr &peer, const LanSyncPkt &pkt)
@@ -49,6 +75,9 @@ void LogicCore::recv(const NetAddr &peer, uint8_t *data, uint64_t size)
     LanSyncPkt pkt(data);
     switch (pkt.getType())
     {
+    case lan_sync_type_enum::LAN_SYNC_TYPE_HELLO_ACK:
+        helloAck(peer, pkt);
+        break;
     case lan_sync_type_enum::LAN_SYNC_TYPE_GET_TABLE_INDEX:
         reqIdx(peer, pkt);
         break;

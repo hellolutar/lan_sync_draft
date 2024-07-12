@@ -105,7 +105,7 @@ bool ResourceManagerBaseFilesystem::validRes(string uri, string hash) const
         return false;
 }
 
-std::vector<struct Resource> ResourceManagerBaseFilesystem::need_to_sync(std::vector<Resource> peer_table) const
+std::vector<Resource> ResourceManagerBaseFilesystem::need_to_sync(std::vector<Resource> peer_table) const
 {
     map<string, Resource> filtered;
 
@@ -124,7 +124,7 @@ std::vector<struct Resource> ResourceManagerBaseFilesystem::need_to_sync(std::ve
     for (size_t i = 0; i < local_table.size(); i++)
     {
         Resource local_rs = local_table[i];
-        struct Resource rs = filtered[local_rs.getName()];
+        Resource rs = filtered[local_rs.getName()];
         if (rs.getName().size() == 0 || rs.getSize() < local_rs.getSize())
         {
             // I have the resource or my resource should sync to peer.
@@ -142,7 +142,7 @@ std::vector<struct Resource> ResourceManagerBaseFilesystem::need_to_sync(std::ve
         // LOG_DEBUG("ResourceManagerBaseFilesystem::cmpThenRetNeedToSyncTable() : uri[{}] need to add to synctable, reason:{}", rs.uri, "size: peer[{}] > local[{}]", rs.getSize(), local_rs.getSize());
     }
 
-    vector<struct Resource> want_to_sync;
+    vector<Resource> want_to_sync;
     for (auto iter = filtered.begin(); iter != filtered.end(); iter++)
         want_to_sync.push_back(iter->second);
 
