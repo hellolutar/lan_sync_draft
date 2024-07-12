@@ -28,6 +28,15 @@ const std::uint64_t Resource::getSize() const
     return size_;
 }
 
+bool Resource::operator==(const Resource &r) const
+{
+    return name_ == r.name_ &&
+           uri_ == r.uri_ &&
+           path_ == r.path_ &&
+           hash_ == r.hash_ &&
+           size_ == r.size_;
+}
+
 const Resource ResourceManager::queryByUri(string uri)
 {
     if (table_.size() == 0)
@@ -167,14 +176,29 @@ bool ResourceManager::saveLocal(string uri, void *data, uint64_t offset, uint64_
 /**
  * 2bit位 ： 00 为uint8_t，01为uint16_t, 10 uint32_t
  */
-uint8_t len(std::string str)
+uint8_t set_flag_and_accum_hdsize(std::string str, BufBaseonEvent &buf, uint16_t &hd_size)
 {
-    if (str.size() <= sizeof(uint8_t))
+    if (str.size() <= 255)
+    {
+        hd_size += sizeof(uint8_t);
+        uint8_t tmp_size = str.size();
+        buf.add(&tmp_size, sizeof(uint8_t));
         return 0;
-    else if (str.size() <= sizeof(uint16_t))
+    }
+    else if (str.size() <= 65535)
+    {
+        hd_size += sizeof(uint16_t);
+        uint16_t tmp_size = str.size();
+        buf.add(reinterpret_cast<uint8_t *>(&tmp_size), sizeof(uint16_t));
         return 1;
+    }
     else
+    {
+        hd_size += sizeof(uint32_t);
+        uint32_t tmp_size = str.size();
+        buf.add(reinterpret_cast<uint8_t *>(&tmp_size), sizeof(uint32_t));
         return 2;
+    }
 }
 
 ResourceSerializerDto ResourceSerializer::serialize(std::vector<Resource> table)
@@ -182,46 +206,130 @@ ResourceSerializerDto ResourceSerializer::serialize(std::vector<Resource> table)
     BufBaseonEvent buf;
     for (auto &&r : table)
     {
+        uint16_t hd_size = sizeof(uint8_t);
         uint8_t flag = 0;
-        flag |= len(r.getName());
+
+        BufBaseonEvent tmp_buf;
+        flag |= set_flag_and_accum_hdsize(r.getName(), tmp_buf, hd_size);
+
         flag <<= 2;
-        flag |= len(r.getUri());
+        flag |= set_flag_and_accum_hdsize(r.getUri(), tmp_buf, hd_size);
+
         flag <<= 2;
-        flag |= len(r.getPath());
+        flag |= set_flag_and_accum_hdsize(r.getPath(), tmp_buf, hd_size);
+
         flag <<= 2;
-        flag |= len(r.getHash());
-        flag <<= 2;
+        flag |= set_flag_and_accum_hdsize(r.getHash(), tmp_buf, hd_size);
 
-        uint64_t r_size = r.getName().size() + r.getUri().size() + r.getPath().size() + r.getHash().size() + sizeof(uint64_t);
-        uint64_t alloc_size = r_size + sizeof(uint8_t);
-        uint8_t *data = new uint8_t(alloc_size);
-        uint8_t *datap = data;
-        
-        memcpy(datap, &flag, sizeof(uint8_t));
-        datap++;
+        buf.add(&flag, sizeof(uint8_t));
 
-        memcpy(datap, r.getName().data(), r.getName().size());
-        datap += r.getName().size();
-
-        memcpy(datap, r.getUri().data(), r.getUri().size());
-        datap += r.getUri().size();
-
-        memcpy(datap, r.getPath().data(), r.getPath().size());
-        datap += r.getPath().size();
-
-        memcpy(datap, r.getHash().data(), r.getHash().size());
-        datap += r.getHash().size();
-
+        uint8_t *size_array = tmp_buf.data().get();
+        buf.add(size_array, tmp_buf.size());
         uint64_t tmp_r_szie = r.getSize();
-        memcpy(datap, &tmp_r_szie, sizeof(uint64_t));
+        buf.add(reinterpret_cast<uint8_t *>(&tmp_r_szie), sizeof(uint64_t));
 
-        buf.add(data, alloc_size);
-        delete[] data;
+        buf.add(reinterpret_cast<uint8_t *>(const_cast<char *>(r.getName().data())), r.getName().size());
+        buf.add(reinterpret_cast<uint8_t *>(const_cast<char *>(r.getUri().data())), r.getUri().size());
+        buf.add(reinterpret_cast<uint8_t *>(const_cast<char *>(r.getPath().data())), r.getPath().size());
+        buf.add(reinterpret_cast<uint8_t *>(const_cast<char *>(r.getHash().data())), r.getHash().size());
     }
-    return {reinterpret_cast<uint8_t *>(buf.data()), buf.size()};
+    return {buf.data(), buf.size()};
 }
 
-std::vector<Resource> ResourceSerializer::parse(uint8_t *data, uint64_t size)
+uint64_t readSize(uint8_t flag, uint8_t *data, uint8_t &step)
 {
-    return std::vector<Resource>();
+    if (flag == 0)
+    {
+        uint8_t size = *data;
+        step = 1;
+        return size;
+    }
+    else if (flag == 1)
+    {
+        uint16_t size = *(reinterpret_cast<uint16_t *>(data));
+        step = 2;
+        return size;
+    }
+    else
+    {
+        uint32_t size = *(reinterpret_cast<uint32_t *>(data));
+        step = 4;
+        return size;
+    }
+}
+
+std::string readString(uint8_t *data, uint64_t size)
+{
+    string s(reinterpret_cast<char *>(data), size);
+    return s;
+}
+
+std::vector<Resource> ResourceSerializer::deserialize(uint8_t *data, uint64_t size)
+{
+    vector<Resource> rs;
+    uint8_t *datap = data;
+    uint64_t pos = 0;
+    const uint32_t loop_times_limit = 4294967295;
+    uint32_t loop_time = 0;
+    while (pos < size && loop_time < loop_times_limit)
+    {
+        loop_time++;
+
+        // 读取flag
+        uint8_t flag = *datap;
+        // 读取size
+        uint8_t name_flag = (flag & 0b11000000) >> 6;
+        uint8_t uri_flag = (flag & 0b00110000) >> 4;
+        uint8_t path_flag = (flag & 0b00001100) >> 2;
+        uint8_t hash_flag = flag & 0b00000011;
+        // 读取内容
+        datap++;
+        pos += sizeof(uint8_t);
+
+        // step 为 name_size 的类型的占用的存储空间的大小
+        uint8_t step = 0;
+        auto name_size = readSize(name_flag, datap, step);
+        pos += step;
+
+        datap += step;
+        auto uri_size = readSize(uri_flag, datap, step);
+        pos += step;
+
+        datap += step;
+        auto path_size = readSize(path_flag, datap, step);
+        pos += step;
+
+        datap += step;
+        auto hash_size = readSize(hash_flag, datap, step);
+        pos += step;
+
+        datap += step;
+        uint64_t rs_size = *(reinterpret_cast<uint64_t *>(datap));
+        // Resource.size 固定为uint64_t, 故不分配空间记录它的大小，故pos不需要累加step
+
+        datap += 8;
+
+        // 读取string
+        auto name = string(reinterpret_cast<char *>(datap), name_size);
+        datap += name_size;
+        pos += name_size;
+
+        auto uri = string(reinterpret_cast<char *>(datap), uri_size);
+        datap += uri_size;
+        pos += uri_size;
+
+        auto path = string(reinterpret_cast<char *>(datap), path_size);
+        datap += path_size;
+        pos += path_size;
+
+        auto hash = string(reinterpret_cast<char *>(datap), hash_size);
+        datap += hash_size;
+        pos += hash_size;
+
+        pos += 8; // 8 为Resource.size的类型的存储空间大小，因为是类型是uint64_t，故+8
+
+        rs.push_back({name, uri, path, hash, rs_size});
+    }
+
+    return rs;
 }

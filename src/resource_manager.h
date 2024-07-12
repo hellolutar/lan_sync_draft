@@ -29,6 +29,8 @@ public:
     const std::string &getPath() const;
     const std::string &getHash() const;
     const std::uint64_t getSize() const;
+
+    bool operator==(const Resource& r) const;
 };
 
 class ResourceManager
@@ -59,7 +61,7 @@ public:
 
 struct ResourceSerializerDto
 {
-    uint8_t *data;
+    std::shared_ptr<uint8_t[]> data;
     uint64_t size;
 };
 
@@ -70,7 +72,7 @@ public:
     ~ResourceSerializer() = delete;
 
     static ResourceSerializerDto serialize(std::vector<Resource> table);
-    static std::vector<Resource> parse(uint8_t *data, uint64_t size);
+    static std::vector<Resource> deserialize(uint8_t *data, uint64_t size);
 };
 
 #endif

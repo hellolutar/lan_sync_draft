@@ -108,5 +108,5 @@ void ProtoSession::reply_hello_ack()
     LanSyncPkt replyPkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_HELLO_ACK);
     BufBaseonEvent buf;
     replyPkt.writeTo(buf);
-    tcli_->write(reinterpret_cast<uint8_t *>(buf.data()), buf.size());
+    tcli_->write(buf.data().get(), buf.size());
 }

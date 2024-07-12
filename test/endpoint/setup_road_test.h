@@ -57,7 +57,7 @@ protected:
     {
         BufBaseonEvent buf;
         pkt.writeTo(buf);
-        net->recv(peer, reinterpret_cast<uint8_t *>(buf.data()), buf.size());
+        net->recv(peer, buf.data().get(), buf.size());
     }
 
     LanSyncPkt popPktFromOs(std::shared_ptr<NetAbility> net)

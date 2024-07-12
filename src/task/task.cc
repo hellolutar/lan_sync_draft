@@ -34,7 +34,7 @@ void Task::req()
     BufBaseonEvent buf;
     pkt.writeTo(buf);
 
-    ctx_.write(reinterpret_cast<uint8_t *>(buf.data()), buf.size());
+    ctx_.write(buf.data().get(), buf.size());
 }
 
 void Task::tick(uint64_t t)

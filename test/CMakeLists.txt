@@ -36,3 +36,7 @@ ttest(net_framework_engine_test
 ttest(setup_road_test
   ${PROJECT_SOURCE_DIR}/test/endpoint/setup_road_test.cc
 )
+
+ttest(resource_manager_test
+  ${PROJECT_SOURCE_DIR}/test/uint-test/resource_manager_test.cc
+)
