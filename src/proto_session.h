@@ -51,8 +51,8 @@ public:
     void write(uint8_t *data, uint64_t size);
     void write(uint8_t *data, uint64_t size) const;
 
-    void bind(const NetAddr &peer);
-    void call(const NetAddr &peer);
+    void bind(const NetAddr &peer, const LanSyncPkt & pkt);
+    void call(const NetAddr &peer, const LanSyncPkt & pkt);
 };
 
 #endif

@@ -37,28 +37,28 @@ bool Resource::operator==(const Resource &r) const
            size_ == r.size_;
 }
 
-const Resource ResourceManager::queryByUri(string uri)
+const Resource &ResourceManagerBaseFilesystem::query(string uri) const
 {
     if (table_.size() == 0)
-        idx();
+        const_cast<ResourceManagerBaseFilesystem &>(*this).idx();
 
     auto iter = table_.find(uri);
     if (iter == table_.end())
-        throw NotFoundException("ResourceManager::queryByUri()! uri:", uri);
+        throw NotFoundException("ResourceManagerBaseFilesystem::query()! uri:", uri);
 
     return iter->second;
 }
 
-vector<Resource> ResourceManager::idx()
+vector<Resource> ResourceManagerBaseFilesystem::idx()
 {
     // filesystem::path p(rsHome);
     auto rss = recur_walk({rsHome});
     for (auto &&r : rss)
         table_[r.getUri()] = r;
-    return rss;
+    return std::move(rss);
 }
 
-vector<Resource> ResourceManager::recur_walk(filesystem::path p)
+vector<Resource> ResourceManagerBaseFilesystem::recur_walk(filesystem::path p)
 {
 
     if (filesystem::is_regular_file(p))
@@ -93,9 +93,9 @@ vector<Resource> ResourceManager::recur_walk(filesystem::path p)
     return {};
 }
 
-bool ResourceManager::validRes(string uri, string hash)
+bool ResourceManagerBaseFilesystem::validRes(string uri, string hash) const
 {
-    const Resource rs = queryByUri(uri);
+    const Resource rs = query(uri);
 
     if (hash.compare(rs.getHash()) == 0)
     {
@@ -105,7 +105,7 @@ bool ResourceManager::validRes(string uri, string hash)
         return false;
 }
 
-std::vector<struct Resource> ResourceManager::diff_for_need_to_sync(std::vector<Resource> peer_table)
+std::vector<struct Resource> ResourceManagerBaseFilesystem::need_to_sync(std::vector<Resource> peer_table) const
 {
     map<string, Resource> filtered;
 
@@ -120,7 +120,7 @@ std::vector<struct Resource> ResourceManager::diff_for_need_to_sync(std::vector<
     if (filtered.size() == 0)
         return {};
 
-    vector<Resource> local_table = idx();
+    vector<Resource> local_table = const_cast<ResourceManagerBaseFilesystem &>(*this).idx();
     for (size_t i = 0; i < local_table.size(); i++)
     {
         Resource local_rs = local_table[i];
@@ -136,10 +136,10 @@ std::vector<struct Resource> ResourceManager::diff_for_need_to_sync(std::vector<
             if (rs.getHash() == local_rs.getHash())
                 filtered.erase(local_rs.getName());
             // else
-            // LOG_DEBUG("ResourceManager::cmpThenRetNeedToSyncTable() : uri[{}] need to add to synctable, reason:{}", rs.uri, "hash is not eq!");
+            // LOG_DEBUG("ResourceManagerBaseFilesystem::cmpThenRetNeedToSyncTable() : uri[{}] need to add to synctable, reason:{}", rs.uri, "hash is not eq!");
         }
         // else
-        // LOG_DEBUG("ResourceManager::cmpThenRetNeedToSyncTable() : uri[{}] need to add to synctable, reason:{}", rs.uri, "size: peer[{}] > local[{}]", rs.getSize(), local_rs.getSize());
+        // LOG_DEBUG("ResourceManagerBaseFilesystem::cmpThenRetNeedToSyncTable() : uri[{}] need to add to synctable, reason:{}", rs.uri, "size: peer[{}] > local[{}]", rs.getSize(), local_rs.getSize());
     }
 
     vector<struct Resource> want_to_sync;
@@ -149,14 +149,14 @@ std::vector<struct Resource> ResourceManager::diff_for_need_to_sync(std::vector<
     return want_to_sync;
 }
 
-string ResourceManager::mapping(string uri)
+string ResourceManagerBaseFilesystem::mapping(string uri)
 {
     return rsHome + uri;
 }
 
-bool ResourceManager::saveLocal(string uri, void *data, uint64_t offset, uint64_t data_len)
+bool ResourceManagerBaseFilesystem::save(string uri, void *data, uint64_t offset, uint64_t data_len)
 {
-    // LOG_DEBUG("ResourceManager::saveLocal() : URI:{} offset:{} data_len:{}", uri, offset, data_len);
+    // LOG_DEBUG("ResourceManagerBaseFilesystem::save() : URI:{} offset:{} data_len:{}", uri, offset, data_len);
     string pathstr = mapping(uri);
 
     auto path = filesystem::path(pathstr);
@@ -200,9 +200,11 @@ uint8_t set_flag_and_accum_hdsize(std::string str, BufBaseonEvent &buf, uint16_t
         return 2;
     }
 }
-
-ResourceSerializerDto ResourceSerializer::serialize(std::vector<Resource> table)
+ResourceSerializerDto ResourceSerializer::serialize(const std::vector<Resource> &table)
 {
+    if (table.size() == 0)
+        return {nullptr, 0};
+
     BufBaseonEvent buf;
     for (auto &&r : table)
     {

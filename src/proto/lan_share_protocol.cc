@@ -64,7 +64,9 @@ LanSyncPkt::LanSyncPkt(lan_sync_header_t *header)
         payload = (char *)malloc(data_len);
         char *datap = (char *)(header) + header_len;
         memcpy(payload, datap, data_len);
-    }else{
+    }
+    else
+    {
         payload = nullptr;
     }
 }
@@ -135,22 +137,46 @@ const map<string, string> LanSyncPkt::getXheaders()
     return xheader;
 }
 
+bool bit_cmp(void *l, void *r, uint64_t size)
+{
+    uint8_t *l_u8 = reinterpret_cast<uint8_t *>(l);
+    uint8_t *r_u8 = reinterpret_cast<uint8_t *>(r);
+
+    for (size_t i = 0; i < size; i++)
+    {
+        if (*l_u8 != *r_u8)
+            return false;
+        l_u8++;
+        r_u8++;
+    }
+    return true;
+}
+
 bool LanSyncPkt::operator==(const LanSyncPkt &p) const
 {
-    return version == p.version && header_len == p.header_len && total_len == p.total_len && type == p.type && xheader == p.xheader;
+    return version == p.version &&
+           header_len == p.header_len &&
+           total_len == p.total_len &&
+           type == p.type &&
+           xheader == p.xheader &&
+           bit_cmp(payload, p.payload, total_len - header_len);
 }
 
 void *LanSyncPkt::getPayload()
 {
+    return const_cast<LanSyncPkt &>(*this).getPayload();
+}
+
+void *LanSyncPkt::getPayload() const
+{
     return payload;
 }
 
-void LanSyncPkt::setPayload(void *data_arg, uint32_t datalen)
+void LanSyncPkt::setPayload(void *data_arg, uint64_t datalen)
 {
     if (payload != nullptr)
     {
-        uint32_t datalen = total_len - header_len;
-        total_len -= datalen;
+        total_len = header_len;
         free(payload);
     }
 

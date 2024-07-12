@@ -2,11 +2,22 @@
 
 void LogicCore::reqIdx(const NetAddr &peer, const LanSyncPkt &pkt)
 {
-    auto idx = rm_.idx();
+    auto idx = rm_->idx();
+    auto dto = ResourceSerializer::serialize(idx);
+    LanSyncPkt p = {lan_sync_version::VER_0_1, LAN_SYNC_TYPE_REPLY_TABLE_INDEX};
+
+    p.setPayload(dto.data.get(), dto.size);
+
+    BufBaseonEvent buf;
+    p.writeTo(buf);
+    adapter_->write(peer, buf.data().get(), buf.size()); 
+    // todo 这里存在虚假指针问题，因为outputstream是放入缓冲区，放完以后，执行到此，执行到
+    // 括号外，buf被释放，会导致buf.data被释放。
 }
 
 void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt)
 {
+    
 }
 
 void LogicCore::recvIdx(const NetAddr &peer, const LanSyncPkt &pkt)
@@ -63,4 +74,9 @@ void LogicCore::setNetworkAdapter(std::shared_ptr<NetworkAdapter> ad)
 {
     adapter_ = nullptr;
     adapter_ = ad;
+}
+
+void LogicCore::setResourceManager(std::shared_ptr<ResourceManager> rm)
+{
+    rm_ = rm;
 }

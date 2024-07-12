@@ -50,11 +50,14 @@ void ProtoSession::write(uint8_t *data, uint64_t size)
 void ProtoSession::write(uint8_t *data, uint64_t size) const
 {
     if (tcli_ != nullptr)
+    {
         tcli_->write(data, size);
+        return;
+    }
     throw NotFoundException("the tcli_ is nullptr!");
 }
 
-void ProtoSession::bind(const NetAddr &from)
+void ProtoSession::bind(const NetAddr &from, const LanSyncPkt &pkt)
 {
     if (tcli_ != nullptr)
         throw NotFoundException("the tcli_ has been bound!");
@@ -68,12 +71,15 @@ void ProtoSession::bind(const NetAddr &from)
     state_ = SessionState::ESTABLISED;
 }
 
-void ProtoSession::call(const NetAddr &from)
+void ProtoSession::call(const NetAddr &from, const LanSyncPkt &pkt)
 {
     if (tcli_ != nullptr)
         throw NotFoundException("the tcli_ has already been created!");
+
+    uint16_t peerPort = *(reinterpret_cast<uint16_t*>(pkt.getPayload()));
     NetAddr peer(from);
     peer.setType(TransportType::TCP);
+    peer.setPort(peerPort);
 
     auto eg = Netframework::getEngine();
     state_ = SessionState::CONNECTING;

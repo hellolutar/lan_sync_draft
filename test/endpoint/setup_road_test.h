@@ -29,6 +29,8 @@ protected:
     EndpointForTest ed_;
     shared_ptr<NetFrameworkEngineForTest> neg_;
     shared_ptr<TimerFrameworkEngineForTest> teg_;
+    shared_ptr<ResourceManagerForTest> rm_ = make_shared<ResourceManagerForTest>();
+
     NetAddr my_udp_cli_addr_{"0.0.0.10:18080", TransportType::UDP};
     NetAddr my_udp_srv_addr_{"0.0.0.10:8080", TransportType::UDP};
     NetAddr my_tcp_cli_addr_{"0.0.0.10:18080", TransportType::TCP};
@@ -44,6 +46,8 @@ protected:
 
         teg_ = make_shared<TimerFrameworkEngineForTest>();
         TimerFramework::init(teg_);
+
+        ed_.getLogicCore()->setResourceManager(rm_);
 
         ed_.run();
     }
@@ -74,37 +78,35 @@ public:
     {
     }
 
-    void my_udp_srv_receive(NetAddr &peer, LanSyncPkt pkt)
+    void my_udp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt)
     {
-        peer.setType(TransportType::UDP);
         auto srv = neg_->queryUdpSerNetAbility(my_udp_srv_addr_);
         recv(srv, peer, pkt);
     }
-    void my_tcp_srv_receive(NetAddr &peer, LanSyncPkt pkt)
+    void my_tcp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt)
     {
-        peer.setType(TransportType::TCP);
         auto srv = neg_->queryTcpSerNetAbility(my_tcp_srv_addr_);
         recv(srv, peer, pkt);
     }
-    void my_tcp_cli_receive(NetAddr &peer, LanSyncPkt pkt)
+    void my_tcp_cli_receive_from(NetAddr &peer, LanSyncPkt &&pkt)
     {
         peer.setType(TransportType::TCP);
-        auto srv = neg_->queryTcpCliNetAbility(my_tcp_cli_addr_);
+        auto srv = neg_->queryTcpCliNetAbility(peer);
         recv(srv, peer, pkt);
     }
 
-    void assert_my_tcp_cli_sended(NetAddr &peer, LanSyncPkt pkt)
+    void assert_my_tcp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
     {
-        peer.setType(TransportType::TCP);
         auto cli = neg_->queryTcpCliNetAbility(peer);
-        ASSERT_EQ(pkt, popPktFromOs(cli));
+        auto rcvPkt = popPktFromOs(cli);
+        ASSERT_EQ(pkt, rcvPkt);
     }
 
-    void assert_my_udp_cli_sended(NetAddr &peer, LanSyncPkt pkt)
+    void assert_my_udp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
     {
-        peer.setType(TransportType::UDP);
         auto cli = neg_->queryUdpCliNetAbility(peer);
-        ASSERT_EQ(pkt, popPktFromOs(cli));
+        auto rcvPkt = popPktFromOs(cli);
+        ASSERT_EQ(pkt, rcvPkt);
     }
 };
 

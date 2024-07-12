@@ -11,15 +11,16 @@ void ProtoServerRecv::recv(const NetAddr &from, uint8_t *data, uint64_t size)
         }
     }
 
+    LanSyncPkt pkt(data);
     auto s = std::make_shared<ProtoSession>(core_logic_);
     if (from.type() == TransportType::UDP)
     {
-        s->call(from);
+        s->call(from, pkt);
         sess_->push_back(s);
     }
     else if (from.type() == TransportType::TCP)
     {
-        s->bind(from);
+        s->bind(from, pkt);
         sess_->push_back(s);
         s->recv(from, data, size);
     }
@@ -32,8 +33,8 @@ const ProtoSession &ProtoServer::findSession(const NetAddr &peer)
     for (size_t i = 0; i < sess_->size(); i++)
     {
         auto &s = sess_->at(i);
-        if (s.isMe(peer))
-            return s;
+        if (s->isMe(peer))
+            return *(s.get());
     }
 
     throw NotFoundException("ProtoServer::findSession can not found the peer !");

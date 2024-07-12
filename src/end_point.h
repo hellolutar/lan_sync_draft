@@ -27,6 +27,8 @@ public:
     virtual ~Endpoint() {}
 
     void run();
+
+    std::shared_ptr<LogicCore> getLogicCore();
 };
 
 #endif

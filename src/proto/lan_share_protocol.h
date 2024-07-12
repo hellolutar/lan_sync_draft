@@ -100,8 +100,9 @@ public:
     std::string queryXheader(std::string key);
 
     void *getPayload();
+    void *getPayload() const;
 
-    void setPayload(void *data, uint32_t datalen);
+    void setPayload(void *data, uint64_t datalen);
 
     uint16_t getHeaderLen();
     uint32_t getTotalLen();

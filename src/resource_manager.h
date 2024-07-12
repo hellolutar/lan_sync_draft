@@ -30,33 +30,47 @@ public:
     const std::string &getHash() const;
     const std::uint64_t getSize() const;
 
-    bool operator==(const Resource& r) const;
+    bool operator==(const Resource &r) const;
 };
 
 class ResourceManager
 {
 private:
+public:
+    ResourceManager(/* args */) {}
+    virtual ~ResourceManager() {}
+
+    virtual std::vector<Resource> idx() = 0;
+    virtual const Resource &query(std::string uri) const = 0;
+    virtual bool validRes(std::string uri, std::string hash) const = 0;
+    virtual std::vector<struct Resource> need_to_sync(std::vector<struct Resource> peer_table) const = 0;
+    virtual bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) = 0;
+};
+
+class ResourceManagerBaseFilesystem : public ResourceManager
+{
+private:
     std::string rsHome;
+    // mapping for uri and resource
     std::map<std::string, Resource> table_;
 
     std::vector<Resource> recur_walk(std::filesystem::path p);
-
-public:
-    ResourceManager(/* args */) {}
-    ResourceManager(std::string path) : rsHome(path) {}
-    ~ResourceManager() {}
-
-    std::vector<Resource> idx();
-
-    const Resource queryByUri(std::string uri);
-
-    bool validRes(std::string uri, std::string hash);
-
-    std::vector<struct Resource> diff_for_need_to_sync(std::vector<struct Resource> peer_table);
-
     std::string mapping(std::string uri);
 
-    bool saveLocal(std::string uri, void *data, uint64_t offset, uint64_t data_len);
+public:
+    ResourceManagerBaseFilesystem(/* args */) {}
+    ResourceManagerBaseFilesystem(std::string path) : rsHome(path) {}
+    virtual ~ResourceManagerBaseFilesystem() {}
+
+    std::vector<Resource> idx() override;
+
+    const Resource &query(std::string uri) const override;
+
+    bool validRes(std::string uri, std::string hash) const override;
+
+    std::vector<struct Resource> need_to_sync(std::vector<struct Resource> peer_table) const override;
+
+    bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) override;
 };
 
 struct ResourceSerializerDto
@@ -71,7 +85,7 @@ public:
     ResourceSerializer(/* args */) = delete;
     ~ResourceSerializer() = delete;
 
-    static ResourceSerializerDto serialize(std::vector<Resource> table);
+    static ResourceSerializerDto serialize(const std::vector<Resource> &table);
     static std::vector<Resource> deserialize(uint8_t *data, uint64_t size);
 };
 

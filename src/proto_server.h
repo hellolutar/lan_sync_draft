@@ -14,10 +14,11 @@ protected:
     std::shared_ptr<Logic> core_logic_;
 
 public:
-    ProtoServerRecv(std::shared_ptr<Logic> logic)
-        : core_logic_(logic) ,
-        sess_(std::make_shared<std::vector<std::shared_ptr<ProtoSession>>>())
-        {}
+    ProtoServerRecv(std::shared_ptr<Logic> logic, std::shared_ptr<std::vector<std::shared_ptr<ProtoSession>>> sess)
+        : core_logic_(logic),
+          sess_(sess)
+    {
+    }
     ~ProtoServerRecv() {}
 
     /**
@@ -38,13 +39,15 @@ private:
 
     std::shared_ptr<Logic> core_logic_;
     std::shared_ptr<ProtoServerRecv> server_logic_;
-    std::shared_ptr<std::vector<ProtoSession>> sess_;
+    std::shared_ptr<std::vector<std::shared_ptr<ProtoSession>>> sess_;
 
 public:
     ProtoServer(NetAddr port, std::shared_ptr<Logic> logic)
         : core_logic_(logic),
-          server_logic_(std::make_shared<ProtoServerRecv>(logic))
+          sess_(std::make_shared<std::vector<std::shared_ptr<ProtoSession>>>())
     {
+        server_logic_ = std::make_shared<ProtoServerRecv>(logic, sess_);
+
         auto net = Netframework::getEngine();
 
         tcpser_ = net->addTcpServer(port);

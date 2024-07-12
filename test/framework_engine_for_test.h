@@ -10,6 +10,7 @@
 #include "exc/not_found_exc.h"
 #include "framework/net/net_framework.h"
 #include "framework/timer/timer_trigger_framework.h"
+#include "resource_manager.h"
 
 using namespace std;
 
@@ -80,6 +81,39 @@ public:
     std::shared_ptr<Trigger> findTrigger(uint16_t id);
 
     void tick(uint64_t since_last);
+};
+
+class ResourceManagerForTest: public ResourceManager
+{
+private:
+    std::vector<Resource> table_;
+    std::vector<Resource> need_to_sync_;
+    bool validres_ = false;
+
+public:
+    ResourceManagerForTest(/* args */) {}
+    virtual ~ResourceManagerForTest() {}
+
+    std::vector<Resource> idx() { return table_; };
+
+    const Resource &query(std::string uri) const
+    {
+        for (size_t i = 0; i < table_.size(); i++)
+        {
+            if (table_[i].getUri() == uri)
+            {
+                return table_[i];
+            }
+        }
+        throw NotFoundException("ResourceManagerForTest:query()! uri:", uri);
+    };
+    bool validRes(std::string uri, std::string hash) const { return validres_; };
+    std::vector<Resource> need_to_sync(std::vector<struct Resource> peer_table) const { return need_to_sync_; };
+    bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) { return true; };
+
+    void setIdx(std::vector<Resource> rs) { table_ = rs; };
+    void setNeedToSync(std::vector<Resource> rs) { need_to_sync_ = rs; };
+    void setValidRes(bool b) { validres_ = b; };
 };
 
 #endif
