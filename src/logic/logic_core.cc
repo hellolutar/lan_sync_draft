@@ -38,16 +38,8 @@ void LogicCore::recvIdx(const NetAddr &peer, const LanSyncPkt &pkt)
     std::vector<Resource> tb = ResourceSerializer::deserialize(reinterpret_cast<uint8_t *>(pkt.getPayload()), pkt.getPayloadSize());
     auto need_to_sync_rs = rm_->need_to_sync(tb);
 
-    // auto dto = ResourceSerializer::serialize(need_to_sync_rs);
-    LanSyncPkt p = {lan_sync_version::VER_0_1, LAN_SYNC_TYPE_GET_RESOURCE};
-
-    // todo syn rs by content-range
-
-    BufBaseonEvent buf;
-    p.writeTo(buf);
-    adapter_->write(peer, buf.data().get(), buf.size());
-    // todo 这里存在虚假指针问题，因为outputstream是放入缓冲区，放完以后，执行到此，执行到
-    // 括号外，buf被释放，会导致buf.data被释放。
+    for (auto &&r : need_to_sync_rs)
+        coor_->add_resource(r.getUri(), {0, r.getSize()}, {adapter_, peer});
 }
 
 void LogicCore::recvRs(const NetAddr &peer, const LanSyncPkt &pkt)
@@ -108,4 +100,9 @@ void LogicCore::setNetworkAdapter(std::shared_ptr<NetworkAdapter> ad)
 void LogicCore::setResourceManager(std::shared_ptr<ResourceManager> rm)
 {
     rm_ = rm;
+}
+
+void LogicCore::setTaskCoordinator(std::shared_ptr<TaskCoordinator> coor)
+{
+    coor_ = coor;
 }

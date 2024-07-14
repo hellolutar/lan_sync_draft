@@ -3,12 +3,14 @@
 
 #include "network_adapter.h"
 #include "resource_manager.h"
+#include "task/task_coordinator.h"
 
 class LogicCore : public Logic
 {
 private:
     std::shared_ptr<NetworkAdapter> adapter_;
     std::shared_ptr<ResourceManager> rm_;
+    std::shared_ptr<TaskCoordinator> coor_; 
 
     void helloAck(const NetAddr &peer, const LanSyncPkt &pkt);
     void reqIdx(const NetAddr &peer, const LanSyncPkt &pkt);
@@ -28,6 +30,7 @@ public:
 
     void setNetworkAdapter(std::shared_ptr<NetworkAdapter> ad);
     void setResourceManager(std::shared_ptr<ResourceManager> rm);
+    void setTaskCoordinator(std::shared_ptr<TaskCoordinator> coor);
 };
 
 #endif

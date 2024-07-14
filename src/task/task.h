@@ -15,18 +15,18 @@
 #include "network_adapter.h"
 #include "network_context.h"
 
-class Block2
+class Block
 {
 public:
     uint64_t start;
     uint64_t end;
-    Block2(){};
-    Block2(uint64_t start, uint64_t end) : start(start), end(end){};
-    ~Block2(){};
+    Block(){};
+    Block(uint64_t start, uint64_t end) : start(start), end(end){};
+    ~Block(){};
 
-    const bool operator==(const Block2 &other);
+    const bool operator==(const Block &other);
 
-    const bool operator==(const Block2 &other) const;
+    const bool operator==(const Block &other) const;
 
     static const uint64_t pos(uint64_t offset);
     static const uint64_t bitPos(uint64_t pos);
@@ -45,7 +45,7 @@ class Task
 {
 private:
     std::string uri_;
-    Block2 block_;
+    Block block_;
     NetworkContext ctx_;
     uint8_t retry_ = 0;
     uint64_t passed_time_ = 0;
@@ -54,7 +54,7 @@ private:
     const uint8_t *prepareHeader() const;
 
 public:
-    Task(std::string uri, Block2 blk, const NetworkContext &ctx) : uri_(uri), block_(blk), ctx_(ctx){};
+    Task(std::string uri, Block blk, const NetworkContext &ctx) : uri_(uri), block_(blk), ctx_(ctx){};
     // Task(const Task &&t) : uri_(t.uri_), block_(t.block_), ctx_(t.ctx_){
     // };
     Task &operator=(const Task t);
@@ -69,12 +69,12 @@ public:
     void setStatus(TaskStatusEnum st);
 
     const std::string getUri() const;
-    const Block2 getBlock() const;
+    const Block getBlock() const;
 
     const NetworkContext &getNetCtx() const;
 };
 
-class TaskManager2
+class TaskManager
 {
 protected:
     std::map<std::string, std::vector<Task>> tasks_;
@@ -82,18 +82,19 @@ protected:
     uint64_t replaceStatusByStatus(std::string, TaskStatusEnum oldst, TaskStatusEnum newst);
 
 public:
-    TaskManager2();
-    virtual ~TaskManager2();
+    TaskManager();
+    virtual ~TaskManager();
 
     void addTask(const Task &t);
     void cancelTask(std::string uri);
 
-    void tick(uint64_t t, std::function<void(const std::string uri, const Block2 blk, const NetworkContext &oldCtx)> reAssignTaskFunc);
+    void tick(std::function<void(const std::string uri, const Block blk, const NetworkContext &oldCtx)> reAssignTaskFunc);
+    void tick(uint64_t t, std::function<void(const std::string uri, const Block blk, const NetworkContext &oldCtx)> reAssignTaskFunc);
 
     uint64_t stopPendingTask(std::string);
     uint64_t pendingStopTask(std::string);
 
-    void success(std::string uri, Block2 block);
+    void success(std::string uri, Block block);
 
     const bool isSuccess(std::string uri) const;
 

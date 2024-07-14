@@ -15,7 +15,7 @@ class CoordinatorSimpleTest : public testing::Test
 
 protected:
     TaskManagerForTest *tmft = new TaskManagerForTest();
-    shared_ptr<TaskManager2> tm{tmft};
+    shared_ptr<TaskManager> tm{tmft};
     TaskCoordinator *cor;
     shared_ptr<NetFrameworkEngineForTest> neg_;
     shared_ptr<TimerFrameworkEngineForTest> teg_;
@@ -54,7 +54,7 @@ public:
 
         for (size_t i = 0; i < ctx_num; i++)
         {
-            cor->add_resource(uri, Range2(0, size), {na, NetAddr(to_string(i))});
+            cor->add_resource(uri, Range(0, size), {na, NetAddr(to_string(i))});
         }
 
         ASSERT_EQ(ctx_num, tmft->tasks_ctx_num(uri));
@@ -72,7 +72,7 @@ public:
             for (; i < DOWNLOAD_LIMIT; i++)
             {
                 uint64_t end = min(size, offset + BLOCK_SIZE);
-                tm->success(uri, Block2(offset, end));
+                tm->success(uri, Block(offset, end));
                 offset = end;
                 if (offset >= size)
                     break;
@@ -84,7 +84,7 @@ public:
         for (; i < blk_nums; i++)
         {
             uint64_t end = min(size, offset + BLOCK_SIZE);
-            tm->success(uri, Block2(offset, end));
+            tm->success(uri, Block(offset, end));
             offset = end;
             if (offset >= size)
                 break;
@@ -107,7 +107,7 @@ public:
 
         for (size_t i = 0; i < ctx_num; i++)
         {
-            cor->add_resource(uri, Range2(0, size), {na, NetAddr(to_string(i))});
+            cor->add_resource(uri, Range(0, size), {na, NetAddr(to_string(i))});
         }
 
         ASSERT_EQ(ctx_num, tmft->tasks_ctx_num(uri));
@@ -133,8 +133,8 @@ public:
                 }
                 for (size_t j = 0; j < DOWNLOAD_LIMIT; j++)
                 {
-                    uint64_t start = Block2::bitPos(i + j);
-                    tm->success(uri, Block2(start, start + BLOCK_SIZE));
+                    uint64_t start = Block::bitPos(i + j);
+                    tm->success(uri, Block(start, start + BLOCK_SIZE));
                 }
             }
 
@@ -154,21 +154,21 @@ public:
         uint64_t pos = 0;
         for (size_t i = 0; i < ctx_num; i++)
         {
-            cor->add_resource(uri, Range2(0, size), {na, NetAddr(to_string(i))});
+            cor->add_resource(uri, Range(0, size), {na, NetAddr(to_string(i))});
 
             cor->tick(1000 * 60);
 
             for (; pos < 5;)
             {
-                uint64_t start = Block2::bitPos(pos++);
-                tm->success(uri, Block2(start, start + BLOCK_SIZE));
+                uint64_t start = Block::bitPos(pos++);
+                tm->success(uri, Block(start, start + BLOCK_SIZE));
             }
         }
 
         while (!tm->isSuccess(uri))
         {
-            uint64_t start = Block2::bitPos(pos++);
-            tm->success(uri, Block2(start, start + BLOCK_SIZE));
+            uint64_t start = Block::bitPos(pos++);
+            tm->success(uri, Block(start, start + BLOCK_SIZE));
         }
 
         ASSERT_EQ(ctx_num, tmft->tasks_ctx_num(uri));

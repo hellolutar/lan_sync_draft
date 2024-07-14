@@ -1,22 +1,29 @@
 #ifndef __RANGE_H_
 #define __RANGE_H_
 
+#include <string>
 #include <cstdint>
 
-class Range2
+#include "constants/proto_constants.h"
+
+
+class Range
 {
 private:
     std::uint64_t start_;
     std::uint64_t end_;
 
 public:
-    Range2(std::uint64_t start, std::uint64_t end) : start_(start), end_(end){};
-    ~Range2();
+    Range(std::uint64_t start, std::uint64_t end) : start_(start), end_(end){};
+    ~Range();
 
-    bool operator==(const Range2 &r) const;
-    bool operator<(const Range2 &r) const;
+    bool operator==(const Range &r) const;
+    bool operator<(const Range &r) const;
 
     const uint64_t size() const;
+    std::string to_string();
+
+    static const std::string defaultStr;
 };
 
 #endif

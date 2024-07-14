@@ -13,14 +13,14 @@ class ResourceInfo
 {
 private:
     std::string uri_;
-    Range2 range_;
+    Range range_;
     std::vector<NetworkContext> ctxs_;
 
 public:
-    ResourceInfo(std::string uri, Range2 range) : uri_(uri), range_(range){};
+    ResourceInfo(std::string uri, Range range) : uri_(uri), range_(range){};
     ~ResourceInfo();
 
-    const Range2 &getRange() const;
+    const Range &getRange() const;
 
     const std::string getUri() const;
 

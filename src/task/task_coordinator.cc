@@ -46,7 +46,7 @@ void TaskCoordinator::assignTask(ResourceInfo &info)
     {
         string uri = info.getUri();
         auto &ctx = const_cast<NetworkContext &>(ctxs[who]); // 可能存在拷贝陷进
-        tm_->addTask({uri, Block2(0, info.size()), ctx});
+        tm_->addTask({uri, Block(0, info.size()), ctx});
     }
     else
     {
@@ -55,18 +55,19 @@ void TaskCoordinator::assignTask(ResourceInfo &info)
         {
             if (who >= ctxs.size())
                 who = 0;
-            uint64_t bitPos = Block2::bitPos(i);
+            uint64_t bitPos = Block::bitPos(i);
             if (bitPos >= info.size())
                 break;
 
             uint64_t end = min(info.size(), bitPos + BLOCK_SIZE);
             string uri = info.getUri();
-            auto& ctx = const_cast<NetworkContext &>(ctxs[who++]); // 可能存在拷贝陷进
-            Task tsk = {uri, Block2(bitPos, end), ctx};
+            auto &ctx = const_cast<NetworkContext &>(ctxs[who++]); // 可能存在拷贝陷进
+            Task tsk = {uri, Block(bitPos, end), ctx};
             tm_->addTask(tsk);
         }
     }
     tm_->pendingStopTask(info.getUri());
+    tick(0);
 }
 
 TaskCoordinator::~TaskCoordinator()
@@ -79,19 +80,19 @@ void TaskCoordinator::tick(std::uint64_t t)
     tm_->tick(t, f);
 }
 
-std::shared_ptr<TaskManager2> &TaskCoordinator::taskManager()
+std::shared_ptr<TaskManager> &TaskCoordinator::taskManager()
 {
     return tm_;
 }
 
-void TaskCoordinator::add_resource(std::string uri, Range2 range, const NetworkContext& ctx)
+void TaskCoordinator::add_resource(std::string uri, Range range, const NetworkContext &ctx)
 {
     ResourceInfo r{uri, range};
     r.addNetCtx(ctx);
     analysis_resource(r, ctx);
 }
 
-void TaskCoordinator::reAssignTask(const std::string uri, const Block2 blk, const NetworkContext& ctx)
+void TaskCoordinator::reAssignTask(const std::string uri, const Block blk, const NetworkContext &ctx)
 {
     auto r_iter = res_.find(uri);
     ResourceInfo &r = r_iter->second;

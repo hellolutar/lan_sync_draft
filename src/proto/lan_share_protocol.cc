@@ -269,51 +269,6 @@ string ContentRange::to_string()
     return ss.str();
 }
 
-string Range::defaultStr = "0-0/0/last";
-
-// str like : 0-500
-// str like : 0-
-Range::Range(string str)
-{
-    vector<string> rawv = splitstr(str, FLAG_XHEADER_CONTENT_BETWEEN_CHAR);
-    sscanf(rawv[0].c_str(), "%lu", &start_pos);
-    if (rawv.size() == 1)
-    {
-        size = 0;
-        return;
-    }
-    uint64_t end = 0;
-    sscanf(rawv[1].c_str(), "%lu", &end);
-    size = end - start_pos;
-}
-
-Range::~Range()
-{
-}
-
-uint64_t Range::getStartPos()
-{
-    return start_pos;
-}
-uint64_t Range::getSize()
-{
-    return size;
-}
-
-// str like : 0-500
-// str like : 0-
-string Range::to_string()
-{
-    stringstream ss;
-    ss << start_pos << FLAG_XHEADER_CONTENT_BETWEEN;
-    if (size != 0)
-    {
-        ss << (start_pos + size);
-    }
-
-    return ss.str();
-}
-
 std::string convert_lan_sync_type_enum(lan_sync_type_enum type)
 {
     switch (type)

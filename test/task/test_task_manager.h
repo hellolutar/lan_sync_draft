@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class TaskManagerForTest : public TaskManager2
+class TaskManagerForTest : public TaskManager
 {
 public:
     TaskManagerForTest(/* args */){};

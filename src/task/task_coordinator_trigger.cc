@@ -10,9 +10,9 @@ void TaskCoordinatorTrigger::trigger()
     auto now = chrono::system_clock::now();
     int64_t duration = chrono::duration_cast<chrono::milliseconds>((now - last_)).count();
     last_ = now;
-    coor_.tick(duration);
+    coor_->tick(duration);
 }
-TaskCoordinator &TaskCoordinatorTrigger::getTaskCoordinator()
+shared_ptr<TaskCoordinator> TaskCoordinatorTrigger::getTaskCoordinator()
 {
     return coor_;
 }

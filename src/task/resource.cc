@@ -4,7 +4,7 @@ ResourceInfo::~ResourceInfo()
 {
 }
 
-const Range2 &ResourceInfo::getRange() const
+const Range &ResourceInfo::getRange() const
 {
     return range_;
 }

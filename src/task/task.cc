@@ -23,13 +23,14 @@ Task::~Task()
 void Task::req()
 {
     status_ = TaskStatusEnum::Syning;
-    const uint8_t *data = prepareHeader();
 
     LanSyncPkt pkt(lan_sync_version::VER_0_1, LAN_SYNC_TYPE_GET_RESOURCE);
 
     string range_hdr = Range(block_.start, block_.end - block_.start).to_string();
     pkt.addXheader(XHEADER_URI, uri_);
     pkt.addXheader(XHEADER_RANGE, range_hdr);
+
+    // 读取数据
 
     BufBaseonEvent buf;
     pkt.writeTo(buf);
@@ -77,7 +78,7 @@ const std::string Task::getUri() const
     return uri_;
 }
 
-const Block2 Task::getBlock() const
+const Block Task::getBlock() const
 {
     return block_;
 }
@@ -87,15 +88,15 @@ const NetworkContext &Task::getNetCtx() const
     return ctx_;
 }
 
-TaskManager2::TaskManager2(/* args */)
+TaskManager::TaskManager(/* args */)
 {
 }
 
-TaskManager2::~TaskManager2()
+TaskManager::~TaskManager()
 {
 }
 
-void TaskManager2::addTask(const Task &t)
+void TaskManager::addTask(const Task &t)
 {
     auto uri = t.getUri();
     auto uri_iter = tasks_.find(uri);
@@ -108,7 +109,7 @@ void TaskManager2::addTask(const Task &t)
     else
     {
         // todo 要确认是否重复
-        uint64_t pos = Block2::pos(t.getBlock().start);
+        uint64_t pos = Block::pos(t.getBlock().start);
         if (pos >= tasks_[uri].size())
             tasks_[uri].push_back(t);
         else
@@ -120,7 +121,7 @@ void TaskManager2::addTask(const Task &t)
     }
 }
 
-void TaskManager2::cancelTask(std::string uri)
+void TaskManager::cancelTask(std::string uri)
 {
     auto iter = tasks_.find(uri);
     if (iter != tasks_.end())
@@ -130,7 +131,12 @@ void TaskManager2::cancelTask(std::string uri)
     }
 }
 
-void TaskManager2::tick(uint64_t t, std::function<void(const std::string uri, const Block2 blk, const NetworkContext &oldCtx)> reAssignTaskFunc)
+void TaskManager::tick(std::function<void(const std::string uri, const Block blk, const NetworkContext &oldCtx)> reAssignTaskFunc)
+{
+    tick(0, reAssignTaskFunc);
+}
+
+void TaskManager::tick(uint64_t t, std::function<void(const std::string uri, const Block blk, const NetworkContext &oldCtx)> reAssignTaskFunc)
 {
     for (auto uri_iter = tasks_.begin(); uri_iter != tasks_.end(); uri_iter++)
     {
@@ -161,17 +167,17 @@ void TaskManager2::tick(uint64_t t, std::function<void(const std::string uri, co
     }
 }
 
-uint64_t TaskManager2::stopPendingTask(std::string uri)
+uint64_t TaskManager::stopPendingTask(std::string uri)
 {
     return replaceStatusByStatus(uri, TaskStatusEnum::Pendding, TaskStatusEnum::Stop);
 }
 
-uint64_t TaskManager2::pendingStopTask(std::string uri)
+uint64_t TaskManager::pendingStopTask(std::string uri)
 {
     return replaceStatusByStatus(uri, TaskStatusEnum::Stop, TaskStatusEnum::Pendding);
 }
 
-uint64_t TaskManager2::replaceStatusByStatus(std::string uri, TaskStatusEnum oldst, TaskStatusEnum newst)
+uint64_t TaskManager::replaceStatusByStatus(std::string uri, TaskStatusEnum oldst, TaskStatusEnum newst)
 {
     auto uri_iter = tasks_.find(uri);
     if (uri_iter == tasks_.end())
@@ -192,7 +198,7 @@ uint64_t TaskManager2::replaceStatusByStatus(std::string uri, TaskStatusEnum old
     return i;
 }
 
-void TaskManager2::success(std::string uri, Block2 block)
+void TaskManager::success(std::string uri, Block block)
 {
     auto uri_iter = tasks_.find(uri);
     if (uri_iter == tasks_.end())
@@ -209,7 +215,7 @@ void TaskManager2::success(std::string uri, Block2 block)
     }
 }
 
-const bool TaskManager2::isSuccess(std::string uri) const
+const bool TaskManager::isSuccess(std::string uri) const
 {
     auto uri_iter = tasks_.find(uri);
     if (uri_iter == tasks_.end())
@@ -224,22 +230,22 @@ const bool TaskManager2::isSuccess(std::string uri) const
     return true;
 }
 
-const uint64_t TaskManager2::downloadNum() const
+const uint64_t TaskManager::downloadNum() const
 {
     return download_num_;
 }
 
-const bool Block2::operator==(const Block2 &other)
+const bool Block::operator==(const Block &other)
 {
-    return static_cast<const Block2 &>(*this) == other;
+    return static_cast<const Block &>(*this) == other;
 }
 
-const bool Block2::operator==(const Block2 &other) const
+const bool Block::operator==(const Block &other) const
 {
     return start == other.start && end == other.end;
 }
 
-const uint64_t Block2::pos(uint64_t offset)
+const uint64_t Block::pos(uint64_t offset)
 {
     if (offset < BLOCK_SIZE)
         return 0;
@@ -249,7 +255,7 @@ const uint64_t Block2::pos(uint64_t offset)
     return pos;
 }
 
-const uint64_t Block2::bitPos(uint64_t pos)
+const uint64_t Block::bitPos(uint64_t pos)
 {
     return pos * BLOCK_SIZE;
 }
