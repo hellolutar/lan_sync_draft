@@ -1,7 +1,7 @@
 #ifndef __TASK_COORDINATOR_TRIGGER_H_
 #define __TASK_COORDINATOR_TRIGGER_H_
 
-#include "framework/timer/timer_trigger.h"
+#include "framework/itf/timer/timer_trigger.h"
 #include "task/task_coordinator.h"
 
 class TaskCoordinatorTrigger : public Trigger

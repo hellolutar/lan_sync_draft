@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "buf/buf_base_on_event.h"
-#include "framework/net/net_framework.h"
+#include "framework/itf/net/net_framework.h"
 #include "proto/lan_share_protocol.h"
 #include "exc/not_found_exc.h"
 

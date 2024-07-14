@@ -3,8 +3,8 @@
 
 #include "logic/logic_core.h"
 #include "task/task_coordinator.h"
-#include "framework/timer/timer_trigger_framework.h"
-#include "framework/net/net_framework.h"
+#include "framework/itf/timer/timer_trigger_framework.h"
+#include "framework/itf/net/net_framework.h"
 #include "udp_cli_trigger.h"
 #include "task/task_coordinator_trigger.h"
 

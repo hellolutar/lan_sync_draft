@@ -1,4 +1,4 @@
-#include "framework/timer/timer_trigger.h"
+#include "framework/itf/timer/timer_trigger.h"
 #include "timer_trigger.h"
 
 using namespace std;

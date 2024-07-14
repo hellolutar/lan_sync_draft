@@ -8,8 +8,8 @@
 #include <cstring>
 
 #include "exc/not_found_exc.h"
-#include "framework/net/net_framework.h"
-#include "framework/timer/timer_trigger_framework.h"
+#include "framework/itf/net/net_framework.h"
+#include "framework/itf/timer/timer_trigger_framework.h"
 #include "resource_manager.h"
 
 using namespace std;

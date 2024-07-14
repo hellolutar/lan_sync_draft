@@ -11,3 +11,8 @@ std::shared_ptr<PersistFrameworkEgine> PersistFramework::getEngine()
 {
     return engine_;
 }
+
+void PersistFrameworkEgine::addReadMonitor(std::shared_ptr<PersistMonitor> monitor)
+{
+    mons_.push_back(monitor);
+}

@@ -1,5 +1,5 @@
 #include "not_found_exc.h"
-#include "framework/net/net_addr.h"
+#include "framework/itf/net/net_addr.h"
 
 std::ostream &operator<<(std::ostream &os, const NetAddr &addr)
 {

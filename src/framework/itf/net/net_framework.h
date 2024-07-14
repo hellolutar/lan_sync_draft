@@ -1,7 +1,7 @@
 #ifndef __NET_FRAMEWORK_ENGINE_H_
 #define __NET_FRAMEWORK_ENGINE_H_
 
-#include "framework/net/net_framework_engine.h"
+#include "framework/itf/net/net_framework_engine.h"
 
 class Netframework
 {
