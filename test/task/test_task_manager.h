@@ -10,12 +10,12 @@ using namespace std;
 class TaskManagerForTest : public TaskManager2
 {
 public:
-    TaskManagerForTest(/* args */) {};
-    ~TaskManagerForTest() {};
+    TaskManagerForTest(/* args */){};
+    ~TaskManagerForTest(){};
 
     const uint64_t tasks_ctx_num(string uri) const
     {
-        map<std::shared_ptr<NetworkConnCtx>, int> ctx_map;
+        map<NetworkContext, int> ctx_map;
         auto uri_iter = tasks_.find(uri);
         if (uri_iter == tasks_.end())
         {
@@ -27,7 +27,7 @@ public:
         for (size_t i = 0; i < ts.size(); i++)
         {
             auto t = ts[i];
-            ctx_map[t.getRoadId()] = 1;
+            ctx_map[t.getNetCtx()] = 1;
         }
 
         return ctx_map.size();
@@ -35,7 +35,7 @@ public:
 
     const std::vector<Task> tasks(std::string uri) const
     {
-        map<std::shared_ptr<NetworkConnCtx>, int> ctx_map;
+        map<std::shared_ptr<NetworkContext>, int> ctx_map;
         auto uri_iter = tasks_.find(uri);
         if (uri_iter == tasks_.end())
             return {};

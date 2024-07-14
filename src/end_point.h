@@ -6,6 +6,7 @@
 #include "framework/timer/timer_trigger_framework.h"
 #include "framework/net/net_framework.h"
 #include "udp_cli_trigger.h"
+#include "task/task_coordinator_trigger.h"
 
 class Endpoint
 {
@@ -15,7 +16,8 @@ private:
 protected:
     std::shared_ptr<NetworkAdapter> na_;
     std::shared_ptr<LogicCore> core_;
-    std::shared_ptr<UdpCliTrigger> trg_;
+    std::shared_ptr<UdpCliTrigger> hello_trg_;
+    std::shared_ptr<TaskCoordinatorTrigger> coor_trg_;
 
 public:
     Endpoint()

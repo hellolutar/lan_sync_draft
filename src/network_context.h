@@ -19,7 +19,11 @@ public:
     virtual void write(uint8_t* data, uint64_t size);
     virtual void write(uint8_t* data, uint64_t size) const;
 
+    const NetAddr& getPeer() const;
+
     bool operator==(const NetworkContext& other) const;
+
+    bool operator<(const NetworkContext& other) const;
 };
 
 #endif

@@ -82,7 +82,7 @@ const Block2 Task::getBlock() const
     return block_;
 }
 
-const NetworkContext& Task::getNetCtx() const
+const NetworkContext &Task::getNetCtx() const
 {
     return ctx_;
 }
@@ -95,7 +95,7 @@ TaskManager2::~TaskManager2()
 {
 }
 
-void TaskManager2::addTask(Task t)
+void TaskManager2::addTask(const Task &t)
 {
     auto uri = t.getUri();
     auto uri_iter = tasks_.find(uri);
@@ -115,7 +115,7 @@ void TaskManager2::addTask(Task t)
         {
             if (tasks_[uri][pos].getStatus() == TaskStatusEnum::Success)
                 return;
-            tasks_[uri][pos] = std::move(t);
+            tasks_[uri][pos] = t;
         }
     }
 }
@@ -130,7 +130,7 @@ void TaskManager2::cancelTask(std::string uri)
     }
 }
 
-void TaskManager2::tick(uint64_t t, std::function<void(const std::string uri, const Block2 blk,  const NetworkContext& oldCtx)> reAssignTaskFunc)
+void TaskManager2::tick(uint64_t t, std::function<void(const std::string uri, const Block2 blk, const NetworkContext &oldCtx)> reAssignTaskFunc)
 {
     for (auto uri_iter = tasks_.begin(); uri_iter != tasks_.end(); uri_iter++)
     {
@@ -163,6 +163,16 @@ void TaskManager2::tick(uint64_t t, std::function<void(const std::string uri, co
 
 uint64_t TaskManager2::stopPendingTask(std::string uri)
 {
+    return replaceStatusByStatus(uri, TaskStatusEnum::Pendding, TaskStatusEnum::Stop);
+}
+
+uint64_t TaskManager2::pendingStopTask(std::string uri)
+{
+    return replaceStatusByStatus(uri, TaskStatusEnum::Stop, TaskStatusEnum::Pendding);
+}
+
+uint64_t TaskManager2::replaceStatusByStatus(std::string uri, TaskStatusEnum oldst, TaskStatusEnum newst)
+{
     auto uri_iter = tasks_.find(uri);
     if (uri_iter == tasks_.end())
         return 0;
@@ -173,9 +183,9 @@ uint64_t TaskManager2::stopPendingTask(std::string uri)
     for (auto t_iter = ts.begin(); t_iter != ts.end(); t_iter++)
     {
         Task &tsk = *t_iter;
-        if (tsk.getStatus() == TaskStatusEnum::Pendding)
+        if (tsk.getStatus() == oldst)
         {
-            tsk.stop();
+            tsk.setStatus(newst);
             i++;
         }
     }

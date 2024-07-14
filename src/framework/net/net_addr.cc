@@ -17,7 +17,11 @@ void NetAddr::setType(TransportType t)
     type_ = t;
 }
 
-std::string NetAddr::str()
+std::string NetAddr::str() 
 {
-    return l_addr_ + ":" + l_port_;
+    return static_cast<const NetAddr&>(*this).str();
+}
+std::string NetAddr::str() const
+{
+    return to_string(l_addr_) + ":" + to_string(l_port_);
 }

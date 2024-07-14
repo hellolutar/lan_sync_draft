@@ -62,9 +62,11 @@ void TaskCoordinator::assignTask(ResourceInfo &info)
             uint64_t end = min(info.size(), bitPos + BLOCK_SIZE);
             string uri = info.getUri();
             auto& ctx = const_cast<NetworkContext &>(ctxs[who++]); // 可能存在拷贝陷进
-            tm_->addTask({uri, Block2(bitPos, end), ctx});
+            Task tsk = {uri, Block2(bitPos, end), ctx};
+            tm_->addTask(tsk);
         }
     }
+    tm_->pendingStopTask(info.getUri());
 }
 
 TaskCoordinator::~TaskCoordinator()

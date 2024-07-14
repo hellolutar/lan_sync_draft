@@ -40,3 +40,7 @@ ttest(setup_road_test
 ttest(resource_manager_test
   ${PROJECT_SOURCE_DIR}/test/uint-test/resource_manager_test.cc
 )
+
+ttest(task_test
+  ${PROJECT_SOURCE_DIR}/test/task/task_test.cc
+)

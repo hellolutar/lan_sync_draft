@@ -70,6 +70,7 @@ public:
     TransportType type() const;
     void setType(TransportType);
     std::string str();
+    std::string str() const;
 
     friend std::ostream &operator<<(std::ostream &os, const NetAddr &addr);
 

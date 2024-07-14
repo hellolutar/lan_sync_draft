@@ -46,7 +46,7 @@ class Task
 private:
     std::string uri_;
     Block2 block_;
-    NetworkContext &ctx_;
+    NetworkContext ctx_;
     uint8_t retry_ = 0;
     uint64_t passed_time_ = 0;
     TaskStatusEnum status_ = TaskStatusEnum::Pendding;
@@ -54,7 +54,7 @@ private:
     const uint8_t *prepareHeader() const;
 
 public:
-    Task(std::string uri, Block2 blk, NetworkContext &ctx) : uri_(uri), block_(blk), ctx_(ctx){};
+    Task(std::string uri, Block2 blk, const NetworkContext &ctx) : uri_(uri), block_(blk), ctx_(ctx){};
     // Task(const Task &&t) : uri_(t.uri_), block_(t.block_), ctx_(t.ctx_){
     // };
     Task &operator=(const Task t);
@@ -71,7 +71,7 @@ public:
     const std::string getUri() const;
     const Block2 getBlock() const;
 
-    const NetworkContext& getNetCtx() const;
+    const NetworkContext &getNetCtx() const;
 };
 
 class TaskManager2
@@ -79,17 +79,19 @@ class TaskManager2
 protected:
     std::map<std::string, std::vector<Task>> tasks_;
     std::uint8_t download_num_ = 0;
+    uint64_t replaceStatusByStatus(std::string, TaskStatusEnum oldst, TaskStatusEnum newst);
 
 public:
     TaskManager2();
     virtual ~TaskManager2();
 
-    void addTask(Task t);
+    void addTask(const Task &t);
     void cancelTask(std::string uri);
 
     void tick(uint64_t t, std::function<void(const std::string uri, const Block2 blk, const NetworkContext &oldCtx)> reAssignTaskFunc);
 
     uint64_t stopPendingTask(std::string);
+    uint64_t pendingStopTask(std::string);
 
     void success(std::string uri, Block2 block);
 
