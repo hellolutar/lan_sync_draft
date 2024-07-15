@@ -18,11 +18,13 @@ protected:
     std::shared_ptr<LogicCore> core_;
     std::shared_ptr<UdpCliTrigger> hello_trg_;
     std::shared_ptr<TaskCoordinatorTrigger> coor_trg_;
+    std::shared_ptr<TaskManager> tm_;
 
 public:
-    Endpoint()
+    Endpoint(std::shared_ptr<TaskManager> tm)
         : na_(std::make_shared<NetworkAdapter>()),
-          core_(std::make_shared<LogicCore>())
+          core_(std::make_shared<LogicCore>()),
+          tm_(tm)
     {
         core_->setNetworkAdapter(na_);
     };
@@ -32,6 +34,7 @@ public:
     void run();
 
     std::shared_ptr<LogicCore> getLogicCore();
+    void setTaskManager(std::shared_ptr<TaskManager> tm);
 };
 
 #endif

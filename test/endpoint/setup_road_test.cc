@@ -105,10 +105,13 @@ TEST_F(EndPointTestCaseSimple, communication_for_req__replyIdx__reqRs)
     my_tcp_srv_receive_from(peer_tcp_cli_addr, pkt_hello_ack());
     assert_my_tcp_srv_sended_to(peer_tcp_cli_addr, pkt_req_idx());
 
-    vector<Resource> tb = {{"java", "java", "java.lang.string", "path", 18}, {"C++", "C++", "since 1985", "path", 1985}};
+    vector<Resource> tb = {{"java", "uri.java", "java.lang.string", "path", 18}, {"C++", "uri.C++", "since 1985", "path", 10 * BLOCK_SIZE}};
     rm_->setIdx(tb);
     rm_->setNeedToSync(tb);
 
     my_tcp_srv_receive_from(peer_tcp_cli_addr, pkt_reply_idx(tb));
-    // assert_my_tcp_srv_sended_to(peer_tcp_cli_addr, pkt_req_rs({}));
+
+    assert_my_tcp_srv_sended_getrs_to(peer_tcp_cli_addr);
+
+    renderReadFrom();
 }

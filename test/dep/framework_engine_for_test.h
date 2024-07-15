@@ -10,6 +10,7 @@
 #include "framework/itf/net/net_framework.h"
 #include "framework/itf/timer/timer_trigger_framework.h"
 #include "resource_manager.h"
+#include "dep/test_common.h"
 
 using namespace std;
 
@@ -94,13 +95,15 @@ public:
 
   bool operator<(const uri_block &other) const
   {
-    return uri == other.uri && blk < other.blk;
+    return str() < other.str();
   }
 
   bool operator==(const uri_block &other) const
   {
-    return uri == other.uri && blk == other.blk;
+    return str() == other.str();
   }
+
+  std::string str() const;
 };
 
 class ResourceManagerForTest : public ResourceManager
@@ -109,7 +112,7 @@ private:
   std::vector<Resource> table_;
   std::vector<Resource> need_to_sync_;
   bool validres_ = false;
-  std::map<uri_block, std::shared_ptr<uint8_t[]>> read_from_data_;
+  mutable std::map<uri_block, std::shared_ptr<uint8_t[]>> read_from_data_;
 
 public:
   ResourceManagerForTest(/* args */) {}

@@ -1,6 +1,5 @@
-1. persist_engine
-    - store: 保存资源，保存在一个临时的地方，保存完成后再放置到指定位置
-2. 
+1. 根据downloading的数量，确定getrs的数量
+2. 合并getrs，将其与vector<rs>进行对比
 
 
 bug

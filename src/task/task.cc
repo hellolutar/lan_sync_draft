@@ -29,12 +29,12 @@ void Task::req()
     pkt.addXheader(XHEADER_URI, uri_);
     pkt.addXheader(XHEADER_RANGE, range_hdr);
 
-    // 读取数据
-    auto data_opt = rm_->readFrom(uri_, block_);
-    if (data_opt.has_value())
-    {
-        pkt.setPayload(data_opt.value().get(), block_.size());
-    }
+    // todo(20240715, lutar) this logic belong to reply resource 读取数据
+    // auto data_opt = rm_->readFrom(uri_, block_);
+    // if (data_opt.has_value())
+    // {
+    //     pkt.setPayload(data_opt.value().get(), block_.size());
+    // }
 
     BufBaseonEvent buf;
     pkt.writeTo(buf);

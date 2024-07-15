@@ -4,21 +4,11 @@
 #include <algorithm>
 
 #include "resource_manager.h"
+#include "dep/test_common.h"
 
 using namespace std;
 
-std::string genStr(uint32_t size)
-{
-    stringstream ss;
-    string dic = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for (uint64_t i = 0; i < size;)
-    {
-        uint64_t subsize = min(static_cast<uint64_t>(size), dic.size());
-        ss << dic.substr(0, subsize);
-        i += subsize;
-    }
-    return ss.str();
-}
+
 
 TEST(ResourceSerializer, serialize_single_resource)
 {

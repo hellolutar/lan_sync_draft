@@ -184,9 +184,11 @@ void TimerFrameworkEngineForTest::tick(uint64_t since_last)
 std::optional<std::shared_ptr<uint8_t[]>> ResourceManagerForTest::readFrom(std::string uri, const Block &blk) const
 {
     uri_block k{uri, blk};
-    if (read_from_data_.find(k) != read_from_data_.end())
+    auto iter = read_from_data_.find(k);
+    if (iter != read_from_data_.end())
     {
-        return make_optional<std::shared_ptr<uint8_t[]>>(read_from_data_.find(k)->second);
+        auto ret = make_optional<std::shared_ptr<uint8_t[]>>(iter->second);
+        read_from_data_.erase(iter);
     }
     return nullopt;
 }
@@ -194,4 +196,10 @@ std::optional<std::shared_ptr<uint8_t[]>> ResourceManagerForTest::readFrom(std::
 void ResourceManagerForTest::setReadFrom(uri_block k, std::shared_ptr<uint8_t[]> v)
 {
     read_from_data_[k] = v;
+}
+
+
+std::string uri_block::str() const
+{
+    return uri + "-" + to_string(blk.start) + "-" + to_string(blk.end);
 }

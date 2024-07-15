@@ -5,7 +5,10 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/test
 )
 
-add_library(test_env_obj OBJECT  ${PROJECT_SOURCE_DIR}/test/framework_engine_for_test.cc)
+add_library(test_env_obj OBJECT
+  ${PROJECT_SOURCE_DIR}/test/dep/framework_engine_for_test.cc
+  ${PROJECT_SOURCE_DIR}/test/dep/test_common.cc
+)
 
 find_package(GTest REQUIRED)
 
