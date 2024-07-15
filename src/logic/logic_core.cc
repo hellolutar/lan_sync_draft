@@ -99,9 +99,14 @@ void LogicCore::setNetworkAdapter(std::shared_ptr<NetworkAdapter> ad)
 void LogicCore::setResourceManager(std::shared_ptr<ResourceManager> rm)
 {
     rm_ = rm;
+    if (coor_ != nullptr)
+        coor_->setResourceManager(rm);
 }
 
 void LogicCore::setTaskCoordinator(std::shared_ptr<TaskCoordinator> coor)
 {
     coor_ = coor;
+
+    if (rm_ != nullptr)
+        coor_->setResourceManager(rm_);
 }

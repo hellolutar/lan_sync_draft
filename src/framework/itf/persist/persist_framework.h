@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <optional>
 
 class PersistMonitor
 {
@@ -46,7 +47,7 @@ public:
      * @return          file content
      *
      */
-    virtual std::shared_ptr<uint8_t[]> readFrom(std::string path, uint64_t &ret_len) = 0;
+    virtual std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string path, uint64_t &ret_len) = 0;
 
     /**
      * keep content to the path
@@ -57,7 +58,7 @@ public:
      * @param ret_len   the size of the actual to read
      * @return          file content
      */
-    virtual std::shared_ptr<uint8_t[]> readFrom(std::string path, uint64_t offset, uint64_t size, uint64_t &ret_len) = 0;
+    virtual std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string path, uint64_t offset, uint64_t size, uint64_t &ret_len) = 0;
 
     /**
      * keep content to the path

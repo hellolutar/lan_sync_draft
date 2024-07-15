@@ -174,6 +174,9 @@ void *LanSyncPkt::getPayload() const
 
 void LanSyncPkt::setPayload(void *data_arg, uint64_t datalen)
 {
+    if (data_arg == nullptr || datalen == 0)
+        return;
+    
     if (payload != nullptr)
     {
         total_len = header_len;

@@ -142,8 +142,7 @@ public:
   {
     return true;
   };
-  std::shared_ptr<uint8_t[]> readFrom(std::string uri,
-                                      const Block &blk) const override;
+  std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string uri, const Block &blk) const override;
 
   void setIdx(std::vector<Resource> rs) { table_ = rs; };
   void setNeedToSync(std::vector<Resource> rs) { need_to_sync_ = rs; };

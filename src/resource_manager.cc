@@ -143,13 +143,13 @@ bool ResourceManagerBaseFilesystem::save(string uri, void *data, uint64_t offset
     return true;
 }
 
-shared_ptr<uint8_t[]> ResourceManagerBaseFilesystem::readFrom(std::string uri, const Block &blk) const
+std::optional<std::shared_ptr<uint8_t[]>> ResourceManagerBaseFilesystem::readFrom(std::string uri, const Block &blk) const
 {
     auto eg = PersistFramework::getEngine();
     auto path = mapping(uri);
 
     uint64_t actual_read_size = 0;
-    std::shared_ptr<uint8_t[]> data = eg->readFrom(path, blk.start, blk.size(), actual_read_size);
+    auto data = eg->readFrom(path, blk.start, blk.size(), actual_read_size);
     // todo(20240715, lutar) when the actual_read_size is not equal the blk.size()
     return data;
 }

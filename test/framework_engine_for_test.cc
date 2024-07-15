@@ -181,14 +181,14 @@ void TimerFrameworkEngineForTest::tick(uint64_t since_last)
         trg->trigger();
 }
 
-std::shared_ptr<uint8_t[]> ResourceManagerForTest::readFrom(std::string uri, const Block &blk) const
+std::optional<std::shared_ptr<uint8_t[]>> ResourceManagerForTest::readFrom(std::string uri, const Block &blk) const
 {
     uri_block k{uri, blk};
     if (read_from_data_.find(k) != read_from_data_.end())
     {
-        return read_from_data_.find(k)->second;
+        return make_optional<std::shared_ptr<uint8_t[]>>(read_from_data_.find(k)->second);
     }
-    throw NotFoundException("ResourceManagerForTest::readFrom");
+    return nullopt;
 }
 
 void ResourceManagerForTest::setReadFrom(uri_block k, std::shared_ptr<uint8_t[]> v)

@@ -10,7 +10,7 @@ PersistFrameworkEgineImplWithFileSystem::~PersistFrameworkEgineImplWithFileSyste
 {
 }
 
-std::shared_ptr<uint8_t[]> PersistFrameworkEgineImplWithFileSystem::readFrom(string path, uint64_t &ret_len)
+std::optional<std::shared_ptr<uint8_t[]>> PersistFrameworkEgineImplWithFileSystem::readFrom(string path, uint64_t &ret_len)
 {
     filesystem::path p(path);
     size_t size = filesystem::file_size(p);
@@ -18,18 +18,18 @@ std::shared_ptr<uint8_t[]> PersistFrameworkEgineImplWithFileSystem::readFrom(str
     return readFrom(path, 0, size, ret_len);
 }
 
-std::shared_ptr<uint8_t[]> PersistFrameworkEgineImplWithFileSystem::readFrom(string path, uint64_t offset, uint64_t size, uint64_t &ret_len)
+std::optional<std::shared_ptr<uint8_t[]>> PersistFrameworkEgineImplWithFileSystem::readFrom(string path, uint64_t offset, uint64_t size, uint64_t &ret_len)
 {
     ret_len = 0;
 
     int fd = open(path.data(), O_RDONLY);
     if (fd < 0)
-        return nullptr;
+        return nullopt;
 
     off_t curpos = lseek(fd, offset, SEEK_SET);
     if (curpos != offset)
     {
-        return nullptr;
+        return nullopt;
     }
 
     filesystem::path filep(path);
@@ -68,7 +68,7 @@ std::shared_ptr<uint8_t[]> PersistFrameworkEgineImplWithFileSystem::readFrom(str
     }
     close(fd);
 
-    return retData;
+    return make_optional<std::shared_ptr<uint8_t[]>>(retData);
 }
 
 uint64_t PersistFrameworkEgineImplWithFileSystem::saveTo(string path, uint64_t offset, uint8_t *data, uint64_t size)

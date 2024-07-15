@@ -25,7 +25,7 @@ private:
 
     std::shared_ptr<ResourceManager> rm_;
 
-    void analysis_resource(const ResourceInfo & info, const NetworkContext& ctx);
+    void analysis_resource(const ResourceInfo &info, const NetworkContext &ctx);
 
     void assignTask(ResourceInfo &info);
 
@@ -36,16 +36,15 @@ public:
 
     void tick(std::uint64_t tick);
 
-    std::shared_ptr<TaskManager> &taskManager();
+    std::shared_ptr<TaskManager> taskManager();
 
-    void add_resource(std::string uri, Range range, const NetworkContext& roadId);
+    void add_resource(std::string uri, Range range, const NetworkContext &roadId);
 
-    void reAssignTask(const std::string uri, const Block blk, const NetworkContext& roadId);
+    void reAssignTask(const std::string uri, const Block blk, const NetworkContext &roadId);
 
     void setNetworkAdapter(std::shared_ptr<NetworkAdapter> na);
 
     void setResourceManager(std::shared_ptr<ResourceManager> rm);
-
 };
 
 #endif

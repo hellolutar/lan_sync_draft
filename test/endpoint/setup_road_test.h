@@ -121,7 +121,6 @@ public:
         auto sentPkt = popPktFromOs(cli);
         ASSERT_EQ(pkt, sentPkt);
     }
-
 };
 
 #endif

@@ -23,6 +23,9 @@ protected:
     void SetUp() override
     {
         cor = new TaskCoordinator(tm);
+        
+        shared_ptr<ResourceManager> rm = make_shared<ResourceManagerForTest>();
+        cor->setResourceManager(rm);
 
         neg_ = make_shared<NetFrameworkEngineForTest>();
         Netframework::init(neg_);

@@ -5,6 +5,7 @@
 #include <map>
 #include <filesystem>
 #include <memory>
+#include <optional>
 
 #include "exc/not_found_exc.h"
 #include "framework/dep/resource.h"
@@ -24,7 +25,7 @@ public:
     virtual std::vector<struct Resource> need_to_sync(std::vector<struct Resource> peer_table) const = 0;
     virtual bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) = 0;
 
-    virtual std::shared_ptr<uint8_t[]> readFrom(std::string uri, const Block &blk) const = 0;
+    virtual std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string uri, const Block &blk) const = 0;
 };
 
 class ResourceManagerBaseFilesystem : public ResourceManager
@@ -52,7 +53,7 @@ public:
 
     bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) override;
 
-    std::shared_ptr<uint8_t[]> readFrom(std::string uri, const Block &blk) const override;
+    std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string uri, const Block &blk) const override;
 };
 
 struct ResourceSerializerDto

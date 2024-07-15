@@ -80,7 +80,7 @@ void TaskCoordinator::tick(std::uint64_t t)
     tm_->tick(t, f);
 }
 
-std::shared_ptr<TaskManager> &TaskCoordinator::taskManager()
+std::shared_ptr<TaskManager> TaskCoordinator::taskManager()
 {
     return tm_;
 }
