@@ -127,9 +127,13 @@ void LanSyncPkt::addXheader(const string key, const string value)
     total_len += kv_len;
 }
 
-string LanSyncPkt::queryXheader(string key)
+const optional<string> LanSyncPkt::queryXheader(string key) const
 {
-    return xheader[key];
+    auto iter = xheader.find(key);
+    if (iter == xheader.end())
+        return nullopt;
+
+    return make_optional<const string &>(iter->second);
 }
 
 const map<string, string> LanSyncPkt::getXheaders() const
@@ -176,7 +180,7 @@ void LanSyncPkt::setPayload(void *data_arg, uint64_t datalen)
 {
     if (data_arg == nullptr || datalen == 0)
         return;
-    
+
     if (payload != nullptr)
     {
         total_len = header_len;

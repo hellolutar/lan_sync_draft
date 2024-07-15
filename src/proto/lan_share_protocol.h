@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 
+#include <optional>
 #include <string>
 #include <vector>
 #include <map>
@@ -66,7 +67,7 @@ public:
 
     void addXheader(const std::string key, const std::string value);
 
-    std::string queryXheader(std::string key);
+    const std::optional<std::string> queryXheader(std::string key) const;
 
     void *getPayload();
     void *getPayload() const;

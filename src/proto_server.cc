@@ -8,6 +8,7 @@ void ProtoServerRecv::recv(const NetAddr &from, uint8_t *data, uint64_t size)
         if (s->isMe(from))
         {
             s->recv(from, data, size);
+            return;
         }
     }
 

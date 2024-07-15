@@ -1,5 +1,7 @@
 #include "logic_core.h"
 
+using namespace std;
+
 void LogicCore::helloAck(const NetAddr &peer, const LanSyncPkt &pkt)
 {
     auto idx = rm_->idx();
@@ -43,7 +45,27 @@ void LogicCore::recvIdx(const NetAddr &peer, const LanSyncPkt &pkt)
         coor_->add_resource(r.getUri(), {0, r.getSize()}, {adapter_, peer});
 }
 
-void LogicCore::recvRs(const NetAddr &peer, const LanSyncPkt &pkt) {}
+void LogicCore::recvRs(const NetAddr &peer, const LanSyncPkt &pkt)
+{
+    auto uri_opt = pkt.queryXheader(XHEADER_URI);
+    auto range_opt = pkt.queryXheader(XHEADER_CONTENT_RANGE);
+    if (!uri_opt.has_value() || !range_opt.has_value())
+    {
+        // LOG_ERROR("SyncService::handleLanSyncReplyResource() : query header is failed! ");
+        return;
+    }
+    auto &uri = uri_opt.value();
+    auto &content_range_str = range_opt.value();
+    ContentRange cr(content_range_str);
+
+    uint8_t *data = reinterpret_cast<uint8_t *>(pkt.getPayload());
+
+    if (rm_->save(uri, data, cr.getStartPos(), cr.getSize()))
+    {
+        Block blk(cr.getStartPos(), cr.getStartPos() + cr.getSize());
+        coor_->taskManager()->success(uri, blk);
+    }
+}
 
 void LogicCore::shutdown(const NetAddr &peer, const LanSyncPkt &pkt) {}
 

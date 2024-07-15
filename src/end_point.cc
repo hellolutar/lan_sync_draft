@@ -11,8 +11,11 @@ void Endpoint::registerTrg()
 
     auto coor = make_shared<TaskCoordinator>(tm_);
     coor_trg_ = make_shared<TaskCoordinatorTrigger>(Trigger::second(2), true, coor);
-    timer->addTrg(hello_trg_);
+    
     core_->setTaskCoordinator(coor);
+
+    timer->addTrg(hello_trg_);
+    timer->addTrg(coor_trg_);
 }
 
 void Endpoint::run()
@@ -26,6 +29,7 @@ void Endpoint::run()
 
 std::shared_ptr<LogicCore> Endpoint::getLogicCore() { return core_; }
 
-void Endpoint::setTaskManager(std::shared_ptr<TaskManager> tm) {
+void Endpoint::setTaskManager(std::shared_ptr<TaskManager> tm)
+{
     tm_ = tm;
 }

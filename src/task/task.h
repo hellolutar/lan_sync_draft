@@ -16,7 +16,6 @@
 #include "network_context.h"
 #include "resource_manager.h"
 
-
 enum class TaskStatusEnum
 {
     Pendding,
@@ -30,6 +29,7 @@ class Task
 {
 private:
     std::string uri_;
+    std::uint64_t total_size_;
     Block block_;
     NetworkContext ctx_;
     uint8_t retry_ = 0;
@@ -41,8 +41,8 @@ private:
     const uint8_t *prepareHeader() const;
 
 public:
-    Task(std::string uri, Block blk, const NetworkContext &ctx, std::shared_ptr<ResourceManager> rm)
-        : uri_(uri), block_(blk), ctx_(ctx), rm_(rm){};
+    Task(std::string uri, std::uint64_t total_size, Block blk, const NetworkContext &ctx, std::shared_ptr<ResourceManager> rm)
+        : uri_(uri), total_size_(total_size), block_(blk), ctx_(ctx), rm_(rm){};
     Task &operator=(const Task t);
 
     ~Task();
@@ -56,6 +56,7 @@ public:
 
     const std::string getUri() const;
     const Block getBlock() const;
+    const uint64_t getTotalSize() const;
 
     const NetworkContext &getNetCtx() const;
 };

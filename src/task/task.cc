@@ -1,4 +1,5 @@
 #include "task/task.h"
+#include "task.h"
 
 using namespace std;
 
@@ -25,7 +26,7 @@ void Task::req()
 
     LanSyncPkt pkt(lan_sync_version::VER_0_1, LAN_SYNC_TYPE_GET_RESOURCE);
 
-    string range_hdr = Range(block_.start, block_.end - block_.start).to_string();
+    string range_hdr = ContentRange(block_.start, block_.size(), total_size_, total_size_ == block_.end).to_string();
     pkt.addXheader(XHEADER_URI, uri_);
     pkt.addXheader(XHEADER_RANGE, range_hdr);
 
@@ -87,10 +88,9 @@ const Block Task::getBlock() const
     return block_;
 }
 
-const NetworkContext &Task::getNetCtx() const
-{
-    return ctx_;
-}
+const uint64_t Task::getTotalSize() const { return total_size_; }
+
+const NetworkContext &Task::getNetCtx() const { return ctx_; }
 
 TaskManager::TaskManager(/* args */)
 {

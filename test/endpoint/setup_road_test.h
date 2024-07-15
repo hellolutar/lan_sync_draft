@@ -23,6 +23,29 @@ public:
         return tasks_;
     }
 
+    const std::vector<Task> getTasksByStatus(TaskStatusEnum st) const
+    {
+        std::vector<Task> ret;
+        for (auto &&kv : tasks_)
+        {
+            for (auto &&t : kv.second)
+            {
+                if (t.getStatus() == st)
+                    ret.push_back(t);
+            }
+        }
+        return ret;
+    }
+
+    const std::vector<Task> getSyncingTasks() const
+    {
+        return getTasksByStatus(TaskStatusEnum::Syning);
+    }
+
+    const std::vector<Task> getSuccessTasks() const
+    {
+        return getTasksByStatus(TaskStatusEnum::Success);
+    }
 };
 
 class EndpointForTest : public Endpoint
@@ -123,6 +146,28 @@ public:
         auto srv = neg_->queryTcpSerNetAbility(my_tcp_srv_addr_);
         recv(srv, peer, pkt);
     }
+    void my_tcp_srv_receive_reply_rs_from(NetAddr &peer)
+    {
+        auto srv = neg_->queryTcpSerNetAbility(my_tcp_srv_addr_);
+        auto syncingTasks = tm_->getSyncingTasks();
+        ASSERT_LT(syncingTasks.size(), DOWNLOAD_LIMIT + 1);
+
+        for (auto &&t : syncingTasks)
+        {
+            auto &blk = t.getBlock();
+            LanSyncPkt pkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_REPLY_RESOURCE);
+            if (blk.size() > 0)
+            {
+                string range_hdr = ContentRange(blk.start, blk.size(), t.getTotalSize(), t.getTotalSize() == blk.end).to_string();
+                pkt.addXheader(XHEADER_URI, t.getUri());
+                pkt.addXheader(XHEADER_CONTENT_RANGE, range_hdr);
+
+                auto str = gen_u8_array(blk.size());
+                pkt.setPayload(str.get(), blk.size());
+            }
+            recv(srv, peer, pkt);
+        }
+    }
     void my_tcp_cli_receive_from(NetAddr &peer, LanSyncPkt &&pkt)
     {
         peer.setType(TransportType::TCP);
@@ -156,7 +201,7 @@ public:
         // 根据peer查找session，然后session.write，故tcp_srv的send的内容，存放在peer的session的outputstream中
         auto cli = neg_->queryTcpCliNetAbility(peer);
         auto sentPkt = justReadPktFromOs(cli);
-        ASSERT_EQ(sentPkt.getType(),lan_sync_type_enum::LAN_SYNC_TYPE_GET_RESOURCE);
+        ASSERT_EQ(sentPkt.getType(), lan_sync_type_enum::LAN_SYNC_TYPE_GET_RESOURCE);
     }
 
     void renderReadFrom()

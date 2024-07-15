@@ -113,5 +113,7 @@ TEST_F(EndPointTestCaseSimple, communication_for_req__replyIdx__reqRs)
 
     assert_my_tcp_srv_sended_getrs_to(peer_tcp_cli_addr);
 
-    renderReadFrom();
+    my_tcp_srv_receive_reply_rs_from(peer_tcp_cli_addr);
+
+    ASSERT_GT(tm_->getSuccessTasks().size(), 0);
 }
