@@ -9,28 +9,13 @@
 
 #include "constants/constants.h"
 #include "framework/itf/net/transport_proto.h"
-#include "task/range.h"
+#include "framework/dep/block_range.h"
 #include "proto/lan_share_protocol.h"
 #include "buf/buf_base_on_event.h"
 #include "network_adapter.h"
 #include "network_context.h"
+#include "resource_manager.h"
 
-class Block
-{
-public:
-    uint64_t start;
-    uint64_t end;
-    Block(){};
-    Block(uint64_t start, uint64_t end) : start(start), end(end){};
-    ~Block(){};
-
-    const bool operator==(const Block &other);
-
-    const bool operator==(const Block &other) const;
-
-    static const uint64_t pos(uint64_t offset);
-    static const uint64_t bitPos(uint64_t pos);
-};
 
 enum class TaskStatusEnum
 {
@@ -51,12 +36,13 @@ private:
     uint64_t passed_time_ = 0;
     TaskStatusEnum status_ = TaskStatusEnum::Pendding;
 
+    std::shared_ptr<ResourceManager> rm_;
+
     const uint8_t *prepareHeader() const;
 
 public:
-    Task(std::string uri, Block blk, const NetworkContext &ctx) : uri_(uri), block_(blk), ctx_(ctx){};
-    // Task(const Task &&t) : uri_(t.uri_), block_(t.block_), ctx_(t.ctx_){
-    // };
+    Task(std::string uri, Block blk, const NetworkContext &ctx, std::shared_ptr<ResourceManager> rm)
+        : uri_(uri), block_(blk), ctx_(ctx), rm_(rm){};
     Task &operator=(const Task t);
 
     ~Task();

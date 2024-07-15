@@ -1,5 +1,4 @@
 #include "task/task.h"
-#include "task.h"
 
 using namespace std;
 
@@ -31,6 +30,7 @@ void Task::req()
     pkt.addXheader(XHEADER_RANGE, range_hdr);
 
     // 读取数据
+    // rm_->query()
 
     BufBaseonEvent buf;
     pkt.writeTo(buf);
@@ -233,29 +233,4 @@ const bool TaskManager::isSuccess(std::string uri) const
 const uint64_t TaskManager::downloadNum() const
 {
     return download_num_;
-}
-
-const bool Block::operator==(const Block &other)
-{
-    return static_cast<const Block &>(*this) == other;
-}
-
-const bool Block::operator==(const Block &other) const
-{
-    return start == other.start && end == other.end;
-}
-
-const uint64_t Block::pos(uint64_t offset)
-{
-    if (offset < BLOCK_SIZE)
-        return 0;
-
-    uint64_t pos = offset / BLOCK_SIZE;
-
-    return pos;
-}
-
-const uint64_t Block::bitPos(uint64_t pos)
-{
-    return pos * BLOCK_SIZE;
 }

@@ -5,8 +5,8 @@
 #include <string>
 #include <memory>
 
-#include "task/range.h"
 #include "network_context.h"
+#include "framework/dep/block_range.h"
 #include "framework/itf/net/transport_proto.h"
 
 class ResourceInfo

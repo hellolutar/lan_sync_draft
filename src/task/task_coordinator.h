@@ -23,6 +23,8 @@ private:
 
     std::shared_ptr<NetworkAdapter> na_;
 
+    std::shared_ptr<ResourceManager> rm_;
+
     void analysis_resource(const ResourceInfo & info, const NetworkContext& ctx);
 
     void assignTask(ResourceInfo &info);
@@ -41,6 +43,9 @@ public:
     void reAssignTask(const std::string uri, const Block blk, const NetworkContext& roadId);
 
     void setNetworkAdapter(std::shared_ptr<NetworkAdapter> na);
+
+    void setResourceManager(std::shared_ptr<ResourceManager> rm);
+
 };
 
 #endif

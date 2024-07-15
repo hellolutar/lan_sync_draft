@@ -1,5 +1,34 @@
-#include "task/range.h"
+#include "block_range.h"
+
 #include <sstream>
+
+
+const bool Block::operator==(const Block &other)
+{
+    return static_cast<const Block &>(*this) == other;
+}
+
+const bool Block::operator==(const Block &other) const
+{
+    return start == other.start && end == other.end;
+}
+
+const uint64_t Block::pos(uint64_t offset)
+{
+    if (offset < BLOCK_SIZE)
+        return 0;
+
+    uint64_t pos = offset / BLOCK_SIZE;
+
+    return pos;
+}
+
+const uint64_t Block::bitPos(uint64_t pos)
+{
+    return pos * BLOCK_SIZE;
+}
+
+
 
 Range::~Range()
 {
