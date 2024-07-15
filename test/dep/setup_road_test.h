@@ -3,8 +3,10 @@
 
 #include <gtest/gtest.h>
 
-#include "dep/framework_engine_for_test.h"
+#include <cstring>
+
 #include "end_point.h"
+#include "dep/framework_engine_for_test.h"
 #include "proto/lan_share_protocol.h"
 #include "buf/buf_base_on_event.h"
 
@@ -21,6 +23,19 @@ public:
     const std::map<std::string, std::vector<Task>> &getTasks() const
     {
         return tasks_;
+    }
+
+    const std::vector<Task> getAllTasks() const
+    {
+        std::vector<Task> ret;
+        for (auto &&kv : tasks_)
+        {
+            for (auto &&t : kv.second)
+            {
+                ret.push_back(t);
+            }
+        }
+        return ret;
     }
 
     const std::vector<Task> getTasksByStatus(TaskStatusEnum st) const
@@ -73,8 +88,8 @@ protected:
     EndpointForTest ed_;
     shared_ptr<NetFrameworkEngineForTest> neg_;
     shared_ptr<TimerFrameworkEngineForTest> teg_;
-    shared_ptr<ResourceManagerForTest> rm_ = make_shared<ResourceManagerForTest>();
-    shared_ptr<TaskManagerForTest> tm_ = make_shared<TaskManagerForTest>();
+    shared_ptr<ResourceManagerForTest> rm_;
+    shared_ptr<TaskManagerForTest> tm_;
 
     NetAddr my_udp_cli_addr_{"0.0.0.10:18080", TransportType::UDP};
     NetAddr my_udp_srv_addr_{"0.0.0.10:8080", TransportType::UDP};
@@ -89,7 +104,9 @@ protected:
     void SetUp() override
     {
         printf("SetUp \n");
-        env({":18080"});
+
+        rm_ = make_shared<ResourceManagerForTest>();
+        tm_ = make_shared<TaskManagerForTest>();
 
         neg_ = make_shared<NetFrameworkEngineForTest>();
         Netframework::init(neg_);
@@ -217,6 +234,12 @@ public:
             }
         }
     }
+
+    LanSyncPkt pkt_hello(void *payload = nullptr, uint64_t size = 0);
+    LanSyncPkt pkt_hello_ack(void *payload = nullptr, uint64_t size = 0);
+    LanSyncPkt pkt_req_idx();
+    LanSyncPkt pkt_reply_idx(vector<Resource> tb);
+    LanSyncPkt pkt_req_rs(Resource r);
 };
 
 #endif

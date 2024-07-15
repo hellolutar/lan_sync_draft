@@ -32,7 +32,22 @@ void LogicCore::reqIdx(const NetAddr &peer, const LanSyncPkt &pkt)
     // 括号外，buf被释放，会导致buf.data被释放。
 }
 
-void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt) {}
+void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt)
+{
+    // todo
+    auto uri_opt = pkt.queryXheader(XHEADER_URI);
+    auto range_opt = pkt.queryXheader(XHEADER_RANGE);
+    if (!uri_opt.has_value() || !range_opt.has_value())
+    {
+        // LOG_ERROR("SyncService::handleLanSyncReplyResource() : query header is failed! ");
+        return;
+    }
+    Range range(range_opt.value());
+    Block b(range.getStart(), range.getEnd());
+    rm_->readFrom(uri_opt.value(), b);
+
+    // todo
+}
 
 void LogicCore::recvIdx(const NetAddr &peer, const LanSyncPkt &pkt)
 {

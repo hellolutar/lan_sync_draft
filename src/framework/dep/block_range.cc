@@ -32,6 +32,13 @@ const uint64_t Block::size() const
     return end - start;
 }
 
+Range::Range(std::string str)
+{
+    uint64_t pos = str.find_first_of("-");
+    start_ = std::stoi(str.substr(0, pos));
+    end_ = std::stoi(str.substr(pos + 1));
+}
+
 Range::~Range()
 {
 }
@@ -66,6 +73,16 @@ std::string Range::to_string()
     }
 
     return ss.str();
+}
+
+uint64_t Range::getStart() const
+{
+    return start_;
+}
+
+uint64_t Range::getEnd() const
+{
+    return end_;
 }
 
 const std::string Range::defaultStr = "0-0/0/last";

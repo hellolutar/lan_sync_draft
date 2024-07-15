@@ -8,6 +8,8 @@ include_directories(
 add_library(test_env_obj OBJECT
   ${PROJECT_SOURCE_DIR}/test/dep/framework_engine_for_test.cc
   ${PROJECT_SOURCE_DIR}/test/dep/test_common.cc
+  ${PROJECT_SOURCE_DIR}/test/dep/setup_road_test.cc
+
 )
 
 find_package(GTest REQUIRED)
@@ -36,8 +38,11 @@ endmacro(ttest)
 ttest(net_framework_engine_test
   ${PROJECT_SOURCE_DIR}/test/net/net_framework_engine_test.cc
 )
-ttest(setup_road_test
-  ${PROJECT_SOURCE_DIR}/test/endpoint/setup_road_test.cc
+ttest(me_tcpcli
+  ${PROJECT_SOURCE_DIR}/test/endpoint/me_tcpcli.cc
+)
+ttest(me_tcpsrv
+  ${PROJECT_SOURCE_DIR}/test/endpoint/me_tcpsrv.cc
 )
 
 ttest(resource_manager_test

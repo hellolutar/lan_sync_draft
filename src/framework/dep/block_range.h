@@ -38,6 +38,7 @@ private:
 
 public:
     Range(std::uint64_t start, std::uint64_t end) : start_(start), end_(end){};
+    Range(std::string str);
     ~Range();
 
     bool operator==(const Range &r) const;
@@ -45,6 +46,9 @@ public:
 
     const uint64_t size() const;
     std::string to_string();
+
+    uint64_t getStart() const;
+    uint64_t getEnd() const;
 
     static const std::string defaultStr;
 };
