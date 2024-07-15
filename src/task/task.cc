@@ -30,7 +30,8 @@ void Task::req()
     pkt.addXheader(XHEADER_RANGE, range_hdr);
 
     // 读取数据
-    // rm_->query()
+    // auto data_p = rm_->readFrom(uri_, block_);
+    // pkt.setPayload(data_p.get(), block_.size());
 
     BufBaseonEvent buf;
     pkt.writeTo(buf);

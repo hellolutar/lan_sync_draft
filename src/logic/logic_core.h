@@ -10,7 +10,7 @@ class LogicCore : public Logic
 private:
     std::shared_ptr<NetworkAdapter> adapter_;
     std::shared_ptr<ResourceManager> rm_;
-    std::shared_ptr<TaskCoordinator> coor_; 
+    std::shared_ptr<TaskCoordinator> coor_;
 
     void helloAck(const NetAddr &peer, const LanSyncPkt &pkt);
     void reqIdx(const NetAddr &peer, const LanSyncPkt &pkt);
@@ -21,11 +21,13 @@ private:
 
 public:
     LogicCore(){};
-    LogicCore(std::shared_ptr<NetworkAdapter> adapter, std::shared_ptr<ResourceManager> rm)
+    LogicCore(std::shared_ptr<NetworkAdapter> adapter,
+              std::shared_ptr<ResourceManager> rm)
         : adapter_(adapter), rm_(rm) {}
     ~LogicCore() {}
 
-    const uint64_t isExtraAllDataNow(uint8_t *data, uint64_t data_len) const override;
+    const uint64_t isExtraAllDataNow(uint8_t *data,
+                                     uint64_t data_len) const override;
     void recv(const NetAddr &peer, uint8_t *data, uint64_t size) override;
 
     void setNetworkAdapter(std::shared_ptr<NetworkAdapter> ad);

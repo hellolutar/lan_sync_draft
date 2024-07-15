@@ -1,37 +1,15 @@
 #ifndef __RESOURCE_MANAGER_H_
 #define __RESOURCE_MANAGER_H_
 
-#include <cstdint>
-#include <string>
 #include <vector>
 #include <map>
 #include <filesystem>
+#include <memory>
 
 #include "exc/not_found_exc.h"
-
-class Resource
-{
-private:
-    std::string name_;
-    std::string uri_;
-    std::string path_;
-    std::string hash_;
-    std::uint64_t size_;
-
-public:
-    Resource(/* args */) {}
-    Resource(std::string name, std::string uri, std::string path, std::string hash, std::uint64_t size)
-        : name_(name), uri_(uri), path_(path), hash_(hash), size_(size) {}
-    ~Resource() {}
-
-    const std::string &getName() const;
-    const std::string &getUri() const;
-    const std::string &getPath() const;
-    const std::string &getHash() const;
-    const std::uint64_t getSize() const;
-
-    bool operator==(const Resource &r) const;
-};
+#include "framework/dep/resource.h"
+#include "framework/dep/block_range.h"
+#include "framework/itf/persist/persist_framework.h"
 
 class ResourceManager
 {
@@ -45,6 +23,8 @@ public:
     virtual bool validRes(std::string uri, std::string hash) const = 0;
     virtual std::vector<struct Resource> need_to_sync(std::vector<struct Resource> peer_table) const = 0;
     virtual bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) = 0;
+
+    virtual std::shared_ptr<uint8_t[]> readFrom(std::string uri, const Block &blk) const = 0;
 };
 
 class ResourceManagerBaseFilesystem : public ResourceManager
@@ -55,7 +35,7 @@ private:
     std::map<std::string, Resource> table_;
 
     std::vector<Resource> recur_walk(std::filesystem::path p);
-    std::string mapping(std::string uri);
+    std::string mapping(std::string uri) const;
 
 public:
     ResourceManagerBaseFilesystem(/* args */) {}
@@ -71,6 +51,8 @@ public:
     std::vector<Resource> need_to_sync(std::vector<Resource> peer_table) const override;
 
     bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) override;
+
+    std::shared_ptr<uint8_t[]> readFrom(std::string uri, const Block &blk) const override;
 };
 
 struct ResourceSerializerDto

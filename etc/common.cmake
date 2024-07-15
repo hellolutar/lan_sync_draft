@@ -29,4 +29,4 @@ add_compile_options(-Wno-format-contains-nul -DRELEASE)
 file(GLOB_RECURSE src_codes ${PROJECT_SOURCE_DIR}/src/*.cc)
 list(REMOVE_ITEM src_codes ${PROJECT_SOURCE_DIR}/src/main.cc)
 
-add_library(lansync_common_obj STATIC ${src_codes})
+add_library(lansync_common_obj OBJECT ${src_codes})

@@ -38,7 +38,7 @@ std::shared_ptr<buf_data> OutputStreamForTest::front()
     return bufs_.front();
 }
 
-void OutputStreamForTest::pop(uint16_t size )
+void OutputStreamForTest::pop(uint16_t size)
 {
     for (size_t i = 0; i < size; i++)
         bufs_.pop();
@@ -179,4 +179,19 @@ void TimerFrameworkEngineForTest::tick(uint64_t since_last)
 {
     for (auto &&trg : trgs_)
         trg->trigger();
+}
+
+std::shared_ptr<uint8_t[]> ResourceManagerForTest::readFrom(std::string uri, const Block &blk) const
+{
+    uri_block k{uri, blk};
+    if (read_from_data_.find(k) != read_from_data_.end())
+    {
+        return read_from_data_.find(k)->second;
+    }
+    throw NotFoundException("ResourceManagerForTest::readFrom");
+}
+
+void ResourceManagerForTest::setReadFrom(uri_block k, std::shared_ptr<uint8_t[]> v)
+{
+    read_from_data_[k] = v;
 }

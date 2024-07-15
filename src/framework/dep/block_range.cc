@@ -2,7 +2,6 @@
 
 #include <sstream>
 
-
 const bool Block::operator==(const Block &other)
 {
     return static_cast<const Block &>(*this) == other;
@@ -28,7 +27,10 @@ const uint64_t Block::bitPos(uint64_t pos)
     return pos * BLOCK_SIZE;
 }
 
-
+const uint64_t Block::size() const
+{
+    return end - start;
+}
 
 Range::~Range()
 {
@@ -54,7 +56,8 @@ const uint64_t Range::size() const
 
 // str like : 0-500
 // str like : 0-
- std::string Range::to_string(){
+std::string Range::to_string()
+{
     std::stringstream ss;
     ss << start_ << FLAG_XHEADER_CONTENT_BETWEEN;
     if (size() != 0)
@@ -63,6 +66,6 @@ const uint64_t Range::size() const
     }
 
     return ss.str();
- }
+}
 
- const std::string Range::defaultStr = "0-0/0/last";
+const std::string Range::defaultStr = "0-0/0/last";

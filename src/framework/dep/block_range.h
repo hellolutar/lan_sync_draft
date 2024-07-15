@@ -20,10 +20,15 @@ public:
 
     const bool operator==(const Block &other) const;
 
+    bool operator<(const Block &other) const {
+        return end < other.end;
+    };
+
+    const uint64_t size() const;
+
     static const uint64_t pos(uint64_t offset);
     static const uint64_t bitPos(uint64_t pos);
 };
-
 
 class Range
 {
@@ -43,6 +48,5 @@ public:
 
     static const std::string defaultStr;
 };
-
 
 #endif

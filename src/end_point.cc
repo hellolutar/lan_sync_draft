@@ -25,7 +25,4 @@ void Endpoint::run()
     TimerFramework::getEngine()->run();
 }
 
-std::shared_ptr<LogicCore> Endpoint::getLogicCore()
-{
-    return core_;
-}
+std::shared_ptr<LogicCore> Endpoint::getLogicCore() { return core_; }

@@ -1,12 +1,12 @@
 #ifndef __END_POINT_H_
 #define __END_POINT_H_
 
+#include "framework/itf/net/net_framework.h"
+#include "framework/itf/timer/timer_trigger_framework.h"
 #include "logic/logic_core.h"
 #include "task/task_coordinator.h"
-#include "framework/itf/timer/timer_trigger_framework.h"
-#include "framework/itf/net/net_framework.h"
-#include "udp_cli_trigger.h"
 #include "task/task_coordinator_trigger.h"
+#include "udp_cli_trigger.h"
 
 class Endpoint
 {
@@ -21,7 +21,8 @@ protected:
 
 public:
     Endpoint()
-        : na_(std::make_shared<NetworkAdapter>()), core_(std::make_shared<LogicCore>())
+        : na_(std::make_shared<NetworkAdapter>()),
+          core_(std::make_shared<LogicCore>())
     {
         core_->setNetworkAdapter(na_);
     };

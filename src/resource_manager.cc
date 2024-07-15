@@ -7,36 +7,6 @@
 
 using namespace std;
 
-const std::string &Resource::getName() const
-{
-    return name_;
-}
-const std::string &Resource::getUri() const
-{
-    return uri_;
-}
-const std::string &Resource::getPath() const
-{
-    return path_;
-}
-const std::string &Resource::getHash() const
-{
-    return hash_;
-}
-const std::uint64_t Resource::getSize() const
-{
-    return size_;
-}
-
-bool Resource::operator==(const Resource &r) const
-{
-    return name_ == r.name_ &&
-           uri_ == r.uri_ &&
-           path_ == r.path_ &&
-           hash_ == r.hash_ &&
-           size_ == r.size_;
-}
-
 const Resource &ResourceManagerBaseFilesystem::query(string uri) const
 {
     if (table_.size() == 0)
@@ -149,7 +119,7 @@ std::vector<Resource> ResourceManagerBaseFilesystem::need_to_sync(std::vector<Re
     return want_to_sync;
 }
 
-string ResourceManagerBaseFilesystem::mapping(string uri)
+string ResourceManagerBaseFilesystem::mapping(string uri) const
 {
     return rsHome + uri;
 }
@@ -171,6 +141,17 @@ bool ResourceManagerBaseFilesystem::save(string uri, void *data, uint64_t offset
     //     return false;
 
     return true;
+}
+
+shared_ptr<uint8_t[]> ResourceManagerBaseFilesystem::readFrom(std::string uri, const Block &blk) const
+{
+    auto eg = PersistFramework::getEngine();
+    auto path = mapping(uri);
+
+    uint64_t actual_read_size = 0;
+    std::shared_ptr<uint8_t[]> data = eg->readFrom(path, blk.start, blk.size(), actual_read_size);
+    // todo(20240715, lutar) when the actual_read_size is not equal the blk.size()
+    return data;
 }
 
 /**

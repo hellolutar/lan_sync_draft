@@ -7,8 +7,8 @@
 #include <memory>
 
 #include "task/task.h"
-#include "task/resource.h"
 #include "network_adapter.h"
+#include "framework/dep/resource.h"
 
 /**
  * 负责协调任务
