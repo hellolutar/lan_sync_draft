@@ -1,11 +1,11 @@
 #include "network_context.h"
 
-void NetworkContext::write(uint8_t *data, uint64_t size)
+void NetworkContext::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     static_cast<const NetworkContext &>(*this).write(data, size);
 }
 
-void NetworkContext::write(uint8_t *data, uint64_t size) const
+void NetworkContext::write(std::shared_ptr<uint8_t[]> data, uint64_t size) const
 {
     na_->write(peer_, data, size);
 }

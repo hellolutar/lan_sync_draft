@@ -16,8 +16,8 @@ public:
         na_ = nullptr;
     }
 
-    virtual void write(uint8_t* data, uint64_t size);
-    virtual void write(uint8_t* data, uint64_t size) const;
+    virtual void write(std::shared_ptr<uint8_t[]> data, uint64_t size);
+    virtual void write(std::shared_ptr<uint8_t[]> data, uint64_t size) const;
 
     const NetAddr& getPeer() const;
 

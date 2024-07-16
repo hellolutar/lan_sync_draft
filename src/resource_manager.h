@@ -23,7 +23,7 @@ public:
     virtual const Resource &query(std::string uri) const = 0;
     virtual bool validRes(std::string uri, std::string hash) const = 0;
     virtual std::vector<struct Resource> need_to_sync(std::vector<struct Resource> peer_table) const = 0;
-    virtual bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) = 0;
+    virtual bool save(std::string uri, std::shared_ptr<uint8_t[]> data, uint64_t offset, uint64_t data_len) = 0;
 
     virtual std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string uri, const Block &blk) const = 0;
 };
@@ -51,7 +51,7 @@ public:
 
     std::vector<Resource> need_to_sync(std::vector<Resource> peer_table) const override;
 
-    bool save(std::string uri, void *data, uint64_t offset, uint64_t data_len) override;
+    bool save(std::string uri, std::shared_ptr<uint8_t[]> data, uint64_t offset, uint64_t data_len) override;
 
     std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string uri, const Block &blk) const override;
 };
@@ -69,7 +69,7 @@ public:
     ~ResourceSerializer() = delete;
 
     static ResourceSerializerDto serialize(const std::vector<Resource> &table);
-    static std::vector<Resource> deserialize(uint8_t *data, uint64_t size);
+    static std::vector<Resource> deserialize(std::shared_ptr<uint8_t[]>data, uint64_t size);
 };
 
 #endif

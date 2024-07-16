@@ -47,9 +47,9 @@ public:
 
     bool isMe(const NetAddr &peer);
 
-    void recv(const NetAddr &peer, uint8_t *data, uint64_t size);
-    void write(uint8_t *data, uint64_t size);
-    void write(uint8_t *data, uint64_t size) const;
+    void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
+    void write(std::shared_ptr<uint8_t[]> data, uint64_t size);
+    void write(std::shared_ptr<uint8_t[]> data, uint64_t size) const;
 
     void bind(const NetAddr &peer, const LanSyncPkt & pkt);
     void call(const NetAddr &peer, const LanSyncPkt & pkt);

@@ -17,7 +17,7 @@ TEST(ResourceSerializer, serialize_single_resource)
 
     auto dto = ResourceSerializer::serialize(v);
 
-    auto result = ResourceSerializer::deserialize(dto.data.get(), dto.size);
+    auto result = ResourceSerializer::deserialize(dto.data, dto.size);
     ASSERT_EQ(v.size(), result.size());
     for (size_t i = 0; i < v.size(); i++)
     {
@@ -32,7 +32,7 @@ TEST(ResourceSerializer, serialize_single_large_uint16t_resource)
 
     auto dto = ResourceSerializer::serialize(v);
 
-    auto result = ResourceSerializer::deserialize(dto.data.get(), dto.size);
+    auto result = ResourceSerializer::deserialize(dto.data, dto.size);
     ASSERT_EQ(v.size(), result.size());
     for (size_t i = 0; i < v.size(); i++)
     {
@@ -47,7 +47,7 @@ TEST(ResourceSerializer, serialize_single_large_uint32t_resource)
 
     auto dto = ResourceSerializer::serialize(v);
 
-    auto result = ResourceSerializer::deserialize(dto.data.get(), dto.size);
+    auto result = ResourceSerializer::deserialize(dto.data, dto.size);
     ASSERT_EQ(v.size(), result.size());
     for (size_t i = 0; i < v.size(); i++)
     {
@@ -71,7 +71,7 @@ TEST(ResourceSerializer, serialize_many_resource)
 
     auto dto = ResourceSerializer::serialize(v);
 
-    auto result = ResourceSerializer::deserialize(dto.data.get(), dto.size);
+    auto result = ResourceSerializer::deserialize(dto.data, dto.size);
     ASSERT_EQ(vecsize, v.size());
     ASSERT_EQ(v.size(), result.size());
     for (size_t i = 0; i < v.size(); i++)

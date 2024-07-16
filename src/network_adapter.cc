@@ -32,7 +32,7 @@ void NetworkAdapter::start(std::shared_ptr<Logic> core)
     }
 }
 
-void NetworkAdapter::write(const NetAddr &peer, uint8_t *data, uint64_t size)
+void NetworkAdapter::write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     if (peer.type() == TransportType::TCP)
     {
@@ -45,7 +45,7 @@ void NetworkAdapter::write(const NetAddr &peer, uint8_t *data, uint64_t size)
     }
 }
 
-void NetworkAdapter::udp_write(const NetAddr &peer, uint8_t *data, uint64_t size)
+void NetworkAdapter::udp_write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     auto eg = Netframework::getEngine();
     auto u_cli = eg->connectWithUdp(peer);

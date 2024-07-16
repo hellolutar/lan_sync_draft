@@ -19,7 +19,7 @@ bool ProtoSession::isMe(const NetAddr &peer)
     return tcli_->peer() == peer;
 }
 
-void ProtoSession::recv(const NetAddr &peer, uint8_t *data, uint64_t size)
+void ProtoSession::recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     LanSyncPkt pkt(data);
 
@@ -42,12 +42,12 @@ void ProtoSession::recv(const NetAddr &peer, uint8_t *data, uint64_t size)
     }
 }
 
-void ProtoSession::write(uint8_t *data, uint64_t size)
+void ProtoSession::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     static_cast<const ProtoSession &>(*this).write(data, size);
 }
 
-void ProtoSession::write(uint8_t *data, uint64_t size) const
+void ProtoSession::write(std::shared_ptr<uint8_t[]> data, uint64_t size) const
 {
     if (tcli_ != nullptr)
     {
@@ -76,7 +76,7 @@ void ProtoSession::call(const NetAddr &from, const LanSyncPkt &pkt)
     if (tcli_ != nullptr)
         throw NotFoundException("the tcli_ has already been created!");
 
-    uint16_t peerPort = *(reinterpret_cast<uint16_t*>(pkt.getPayload()));
+    uint16_t peerPort = *(reinterpret_cast<uint16_t*>(pkt.getPayload().get()));
     NetAddr peer(from);
     peer.setType(TransportType::TCP);
     peer.setPort(peerPort);
@@ -97,7 +97,7 @@ void ProtoSession::handleDisconnect(LanSyncPkt &pkt, const NetAddr &from)
     if (pkt.getPayloadSize() == 0)
         return;
 
-    uint16_t peer_tcp_port = *(reinterpret_cast<uint16_t *>(pkt.getPayload()));
+    uint16_t peer_tcp_port = *(reinterpret_cast<uint16_t *>(pkt.getPayload().get()));
 
     NetAddr peer(from);
     peer.setPort(peer_tcp_port);
@@ -114,5 +114,5 @@ void ProtoSession::reply_hello_ack()
     LanSyncPkt replyPkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_HELLO_ACK);
     BufBaseonEvent buf;
     replyPkt.writeTo(buf);
-    tcli_->write(buf.data().get(), buf.size());
+    tcli_->write(buf.data(), buf.size());
 }

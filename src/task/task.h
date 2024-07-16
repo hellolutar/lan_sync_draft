@@ -38,8 +38,6 @@ private:
 
     std::shared_ptr<ResourceManager> rm_;
 
-    const uint8_t *prepareHeader() const;
-
 public:
     Task(std::string uri, std::uint64_t total_size, Block blk, const NetworkContext &ctx, std::shared_ptr<ResourceManager> rm)
         : uri_(uri), total_size_(total_size), block_(blk), ctx_(ctx), rm_(rm){};

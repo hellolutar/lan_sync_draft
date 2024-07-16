@@ -32,7 +32,6 @@ macro(ttest name fpath)
   )
   message("testname " ${name})
   gtest_discover_tests(${name})
-  add_test(${name} ${name})
 endmacro(ttest)
 
 ttest(net_framework_engine_test

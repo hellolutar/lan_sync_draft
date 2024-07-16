@@ -60,7 +60,7 @@ public:
     LanSyncPkt(enum lan_sync_version version, enum lan_sync_type_enum type)
         : version(version), type(type), header_len(LEN_LAN_SYNC_HEADER_T), total_len(LEN_LAN_SYNC_HEADER_T), payload(nullptr){};
     LanSyncPkt(lan_sync_header_t *header);
-    LanSyncPkt(void *header);
+    LanSyncPkt(std::shared_ptr<uint8_t[]> header);
     ~LanSyncPkt();
 
     void writeTo(AbsBuf &buf);
@@ -69,8 +69,8 @@ public:
 
     const std::optional<std::string> queryXheader(std::string key) const;
 
-    void *getPayload();
-    void *getPayload() const;
+    std::shared_ptr<uint8_t[]> getPayload();
+    std::shared_ptr<uint8_t[]> getPayload() const;
 
     void setPayload(void *data, uint64_t datalen);
 

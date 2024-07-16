@@ -1,18 +1,17 @@
 #include "framework_engine_for_test.h"
 
-buf_data::buf_data(uint8_t *data, uint64_t size)
+buf_data::buf_data(std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
-    data_ = new uint8_t[size];
+    data_ = data;
     size_ = size;
-    memcpy(data_, data, size);
 }
 
 buf_data::~buf_data()
 {
-    delete[] data_;
+    data_ = nullptr;
 }
 
-uint8_t *buf_data::data()
+std::shared_ptr<uint8_t[]> buf_data::data()
 {
     return data_;
 }
@@ -27,7 +26,7 @@ OutputStreamForTest::~OutputStreamForTest()
     clear();
 }
 
-void OutputStreamForTest::write(uint8_t *data, uint64_t size)
+void OutputStreamForTest::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     auto b = make_shared<buf_data>(data, size);
     bufs_.push(b);

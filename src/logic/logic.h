@@ -10,8 +10,8 @@ public:
     Logic(/* args */) {}
     virtual ~Logic() {}
 
-    virtual const uint64_t isExtraAllDataNow(uint8_t *data, uint64_t data_len) const = 0;
-    virtual void recv(const NetAddr &peer, uint8_t *data, uint64_t size) = 0;
+    virtual const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, uint64_t data_len) const = 0;
+    virtual void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size) = 0;
 };
 
 #endif

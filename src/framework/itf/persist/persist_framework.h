@@ -70,7 +70,7 @@ public:
      * @return          the size of the actual to write
      *
      */
-    virtual uint64_t saveTo(std::string path, uint64_t offset, uint8_t *data, uint64_t size) = 0;
+    virtual uint64_t saveTo(std::string path, uint64_t offset, std::shared_ptr<uint8_t[]> data, uint64_t size) = 0;
 };
 
 class PersistFramework

@@ -129,7 +129,7 @@ protected:
     {
         BufBaseonEvent buf;
         pkt.writeTo(buf);
-        net->recv(peer, buf.data().get(), buf.size());
+        net->recv(peer, buf.data(), buf.size());
     }
 
     optional<LanSyncPkt> popPktFromOs(std::shared_ptr<NetAbility> net)
@@ -178,7 +178,7 @@ public:
             {
                 string range_hdr = Range(blk.start, blk.end).to_string();
                 pkt.addXheader(XHEADER_URI, t.getUri());
-                pkt.addXheader(XHEADER_CONTENT_RANGE, range_hdr);
+                pkt.addXheader(XHEADER_RANGE, range_hdr);
 
                 auto str = gen_u8_array(blk.size());
                 pkt.setPayload(str.get(), blk.size());

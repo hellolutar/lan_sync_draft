@@ -7,7 +7,7 @@ void UdpCliTrigger::trigger()
     pkt.setPayload(&port, sizeof(uint16_t));
     BufBaseonEvent buf;
     pkt.writeTo(buf);
-    ctx_.write(buf.data().get(), buf.size());
+    ctx_.write(buf.data(), buf.size());
 }
 
 const bool UdpCliTrigger::isRunning() const

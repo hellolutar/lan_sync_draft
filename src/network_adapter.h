@@ -22,9 +22,9 @@ public:
 
     void start(std::shared_ptr<Logic> core);
 
-    void write(const NetAddr &peer, uint8_t *data, uint64_t size);
+    void write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
 
-    void udp_write(const NetAddr &peer, uint8_t *data, uint64_t size);
+    void udp_write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
 };
 
 #endif

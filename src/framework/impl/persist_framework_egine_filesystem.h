@@ -23,7 +23,7 @@ public:
     std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string path, uint64_t &ret_len) override;
     std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string path, uint64_t offset, uint64_t size, uint64_t &ret_len) override;
 
-    uint64_t saveTo(std::string path, uint64_t offset, uint8_t *data, uint64_t size) override;
+    uint64_t saveTo(std::string path, uint64_t offset, std::shared_ptr<uint8_t[]> data, uint64_t size) override;
     bool mkdirs(std::string path);
 };
 

@@ -28,9 +28,9 @@ public:
         : adapter_(adapter), rm_(rm) {}
     ~LogicCore() {}
 
-    const uint64_t isExtraAllDataNow(uint8_t *data,
+    const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data,
                                      uint64_t data_len) const override;
-    void recv(const NetAddr &peer, uint8_t *data, uint64_t size) override;
+    void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size) override;
 
     void setNetworkAdapter(std::shared_ptr<NetworkAdapter> ad);
     void setResourceManager(std::shared_ptr<ResourceManager> rm);

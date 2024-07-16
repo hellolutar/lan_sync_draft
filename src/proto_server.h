@@ -24,8 +24,8 @@ public:
     /**
      * 由TcpServer、UdpServer 调用； tcpcli 直接调用的core_logic_
      */
-    void recv(const NetAddr &from, uint8_t *data, uint64_t size) override;
-    const uint64_t isExtraAllDataNow(uint8_t *data, uint64_t data_len) const override
+    void recv(const NetAddr &from, std::shared_ptr<uint8_t[]>data, uint64_t size) override;
+    const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, uint64_t data_len) const override
     {
         return core_logic_->isExtraAllDataNow(data, data_len);
     }

@@ -15,13 +15,13 @@ public:
     TcpServerDemoLogic(/* args */) {}
     ~TcpServerDemoLogic() {}
 
-    const uint64_t isExtraAllDataNow(uint8_t *data, uint64_t data_len) const override
+    const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, uint64_t data_len) const override
     {
         return data_len == test_case_worlds.size();
     };
-    void recv(const NetAddr &peer, uint8_t *data, uint64_t size) override
+    void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size) override
     {
-        string world(reinterpret_cast<char *>(data));
+        string world(reinterpret_cast<char *>(data.get()));
         buf = world;
     }
 
@@ -44,7 +44,10 @@ TEST(NetFrameworkEngine, tcpCli)
 
     auto na = ep_->queryNetAbility(addr);
 
-    na->recv(addr, reinterpret_cast<uint8_t *>(const_cast<char *>(test_case_worlds.data())), test_case_worlds.size());
+    std::shared_ptr<uint8_t[]> sp(new uint8_t[test_case_worlds.size()]());
+    memcpy(sp.get(), test_case_worlds.data(), test_case_worlds.size());
+
+    na->recv(addr, sp, test_case_worlds.size());
 
     ASSERT_EQ(test_case_worlds, logic->getBuf());
 }

@@ -37,8 +37,8 @@ std::optional<std::shared_ptr<uint8_t[]>> PersistFrameworkEgineImplWithFileSyste
 
     std::shared_ptr<uint8_t[]> retData(new uint8_t[size]());
 
-    uint8_t *data = retData.get();
-    uint8_t *data_pos = data;
+    auto data = retData.get();
+    auto data_pos = data;
     memset(data, 0, size);
     uint64_t once_write_max_num = ONCE_MAX_READ_SIZE;
 
@@ -71,7 +71,7 @@ std::optional<std::shared_ptr<uint8_t[]>> PersistFrameworkEgineImplWithFileSyste
     return make_optional<std::shared_ptr<uint8_t[]>>(retData);
 }
 
-uint64_t PersistFrameworkEgineImplWithFileSystem::saveTo(string path, uint64_t offset, uint8_t *data, uint64_t size)
+uint64_t PersistFrameworkEgineImplWithFileSystem::saveTo(string path, uint64_t offset, std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     uint64_t ret_len = 0;
     int fd = open(path.data(), O_RDWR | O_CREAT, 0644);
@@ -84,7 +84,7 @@ uint64_t PersistFrameworkEgineImplWithFileSystem::saveTo(string path, uint64_t o
     uint64_t once_write_max_num = ONCE_MAX_READ_SIZE;
 
     uint64_t expected_write = min(once_write_max_num, size);
-    uint64_t actual_write = write(fd, data, expected_write);
+    uint64_t actual_write = write(fd, data.get(), expected_write);
     curpos += actual_write;
     ret_len += actual_write;
 
@@ -93,7 +93,7 @@ uint64_t PersistFrameworkEgineImplWithFileSystem::saveTo(string path, uint64_t o
         uint64_t remained = end - curpos;
 
         expected_write = min(once_write_max_num, remained);
-        actual_write = write(fd, data, expected_write);
+        actual_write = write(fd, data.get(), expected_write);
         curpos += actual_write;
         ret_len += actual_write;
     }

@@ -17,14 +17,14 @@ using namespace std;
 class buf_data
 {
 private:
-  uint8_t *data_;
+  std::shared_ptr<uint8_t[]> data_;
   uint64_t size_;
 
 public:
-  buf_data(uint8_t *data, uint64_t size);
+  buf_data(std::shared_ptr<uint8_t[]> data, uint64_t size);
   ~buf_data();
 
-  uint8_t *data();
+  std::shared_ptr<uint8_t[]> data();
   uint64_t size();
 };
 
@@ -37,7 +37,7 @@ public:
   OutputStreamForTest(/* args */) {}
   ~OutputStreamForTest();
 
-  void write(uint8_t *data, uint64_t size) override;
+  void write(std::shared_ptr<uint8_t[]> data, uint64_t size) override;
   std::shared_ptr<buf_data> front();
   void pop(uint16_t size = 1);
   void clear();
@@ -141,7 +141,7 @@ public:
   {
     return need_to_sync_;
   };
-  bool save(std::string uri, void *data, uint64_t offset,
+  bool save(std::string uri, std::shared_ptr<uint8_t[]> data, uint64_t offset,
             uint64_t data_len) override
   {
     return true;

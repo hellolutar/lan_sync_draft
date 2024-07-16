@@ -3,11 +3,6 @@
 
 using namespace std;
 
-const uint8_t *Task::prepareHeader() const
-{
-    return nullptr;
-}
-
 Task &Task::operator=(const Task t)
 {
     uri_ = t.uri_;
@@ -40,7 +35,7 @@ void Task::req()
     BufBaseonEvent buf;
     pkt.writeTo(buf);
 
-    ctx_.write(buf.data().get(), buf.size());
+    ctx_.write(buf.data(), buf.size());
 }
 
 void Task::tick(uint64_t t)

@@ -124,7 +124,7 @@ string ResourceManagerBaseFilesystem::mapping(string uri) const
     return rsHome + uri;
 }
 
-bool ResourceManagerBaseFilesystem::save(string uri, void *data, uint64_t offset, uint64_t data_len)
+bool ResourceManagerBaseFilesystem::save(string uri, std::shared_ptr<uint8_t[]> data, uint64_t offset, uint64_t data_len)
 {
     // LOG_DEBUG("ResourceManagerBaseFilesystem::save() : URI:{} offset:{} data_len:{}", uri, offset, data_len);
     string pathstr = mapping(uri);
@@ -206,7 +206,7 @@ ResourceSerializerDto ResourceSerializer::serialize(const std::vector<Resource> 
 
         buf.add(&flag, sizeof(uint8_t));
 
-        uint8_t *size_array = tmp_buf.data().get();
+        auto size_array = tmp_buf.data().get();
         buf.add(size_array, tmp_buf.size());
         uint64_t tmp_r_szie = r.getSize();
         buf.add(reinterpret_cast<uint8_t *>(&tmp_r_szie), sizeof(uint64_t));
@@ -241,16 +241,10 @@ uint64_t readSize(uint8_t flag, uint8_t *data, uint8_t &step)
     }
 }
 
-std::string readString(uint8_t *data, uint64_t size)
-{
-    string s(reinterpret_cast<char *>(data), size);
-    return s;
-}
-
-std::vector<Resource> ResourceSerializer::deserialize(uint8_t *data, uint64_t size)
+std::vector<Resource> ResourceSerializer::deserialize(std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     vector<Resource> rs;
-    uint8_t *datap = data;
+    auto datap = data.get();
     uint64_t pos = 0;
     const uint32_t loop_times_limit = 4294967295;
     uint32_t loop_time = 0;

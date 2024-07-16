@@ -1,6 +1,6 @@
 #include "proto_server.h"
 
-void ProtoServerRecv::recv(const NetAddr &from, uint8_t *data, uint64_t size)
+void ProtoServerRecv::recv(const NetAddr &from, std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     // 寻找session
     for (auto &&s : *sess_)
