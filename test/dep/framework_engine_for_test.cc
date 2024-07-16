@@ -189,6 +189,7 @@ std::optional<std::shared_ptr<uint8_t[]>> ResourceManagerForTest::readFrom(std::
     {
         auto ret = make_optional<std::shared_ptr<uint8_t[]>>(iter->second);
         read_from_data_.erase(iter);
+        return ret;
     }
     return nullopt;
 }
@@ -196,8 +197,39 @@ std::optional<std::shared_ptr<uint8_t[]>> ResourceManagerForTest::readFrom(std::
 void ResourceManagerForTest::setReadFrom(uri_block k, std::shared_ptr<uint8_t[]> v)
 {
     read_from_data_[k] = v;
+    read_from_history_data_[k] = v;
 }
 
+void ResourceManagerForTest::setReadFrom(const LanSyncPkt &pkt)
+{
+    auto uri_opt = pkt.queryXheader(XHEADER_URI);
+    auto range_opt = pkt.queryXheader(XHEADER_RANGE);
+    Range range(range_opt.value());
+
+    // 分批传输
+    uint64_t offset = range.getStart();
+    while (offset < range.getEnd())
+    {
+        uint64_t size = min(BLOCK_SIZE, (range.getEnd() - offset));
+
+        Block b(offset, offset + size);
+        Range r(b.start, b.end);
+
+        setReadFrom({uri_opt.value(), b}, gen_u8_array(size));
+
+        offset += size;
+    }
+}
+
+std::optional<std::shared_ptr<uint8_t[]>> ResourceManagerForTest::queryReadFromHistory(uri_block k)
+{
+    auto iter = read_from_history_data_.find(k);
+    if (iter == read_from_history_data_.end())
+    {
+        return nullopt;
+    }
+    return make_optional<std::shared_ptr<uint8_t[]>>(iter->second);
+}
 
 std::string uri_block::str() const
 {

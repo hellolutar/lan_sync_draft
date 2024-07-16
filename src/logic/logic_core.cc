@@ -34,7 +34,6 @@ void LogicCore::reqIdx(const NetAddr &peer, const LanSyncPkt &pkt)
 
 void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt)
 {
-    // todo
     auto uri_opt = pkt.queryXheader(XHEADER_URI);
     auto range_opt = pkt.queryXheader(XHEADER_RANGE);
     if (!uri_opt.has_value() || !range_opt.has_value())
@@ -42,11 +41,48 @@ void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt)
         // LOG_ERROR("SyncService::handleLanSyncReplyResource() : query header is failed! ");
         return;
     }
-    Range range(range_opt.value());
-    Block b(range.getStart(), range.getEnd());
-    rm_->readFrom(uri_opt.value(), b);
 
-    // todo
+    Range range(range_opt.value());
+
+    if (range.size() <= BLOCK_SIZE)
+    {
+        Block b(range.getStart(), range.getEnd());
+        readDataThenReplyRs(uri_opt.value(), b, peer);
+    }
+    else
+    {
+        // 分批传输
+        uint64_t offset = range.getStart();
+        while (offset < range.getEnd())
+        {
+            uint64_t size = min(BLOCK_SIZE, (range.getEnd() - offset));
+
+            Block b(offset, offset + size);
+            // Range r(b.start, b.end);
+            readDataThenReplyRs(uri_opt.value(), b, peer);
+
+            offset += b.size();
+        }
+    }
+}
+
+void LogicCore::readDataThenReplyRs(const std::string &uri, const Block &b, const NetAddr &peer)
+{
+    auto data_opt = rm_->readFrom(uri, b);
+    if (!data_opt.has_value())
+    {
+        // LOGWARN
+        return;
+    }
+    LanSyncPkt p = {lan_sync_version::VER_0_1, LAN_SYNC_TYPE_REPLY_RESOURCE};
+    Range r(b.start, b.end);
+    p.addXheader(XHEADER_RANGE, r.to_string());
+    p.addXheader(XHEADER_URI, uri);
+    p.setPayload(data_opt.value().get(), b.size());
+
+    BufBaseonEvent buf;
+    p.writeTo(buf);
+    adapter_->write(peer, buf.data().get(), buf.size());
 }
 
 void LogicCore::recvIdx(const NetAddr &peer, const LanSyncPkt &pkt)
@@ -63,21 +99,21 @@ void LogicCore::recvIdx(const NetAddr &peer, const LanSyncPkt &pkt)
 void LogicCore::recvRs(const NetAddr &peer, const LanSyncPkt &pkt)
 {
     auto uri_opt = pkt.queryXheader(XHEADER_URI);
-    auto range_opt = pkt.queryXheader(XHEADER_CONTENT_RANGE);
+    auto range_opt = pkt.queryXheader(XHEADER_RANGE);
     if (!uri_opt.has_value() || !range_opt.has_value())
     {
         // LOG_ERROR("SyncService::handleLanSyncReplyResource() : query header is failed! ");
         return;
     }
     auto &uri = uri_opt.value();
-    auto &content_range_str = range_opt.value();
-    ContentRange cr(content_range_str);
+    auto &range_str = range_opt.value();
+    Range r(range_str);
 
     uint8_t *data = reinterpret_cast<uint8_t *>(pkt.getPayload());
 
-    if (rm_->save(uri, data, cr.getStartPos(), cr.getSize()))
+    if (rm_->save(uri, data, r.getStart(), r.size()))
     {
-        Block blk(cr.getStartPos(), cr.getStartPos() + cr.getSize());
+        Block blk(r.getStart(), r.getEnd());
         coor_->taskManager()->success(uri, blk);
     }
 }

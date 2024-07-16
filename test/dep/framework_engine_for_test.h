@@ -113,6 +113,7 @@ private:
   std::vector<Resource> need_to_sync_;
   bool validres_ = false;
   mutable std::map<uri_block, std::shared_ptr<uint8_t[]>> read_from_data_;
+  mutable std::map<uri_block, std::shared_ptr<uint8_t[]>> read_from_history_data_;
 
 public:
   ResourceManagerForTest(/* args */) {}
@@ -151,6 +152,9 @@ public:
   void setNeedToSync(std::vector<Resource> rs) { need_to_sync_ = rs; };
   void setValidRes(bool b) { validres_ = b; };
   void setReadFrom(uri_block k, std::shared_ptr<uint8_t[]> v);
+  void setReadFrom(const LanSyncPkt &pkt);
+
+  std::optional<std::shared_ptr<uint8_t[]>> queryReadFromHistory(uri_block k);
 };
 
 #endif

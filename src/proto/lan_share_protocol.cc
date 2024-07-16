@@ -6,7 +6,6 @@ LanSyncPkt::~LanSyncPkt()
 {
     if (payload != nullptr)
     {
-        free(payload);
         payload = nullptr;
     }
 }
@@ -61,9 +60,9 @@ LanSyncPkt::LanSyncPkt(lan_sync_header_t *header)
     uint32_t data_len = total_len - header_len;
     if (data_len > 0)
     {
-        payload = (char *)malloc(data_len);
+        payload = std::shared_ptr<uint8_t[]>(new uint8_t[data_len]());
         char *datap = (char *)(header) + header_len;
-        memcpy(payload, datap, data_len);
+        memcpy(payload.get(), datap, data_len);
     }
     else
     {
@@ -104,7 +103,7 @@ void LanSyncPkt::writeTo(AbsBuf &buf)
     // 写入data
     uint16_t xhd_len = header_len - LEN_LAN_SYNC_HEADER_T;
     char *datap = (char *)(xhdp + xhd_len);
-    memcpy(datap, payload, total_len - header_len);
+    memcpy(datap, payload.get(), total_len - header_len);
 
     buf.add((uint8_t *)hd, total_len);
     free(hd);
@@ -163,7 +162,7 @@ bool LanSyncPkt::operator==(const LanSyncPkt &p) const
            total_len == p.total_len &&
            type == p.type &&
            xheader == p.xheader &&
-           bit_cmp(payload, p.payload, total_len - header_len);
+           bit_cmp(payload.get(), p.payload.get(), total_len - header_len);
 }
 
 void *LanSyncPkt::getPayload()
@@ -173,7 +172,7 @@ void *LanSyncPkt::getPayload()
 
 void *LanSyncPkt::getPayload() const
 {
-    return payload;
+    return payload.get();
 }
 
 void LanSyncPkt::setPayload(void *data_arg, uint64_t datalen)
@@ -184,12 +183,12 @@ void LanSyncPkt::setPayload(void *data_arg, uint64_t datalen)
     if (payload != nullptr)
     {
         total_len = header_len;
-        free(payload);
+        payload = nullptr;
     }
 
-    payload = (void *)malloc(datalen);
-    memset(payload, 0, datalen);
-    memcpy(payload, data_arg, datalen);
+    payload = std::shared_ptr<uint8_t[]>(new uint8_t[datalen]());
+    memset(payload.get(), 0, datalen);
+    memcpy(payload.get(), data_arg, datalen);
 
     total_len += datalen;
 }

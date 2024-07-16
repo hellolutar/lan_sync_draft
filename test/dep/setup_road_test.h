@@ -132,13 +132,14 @@ protected:
         net->recv(peer, buf.data().get(), buf.size());
     }
 
-    LanSyncPkt popPktFromOs(std::shared_ptr<NetAbility> net)
+    optional<LanSyncPkt> popPktFromOs(std::shared_ptr<NetAbility> net)
     {
         auto os = dynamic_pointer_cast<OutputStreamForTest>(net->getOutputStream());
         auto recvBuf = os->front();
+        if (recvBuf == nullptr)
+            return nullopt;
         os->pop();
-        LanSyncPkt recvPkt(recvBuf->data());
-        return recvPkt;
+        return make_optional<LanSyncPkt>(recvBuf->data());
     }
     LanSyncPkt justReadPktFromOs(std::shared_ptr<NetAbility> net)
     {
@@ -175,7 +176,7 @@ public:
             LanSyncPkt pkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_REPLY_RESOURCE);
             if (blk.size() > 0)
             {
-                string range_hdr = ContentRange(blk.start, blk.size(), t.getTotalSize(), t.getTotalSize() == blk.end).to_string();
+                string range_hdr = Range(blk.start, blk.end).to_string();
                 pkt.addXheader(XHEADER_URI, t.getUri());
                 pkt.addXheader(XHEADER_CONTENT_RANGE, range_hdr);
 
@@ -196,14 +197,58 @@ public:
     {
         auto cli = neg_->queryTcpCliNetAbility(peer);
         auto sentPkt = popPktFromOs(cli);
-        ASSERT_EQ(pkt, sentPkt);
+        ASSERT_TRUE(sentPkt.has_value());
+        auto &p = sentPkt.value();
+        ASSERT_EQ(pkt, p);
+    }
+
+    void assert_my_tcp_cli_sended_replyRs_to(const NetAddr &peer)
+    {
+        auto cli = neg_->queryTcpCliNetAbility(peer);
+
+        uint16_t limit = 100;
+        uint16_t i = 0;
+        while (true)
+        {
+            ASSERT_LT(i++, limit);
+
+            auto sentPktOpt = popPktFromOs(cli);
+            if (!sentPktOpt.has_value())
+                return;
+
+            auto sentPkt = sentPktOpt.value();
+
+            auto uri_opt = sentPkt.queryXheader(XHEADER_URI);
+            auto range_opt = sentPkt.queryXheader(XHEADER_RANGE);
+            Range range(range_opt.value());
+            uint64_t offset = range.getStart();
+
+            uint64_t size = min(BLOCK_SIZE, (range.getEnd() - offset));
+
+            Block b(offset, offset + size);
+            Range r(b.start, b.end);
+
+            auto data_opt = rm_->queryReadFromHistory({uri_opt.value(), b});
+
+            ASSERT_TRUE(data_opt.has_value());
+
+            LanSyncPkt p = {lan_sync_version::VER_0_1, LAN_SYNC_TYPE_REPLY_RESOURCE};
+            p.addXheader(XHEADER_RANGE, r.to_string());
+            p.addXheader(XHEADER_URI, uri_opt.value());
+            p.setPayload(data_opt.value().get(), b.size());
+
+            ASSERT_EQ(sentPkt, p);
+
+            offset += b.size();
+        }
     }
 
     void assert_my_udp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
     {
         auto cli = neg_->queryUdpCliNetAbility(peer);
         auto sentPkt = popPktFromOs(cli);
-        ASSERT_EQ(pkt, sentPkt);
+        ASSERT_TRUE(sentPkt.has_value());
+        ASSERT_EQ(pkt, sentPkt.value());
     }
 
     void assert_my_tcp_srv_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
@@ -211,7 +256,8 @@ public:
         // 根据peer查找session，然后session.write，故tcp_srv的send的内容，存放在peer的session的outputstream中
         auto cli = neg_->queryTcpCliNetAbility(peer);
         auto sentPkt = popPktFromOs(cli);
-        ASSERT_EQ(pkt, sentPkt);
+        ASSERT_TRUE(sentPkt.has_value());
+        ASSERT_EQ(pkt, sentPkt.value());
     }
     void assert_my_tcp_srv_sended_getrs_to(const NetAddr &peer)
     {

@@ -26,7 +26,6 @@ void Task::req()
 
     LanSyncPkt pkt(lan_sync_version::VER_0_1, LAN_SYNC_TYPE_GET_RESOURCE);
 
-    // string range_hdr = ContentRange(block_.start, block_.size(), total_size_, total_size_ == block_.end).to_string();
     string range_hdr = Range(block_.start, block_.end).to_string();
     pkt.addXheader(XHEADER_URI, uri_);
     pkt.addXheader(XHEADER_RANGE, range_hdr);

@@ -50,7 +50,7 @@ class LanSyncPkt
 {
 private:
     std::map<std::string, std::string> xheader;
-    void *payload = nullptr; //  ~LanSyncPkt()
+    std::shared_ptr<uint8_t[]> payload = nullptr; //  ~LanSyncPkt()
     uint16_t header_len = 0;
     uint32_t total_len = 0;
 

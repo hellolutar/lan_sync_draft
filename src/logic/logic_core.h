@@ -19,6 +19,8 @@ private:
     void recvRs(const NetAddr &peer, const LanSyncPkt &pkt);
     void shutdown(const NetAddr &peer, const LanSyncPkt &pkt);
 
+    void readDataThenReplyRs(const std::string &uri, const Block &b, const NetAddr &peer);
+
 public:
     LogicCore(){};
     LogicCore(std::shared_ptr<NetworkAdapter> adapter,
