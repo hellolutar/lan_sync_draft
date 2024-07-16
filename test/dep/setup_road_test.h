@@ -67,7 +67,7 @@ class EndpointForTest : public Endpoint
 {
 private:
 public:
-    EndpointForTest() : Endpoint(nullptr) {}
+    EndpointForTest() {}
 
     ~EndpointForTest() {}
 
@@ -80,6 +80,8 @@ public:
     {
         return coor_trg_;
     }
+
+    std::shared_ptr<LogicCore> getLogicCore() { return core_; }
 };
 
 class EndPointTestCaseSimple : public testing::Test
@@ -115,6 +117,7 @@ protected:
         TimerFramework::init(teg_);
 
         ed_.setTaskManager(tm_);
+        ed_.init();
         ed_.getLogicCore()->setResourceManager(rm_);
 
         ed_.run();

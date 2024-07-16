@@ -21,19 +21,12 @@ protected:
     std::shared_ptr<TaskManager> tm_;
 
 public:
-    Endpoint(std::shared_ptr<TaskManager> tm)
-        : na_(std::make_shared<NetworkAdapter>()),
-          core_(std::make_shared<LogicCore>()),
-          tm_(tm)
-    {
-        core_->setNetworkAdapter(na_);
-    };
-
+    Endpoint() {}
     virtual ~Endpoint() {}
 
-    void run();
+    virtual void init();
+    virtual void run();
 
-    std::shared_ptr<LogicCore> getLogicCore();
     void setTaskManager(std::shared_ptr<TaskManager> tm);
 };
 

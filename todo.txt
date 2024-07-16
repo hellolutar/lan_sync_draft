@@ -1,5 +1,12 @@
-1. 根据downloading的数量，确定getrs的数量
-2. 合并getrs，将其与vector<rs>进行对比
+1. 同步过程中 peer_tcp 断开连接
+    - me.tcp_srv 会如何做
+    - me.tcp_cli 会如何做
+2. 同步过程中同一资源加入新的peer_tcp
+    - me.tcp_srv 会如何做
+    - me.tcp_cli 会如何做
+3. 同步过程中，一个资源同步失败了，如hash校验失败
+    - me.tcp_srv 会如何做 
+    - me.tcp_cli 会如何做
 
 
 bug
