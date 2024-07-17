@@ -74,6 +74,7 @@
         "ranges": "cpp",
         "filesystem": "cpp",
         "codecvt": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "cassert": "cpp"
     }
 }

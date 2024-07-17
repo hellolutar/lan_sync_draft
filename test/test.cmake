@@ -1,6 +1,3 @@
-include(${PROJECT_SOURCE_DIR}/etc/config.cmake)
-include(${PROJECT_SOURCE_DIR}/etc/common.cmake)
-
 include_directories(
   ${PROJECT_SOURCE_DIR}/test
 )
@@ -30,7 +27,7 @@ macro(ttest name fpath)
     $<TARGET_OBJECTS:lansync_common_obj>
     $<TARGET_OBJECTS:test_env_obj>
   )
-  message("testname " ${name})
+  message("compile test: " ${name})
   gtest_discover_tests(${name})
 endmacro(ttest)
 

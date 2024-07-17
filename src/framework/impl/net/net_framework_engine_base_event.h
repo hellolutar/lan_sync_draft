@@ -15,20 +15,22 @@
 #include <event2/bufferevent.h>
 #include <netinet/tcp.h>
 
+#include "event_wrap.h"
 #include "framework/itf/net/net_framework_engine.h"
 // #include "utils/logger.h"
 
 class NetFrameworkEngineBaseEvent : public NetframeworkEngine, public std::enable_shared_from_this<NetFrameworkEngineBaseEvent>
 {
 private:
-    std::shared_ptr<event_base> base_;
+    std::shared_ptr<EventBaseWrap> base_;
     std::vector<std::shared_ptr<event>> events_; // only persist event need to add
     std::map<NetAddr, NetAbility> ctxs_;
 
     void init_check();
 
 public:
-    NetFrameworkEngineBaseEvent(){};
+    NetFrameworkEngineBaseEvent(std::shared_ptr<EventBaseWrap> b)
+        : base_(b) {};
     ~NetFrameworkEngineBaseEvent()
     {
         base_ = nullptr;
@@ -39,11 +41,12 @@ public:
     std::shared_ptr<UdpServer> addUdpServer(const NetAddr &addr) override;
     std::shared_ptr<TcpCli> connectWithTcp(const NetAddr &peer) override;
     std::shared_ptr<UdpCli> connectWithUdp(const NetAddr &peer) override;
+    void addConn(std::shared_ptr<NetAbility> ) override;
 
     void unregisterUdpCli(const NetAddr &addr) override;
     std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) override;
 
-    void run();
+    void start();
     void shutdown();
 };
 

@@ -59,6 +59,7 @@ public:
   std::shared_ptr<UdpServer> addUdpServer(const NetAddr &addr) override;
   std::shared_ptr<TcpCli> connectWithTcp(const NetAddr &addr) override;
   std::shared_ptr<UdpCli> connectWithUdp(const NetAddr &addr) override;
+  void addConn(std::shared_ptr<NetAbility> ) override {};
 
   void unregisterUdpCli(const NetAddr &addr) override;
 
