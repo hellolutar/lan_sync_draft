@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include <arpa/inet.h>
+#include <sys/socket.h>
 #include <cstdlib>
 #include <iostream>
 
@@ -22,7 +23,6 @@ private:
     TransportType type_;
 
 public:
-
     NetAddr(TransportType type = TransportType::UDP) : type_(type)
     {
     }
@@ -51,6 +51,8 @@ public:
     NetAddr(std::uint32_t l_addr, std::uint16_t l_port, TransportType type = TransportType::UDP)
         : l_addr_(l_addr), l_port_(l_port), type_(type){};
 
+    NetAddr(sockaddr_in addr, TransportType type = TransportType::UDP);
+
     NetAddr(const NetAddr &other)
         : l_addr_(other.l_addr_), l_port_(other.l_port_), type_(other.type_){};
 
@@ -74,6 +76,7 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const NetAddr &addr);
 
+    sockaddr_in sockaddrV4() const;
 };
 
 #endif
