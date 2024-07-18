@@ -1,29 +1,38 @@
 #include "recv_base_event.h"
 
+#include <cstring>
+#include <cassert>
+
+#include <event2/buffer.h>
+#include <event2/event.h>
+// #include <event2/bufferevent.h>
+
+#include "log/log.h"
+
 void event_cb(struct bufferevent *bev, short events, void *ctx)
 {
     switch (events)
     {
     case BEV_EVENT_EOF:
-        // LOG_ERROR("NetFrameworkImplWithEvent::event_cb : BEV_EVENT_EOF : {}", strerror(errno));
+        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_EOF : {}", strerror(errno));
         break;
     case BEV_EVENT_ERROR:
-        // LOG_ERROR("NetFrameworkImplWithEvent::event_cb : BEV_EVENT_ERROR : {}", strerror(errno));
+        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_ERROR : {}", strerror(errno));
         break;
     case BEV_EVENT_TIMEOUT:
-        // LOG_ERROR("NetFrameworkImplWithEvent::event_cb : BEV_EVENT_TIMEOUT : {}", strerror(errno));
+        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_TIMEOUT : {}", strerror(errno));
         break;
     case BEV_EVENT_CONNECTED:
-        // LOG_ERROR("NetFrameworkImplWithEvent::event_cb : BEV_EVENT_CONNECTED : {}", strerror(errno));
+        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_CONNECTED : {}", strerror(errno));
         break;
     case BEV_EVENT_READING:
-        // LOG_ERROR("NetFrameworkImplWithEvent::event_cb : BEV_EVENT_READING : {}", strerror(errno));
+        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_READING : {}", strerror(errno));
         break;
     case BEV_EVENT_WRITING:
-        // LOG_ERROR("NetFrameworkImplWithEvent::event_cb : BEV_EVENT_WRITING : {}", strerror(errno));
+        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_WRITING : {}", strerror(errno));
         break;
     default:
-        // LOG_ERROR("NetFrameworkImplWithEvent::event_cb : OTHER : {}", strerror(errno));
+        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : OTHER : {}", strerror(errno));
         break;
     }
 }
@@ -72,7 +81,7 @@ void read_cb(struct bufferevent *bev, void *ctx)
         ne->recv(peer, head, actual_extra_len);
         if (i++ >= limit)
         {
-            // LOG_WARN("NetFrameworkImplWithEvent::read_cb : READ TIMES must <= LIMIT({})", limit);
+            // LOG_WARN("NetFrameworkEngineBaseEvent::read_cb : READ TIMES must <= LIMIT({})", limit);
             break;
         }
     }
@@ -126,7 +135,7 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
     auto bevp = bufferevent_socket_new(base->getBase(), peer_sock, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
     if (bevp == nullptr)
     {
-        // LOG_ERROR("NetFrameworkImplWithEvent::tcp_accept(): bufferevent_socket_new has a error: {}", strerror(errno));
+        ERROR("NetFrameworkEngineBaseEvent::tcp_accept(): bufferevent_socket_new has a error", strerror(errno));
         delete dto;
         exit(-1);
     }

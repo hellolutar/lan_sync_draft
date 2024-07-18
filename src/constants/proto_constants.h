@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <string>
 
-
 const std::uint8_t FLAG_KEY_VALUE_SPLIT = 2; // 2 is: ':' and '\0'
 
 const std::string XHEADER_URI = "uri";
@@ -34,6 +33,5 @@ const std::string FLAG_XHEADER_CONTENT_SEPERATE = "/";
 const char FLAG_XHEADER_CONTENT_SEPERATE_CHAR = '/';
 const std::string FLAG_XHEADER_CONTENT_BETWEEN = "-";
 const char FLAG_XHEADER_CONTENT_BETWEEN_CHAR = '-';
-
 
 #endif

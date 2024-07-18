@@ -1,5 +1,7 @@
 #include "net_addr.h"
 
+#include <sstream>
+
 using namespace std;
 
 NetAddr::NetAddr(sockaddr_in addr, TransportType type)
@@ -27,7 +29,19 @@ std::string NetAddr::str()
 }
 std::string NetAddr::str() const
 {
-    return to_string(l_addr_) + ":" + to_string(l_port_);
+    std::stringstream ss;
+    std::string s1 = to_string(l_addr_ >> 24);
+    std::string s2 = to_string(l_addr_ & 00100 >> 16);
+    std::string s3 = to_string(l_addr_ & 00010 >> 8);
+    std::string s4 = to_string(l_addr_ & 0001);
+
+    if (type_ == TransportType::TCP)
+        ss << "tcp://";
+    else
+        ss << "udp://";
+    ss << s1 << "." << s2 << "." << s3 << "." << s4 << ":" << to_string(l_port_);
+
+    return ss.str();
 }
 
 sockaddr_in NetAddr::sockaddrV4() const

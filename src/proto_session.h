@@ -2,7 +2,6 @@
 #define __PROTO_SESSION_MANAGER_H_
 
 #include <atomic>
-#include <memory>
 
 #include "buf/buf_base_on_event.h"
 #include "framework/itf/net/net_framework.h"

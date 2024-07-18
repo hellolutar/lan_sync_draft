@@ -1,8 +1,6 @@
 #ifndef __UDP_CLI_TRIGGER_H_
 #define __UDP_CLI_TRIGGER_H_
 
-#include <cstdint>
-
 #include "network_context.h"
 #include "buf/buf_base_on_event.h"
 #include "framework/itf/net/transport_proto.h"

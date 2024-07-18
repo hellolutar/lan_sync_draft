@@ -1,7 +1,7 @@
 #ifndef __NETWORK_ADAPTER_H_
 #define __NETWORK_ADAPTER_H_
 
-#include "framework/itf/net/net_addr.h"
+#include "framework/dep/net_addr.h"
 #include "proto_server.h"
 
 class NetworkAdapter

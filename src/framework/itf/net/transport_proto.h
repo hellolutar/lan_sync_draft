@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include "framework/itf/net/net_addr.h"
 #include "logic/logic.h"
 
 class OutputStream

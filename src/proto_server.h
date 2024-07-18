@@ -1,7 +1,6 @@
 #ifndef __LANSYNC_PROTO_SERVER_H_
 #define __LANSYNC_PROTO_SERVER_H_
 
-#include <memory>
 #include <vector>
 
 #include "logic/logic.h"

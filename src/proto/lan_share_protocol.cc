@@ -1,5 +1,11 @@
 #include "lan_share_protocol.h"
 
+#include <vector>
+#include <cstring>
+#include <sstream>
+
+#include <arpa/inet.h>
+
 using namespace std;
 
 LanSyncPkt::~LanSyncPkt()

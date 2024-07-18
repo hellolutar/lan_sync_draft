@@ -1,8 +1,6 @@
 #ifndef __NET_FRAMEWORK_H_
 #define __NET_FRAMEWORK_H_
 
-#include <memory>
-
 #include "framework/itf/net/transport_proto.h"
 
 class NetframeworkEngine

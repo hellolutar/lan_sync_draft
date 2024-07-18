@@ -1,11 +1,7 @@
 #ifndef __RESOURCE_MANAGER_H_
 #define __RESOURCE_MANAGER_H_
 
-#include <vector>
-#include <map>
 #include <filesystem>
-#include <memory>
-#include <optional>
 
 #include "exc/not_found_exc.h"
 #include "framework/dep/resource.h"
@@ -69,7 +65,7 @@ public:
     ~ResourceSerializer() = delete;
 
     static ResourceSerializerDto serialize(const std::vector<Resource> &table);
-    static std::vector<Resource> deserialize(std::shared_ptr<uint8_t[]>data, uint64_t size);
+    static std::vector<Resource> deserialize(std::shared_ptr<uint8_t[]> data, uint64_t size);
 };
 
 #endif

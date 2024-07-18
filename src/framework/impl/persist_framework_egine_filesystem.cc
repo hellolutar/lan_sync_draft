@@ -1,5 +1,12 @@
 #include "persist_framework_egine_filesystem.h"
 
+#include <cstring>
+#include <algorithm>
+#include <filesystem>
+
+#include <sys/fcntl.h>
+#include <unistd.h>
+
 using namespace std;
 
 PersistFrameworkEgineImplWithFileSystem::PersistFrameworkEgineImplWithFileSystem(/* args */)

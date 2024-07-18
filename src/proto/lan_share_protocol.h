@@ -1,16 +1,8 @@
 #ifndef __LAN_SHARE_PROTOCOL_H
 #define __LAN_SHARE_PROTOCOL_H
 
-#include <cstdint>
-#include <cstring>
-
 #include <optional>
-#include <string>
-#include <vector>
 #include <map>
-#include <sstream>
-
-#include <arpa/inet.h>
 
 #include "buf/abs_buf.h"
 #include "constants/proto_constants.h"

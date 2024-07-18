@@ -1,22 +1,6 @@
 #ifndef __RECV_BASE_EVENT_H_
 #define __RECV_BASE_EVENT_H_
 
-#include <map>
-#include <set>
-#include <vector>
-#include <cerrno>
-#include <cstring>
-#include <functional>
-#include <memory>
-#include <cassert>
-
-#include <arpa/inet.h>
-#include <event2/event.h>
-#include <event2/buffer.h>
-#include <event2/listener.h>
-#include <event2/bufferevent.h>
-#include <netinet/tcp.h>
-
 #include "framework/itf/net/net_framework_engine.h"
 #include "framework/impl/net/outputstream_base_event.h"
 #include "framework/impl/net/outputstream_for_udp.h"

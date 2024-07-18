@@ -1,9 +1,6 @@
 #ifndef __LAN_SYNC_BLOCK_RANGE_H_
 #define __LAN_SYNC_BLOCK_RANGE_H_
 
-#include <string>
-#include <cstdint>
-
 #include "constants/constants.h"
 #include "constants/proto_constants.h"
 
