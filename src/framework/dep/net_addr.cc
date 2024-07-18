@@ -31,9 +31,9 @@ std::string NetAddr::str() const
 {
     std::stringstream ss;
     std::string s1 = to_string(l_addr_ >> 24);
-    std::string s2 = to_string(l_addr_ & 00100 >> 16);
-    std::string s3 = to_string(l_addr_ & 00010 >> 8);
-    std::string s4 = to_string(l_addr_ & 0001);
+    std::string s2 = to_string(l_addr_ >> 16 & 255);
+    std::string s3 = to_string(l_addr_ >> 8 & 255);
+    std::string s4 = to_string(l_addr_ & 255);
 
     if (type_ == TransportType::TCP)
         ss << "tcp://";

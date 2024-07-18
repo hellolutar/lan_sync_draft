@@ -188,6 +188,10 @@ void NetFrameworkEngineBaseEvent::addConn(std::shared_ptr<NetAbility> ne)
     // todo
 }
 
+void NetFrameworkEngineBaseEvent::start() {
+    base_->dispatch();
+}
+
 void NetFrameworkEngineBaseEvent::unregisterUdpCli(const NetAddr &addr)
 {
 }
@@ -195,11 +199,6 @@ void NetFrameworkEngineBaseEvent::unregisterUdpCli(const NetAddr &addr)
 std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::findTcpCli(const NetAddr &addr)
 {
     return nullptr;
-}
-
-void NetFrameworkEngineBaseEvent::start()
-{
-    event_base_dispatch(base_->getBase());
 }
 
 void NetFrameworkEngineBaseEvent::shutdown()

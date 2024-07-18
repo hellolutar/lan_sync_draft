@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
     auto cli = engine->connectWithTcp(NetAddr("127.0.0.1:8080", TransportType::TCP));
     if (cli == 0)
         return -1;
-        
+
     cli->bind(make_shared<TcpCliLogic>());
 
     std::shared_ptr<uint8_t[]> data(new uint8_t[2]());
@@ -48,8 +48,7 @@ int main(int argc, char const *argv[])
 
     cli->write(data, 2);
 
-    int ret = event_base_dispatch(base->getBase());
-    assert(ret == 0);
+    engine->start();
 
     return 0;
 }

@@ -1,12 +1,14 @@
 #ifndef __EVENT_WRAP_H_
 #define __EVENT_WRAP_H_
 
+#include <event2/event.h>
 #include <event2/bufferevent.h>
 
 class EventBaseWrap
 {
 private:
     event_base *base_;
+    bool dispatched_ = false;
 
 public:
     EventBaseWrap(event_base *b) : base_(b) {}
@@ -15,9 +17,18 @@ public:
         // todo free event_base
     }
 
-    event_base *getBase() 
+    event_base *getBase()
     {
         return base_;
+    }
+
+    void dispatch()
+    {
+        if (dispatched_)
+            return;
+
+        dispatched_ = true;
+        event_base_dispatch(base_);
     }
 };
 
@@ -39,7 +50,7 @@ public:
             buf_ = nullptr;
         }
     }
-    const bufferevent *get() const
+    bufferevent *getBuf() const
     {
         return buf_;
     }

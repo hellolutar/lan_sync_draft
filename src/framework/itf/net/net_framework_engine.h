@@ -18,6 +18,8 @@ public:
     virtual std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) = 0;
 
     virtual void addConn(std::shared_ptr<NetAbility> ) = 0;
+
+    virtual void start() = 0;
 };
 
 #endif

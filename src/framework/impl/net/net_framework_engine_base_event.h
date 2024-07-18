@@ -33,11 +33,11 @@ public:
     std::shared_ptr<TcpCli> connectWithTcp(const NetAddr &peer) override;
     std::shared_ptr<UdpCli> connectWithUdp(const NetAddr &peer) override;
     void addConn(std::shared_ptr<NetAbility>) override;
+    void start() override;
 
     void unregisterUdpCli(const NetAddr &addr) override;
     std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) override;
 
-    void start();
     void shutdown();
 };
 
