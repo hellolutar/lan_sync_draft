@@ -4,30 +4,16 @@
 #include <memory>
 
 #include "logic/logic.h"
-
-class OutputStream
-{
-private:
-    bool closed_ = true;
-
-public:
-    OutputStream() {}
-    OutputStream(bool closed) : closed_(closed) {}
-    virtual ~OutputStream() {}
-
-    virtual void close();
-    virtual bool isClosed();
-    virtual void write(std::shared_ptr<uint8_t[]> data, const uint64_t size) = 0;
-};
+#include "framework/dep/outputstream.h"
 
 class NetAbility
 {
 protected:
     std::shared_ptr<OutputStream> os_ = nullptr;
-    std::shared_ptr<Logic> logic_ = nullptr;
+    std::shared_ptr<LogicWrite> logic_ = nullptr;
 
 public:
-    NetAbility(){};
+    NetAbility() {};
     virtual ~NetAbility()
     {
         os_ = nullptr;
@@ -37,8 +23,8 @@ public:
     virtual void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
     virtual void write(std::shared_ptr<uint8_t[]> data, uint64_t size);
 
-    void setOutputStream(std::shared_ptr<OutputStream> os);
-    void bind(std::shared_ptr<Logic> logic);
+    void setOutputStream(std::shared_ptr<OutputStream> os); // 由engine调用
+    void bind(std::shared_ptr<LogicWrite> logic);
 
     std::shared_ptr<OutputStream> getOutputStream();
 };
@@ -50,7 +36,7 @@ protected:
 
 public:
     ConnCli(/* args */) {}
-    ConnCli(NetAddr peer) : peer_(peer){};
+    ConnCli(NetAddr peer) : peer_(peer) {};
     virtual ~ConnCli() {}
 
     const NetAddr &peer() const;
@@ -60,7 +46,8 @@ class TcpCli : public ConnCli
 {
 public:
     TcpCli(NetAddr peer) : ConnCli(peer) {}
-    ~TcpCli() {
+    ~TcpCli()
+    {
         logic_ = nullptr;
     }
 };
@@ -69,7 +56,7 @@ class UdpCli : public ConnCli
 {
 
 public:
-    UdpCli(){};
+    UdpCli() {};
     UdpCli(NetAddr peer) : ConnCli(peer) {}
     ~UdpCli() {}
 };

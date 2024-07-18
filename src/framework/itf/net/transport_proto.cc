@@ -20,9 +20,10 @@ void NetAbility::setOutputStream(std::shared_ptr<OutputStream> os)
     os_ = os;
 }
 
-void NetAbility::bind(std::shared_ptr<Logic> logic)
+void NetAbility::bind(std::shared_ptr<LogicWrite> logic)
 {
     logic_ = logic;
+    logic_->setOutputStream(os_);
 }
 
 std::shared_ptr<OutputStream> NetAbility::getOutputStream()

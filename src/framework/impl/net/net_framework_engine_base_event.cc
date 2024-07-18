@@ -66,7 +66,7 @@ std::shared_ptr<TcpServer> NetFrameworkEngineBaseEvent::addTcpServer(const NetAd
     event_add(accept_event_persist, nullptr);
 
     auto srv = std::make_shared<TcpServer>(addr);
-    addConn(srv);
+    // addConn(srv);
 
     return srv;
 }
@@ -103,13 +103,12 @@ std::shared_ptr<UdpServer> NetFrameworkEngineBaseEvent::addUdpServer(const NetAd
 
     auto srv = std::make_shared<UdpServer>(addr);
 
-    auto dto = new UdpCbDto(srv, udp_sock);
+    auto conn = std::make_shared<UdpConn>(addr, srv, udp_sock);
+    addConn(conn);
 
-    auto read_e = event_new(base_->getBase(), udp_sock, EV_READ | EV_PERSIST, udp_read_cb, dto);
+    auto read_e = event_new(base_->getBase(), udp_sock, EV_READ | EV_PERSIST, udp_read_cb, conn.get());
 
     event_add(read_e, nullptr);
-
-    addConn(srv);
 
     return srv;
 }
@@ -143,12 +142,12 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::connectWithTcp(const NetAdd
     auto os = std::make_shared<OutputstreamBaseEvent>(buf);
     cli->setOutputStream(os);
 
-    auto dto = new TcpCbDto(peer, cli);
-    bufferevent_setcb(bevp, read_cb, write_cb, event_cb, dto);
+    auto conn = std::make_shared<TcpConn>(peer, cli);
+    addConn(conn);
+
+    bufferevent_setcb(bevp, read_cb, write_cb, event_cb, conn.get());
     bufferevent_enable(bevp, EV_READ | EV_WRITE);
     bevp = nullptr;
-
-    addConn(cli);
 
     return cli;
 }
@@ -173,22 +172,23 @@ std::shared_ptr<UdpCli> NetFrameworkEngineBaseEvent::connectWithUdp(const NetAdd
     INFO("UDP connect :", peer.str().data());
 
     auto cli = std::make_shared<UdpCli>(peer);
-    auto dto = new UdpCbDto(cli, peer_sock);
 
-    auto read_e = event_new(base_->getBase(), peer_sock, EV_READ | EV_PERSIST, udp_read_cb, dto);
+    auto conn = std::make_shared<UdpConn>(peer, cli, peer_sock);
+    addConn(conn);
+
+    auto read_e = event_new(base_->getBase(), peer_sock, EV_READ | EV_PERSIST, udp_read_cb, conn.get());
     event_add(read_e, nullptr);
-
-    addConn(cli);
 
     return cli;
 }
 
-void NetFrameworkEngineBaseEvent::addConn(std::shared_ptr<NetAbility> ne)
+void NetFrameworkEngineBaseEvent::addConn(std::shared_ptr<Connection> ne)
 {
-    // todo
+    ctxs_[ne->addr().str()] = ne;
 }
 
-void NetFrameworkEngineBaseEvent::start() {
+void NetFrameworkEngineBaseEvent::start()
+{
     base_->dispatch();
 }
 
@@ -203,5 +203,5 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::findTcpCli(const NetAddr &a
 
 void NetFrameworkEngineBaseEvent::shutdown()
 {
-    event_base_loopbreak(base_->getBase());
+    base_->shutdown();
 }

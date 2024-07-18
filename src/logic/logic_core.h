@@ -5,7 +5,7 @@
 #include "resource_manager.h"
 #include "task/task_coordinator.h"
 
-class LogicCore : public Logic
+class LogicCore : public LogicWrite
 {
 private:
     std::shared_ptr<NetworkAdapter> adapter_;

@@ -30,20 +30,19 @@ public:
     }
 };
 
-class TcpCbDto
+class TcpConn : public Connection
 {
 private:
-    NetAddr peer_;
     std::shared_ptr<NetAbility> ne_;
 
 public:
-    TcpCbDto(NetAddr peer, std::shared_ptr<NetAbility> ne)
-        : peer_(peer), ne_(ne) {}
-    ~TcpCbDto() {}
+    TcpConn(NetAddr peer, std::shared_ptr<NetAbility> ne)
+        : Connection(peer), ne_(ne) {}
+    ~TcpConn() {}
 
     NetAddr getPeer()
     {
-        return peer_;
+        return addr_;
     }
     std::shared_ptr<NetAbility> getNe()
     {
@@ -51,16 +50,16 @@ public:
     }
 };
 
-class UdpCbDto
+class UdpConn : public Connection
 {
 private:
     std::shared_ptr<NetAbility> ne_;
     int sock_;
 
 public:
-    UdpCbDto(std::shared_ptr<NetAbility> ne, int sk)
-        : ne_(ne), sock_(sk) {}
-    ~UdpCbDto() {}
+    UdpConn(NetAddr peer, std::shared_ptr<NetAbility> ne, int sk)
+        : Connection(peer), ne_(ne), sock_(sk) {}
+    ~UdpConn() {}
 
     std::shared_ptr<NetAbility> getNe()
     {
@@ -70,6 +69,11 @@ public:
     int getSock()
     {
         return sock_;
+    }
+
+    NetAddr getPeer()
+    {
+        return addr_;
     }
 };
 

@@ -23,7 +23,7 @@ const ProtoSession &NetworkAdapter::findSession(const NetAddr &peer)
     throw;
 }
 
-void NetworkAdapter::start(std::shared_ptr<Logic> core)
+void NetworkAdapter::start(std::shared_ptr<LogicWrite> core)
 {
     auto ports = query_local_ports();
     for (auto &&p : ports)

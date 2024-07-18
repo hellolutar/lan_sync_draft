@@ -30,6 +30,11 @@ public:
         dispatched_ = true;
         event_base_dispatch(base_);
     }
+
+    void shutdown()
+    {
+        event_base_loopbreak(base_);
+    }
 };
 
 class BuffereventWrap

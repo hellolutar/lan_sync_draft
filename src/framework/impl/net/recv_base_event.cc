@@ -37,16 +37,15 @@ void event_cb(struct bufferevent *bev, short events, void *ctx)
     }
 }
 
-void write_cb(struct bufferevent *bev, void *data){
-    
+void write_cb(struct bufferevent *bev, void *data)
+{
 }
 
 void read_cb(struct bufferevent *bev, void *ctx)
 {
-    auto dto = reinterpret_cast<TcpCbDto *>(ctx);
+    auto dto = reinterpret_cast<TcpConn *>(ctx);
     auto ne = dto->getNe();
     auto peer = dto->getPeer();
-    delete dto;
 
     struct evbuffer *in = bufferevent_get_input(bev);
 
@@ -92,10 +91,9 @@ void read_cb(struct bufferevent *bev, void *ctx)
 void udp_read_cb(evutil_socket_t fd, short events, void *ctx)
 {
 
-    auto dto = reinterpret_cast<UdpCbDto *>(ctx);
+    auto dto = reinterpret_cast<UdpConn *>(ctx);
     auto ne = dto->getNe();
     auto sock = dto->getSock();
-    delete dto;
 
     struct sockaddr_in target_addr;
     socklen_t addrlen = sizeof(struct sockaddr_in);
@@ -142,16 +140,16 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
 
     NetAddr peer(peer_addr);
     auto cli = std::make_shared<TcpCli>(peer);
-    engine->addConn(cli);
 
     uint64_t hw = 0;
     uint64_t lw = 0;
     bufferevent_getwatermark(bevp, EV_WRITE, &lw, &hw);
     bufferevent_setwatermark(bevp, EV_WRITE, 0, hw);
 
-    auto tcpdto = new TcpCbDto(peer, cli);
+    auto conn = std::make_shared<TcpConn>(peer, cli);
+    engine->addConn(conn);
 
-    bufferevent_setcb(bevp, read_cb, write_cb, event_cb, tcpdto);
+    bufferevent_setcb(bevp, read_cb, write_cb, event_cb, conn.get());
     bufferevent_enable(bevp, EV_READ | EV_WRITE);
 
     auto buf = std::make_shared<BuffereventWrap>(bevp);
@@ -159,6 +157,4 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
 
     auto os = std::make_shared<OutputstreamBaseEvent>(buf);
     cli->setOutputStream(os);
-
-    
 }

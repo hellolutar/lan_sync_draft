@@ -3,6 +3,25 @@
 
 #include "framework/itf/net/transport_proto.h"
 
+class Connection
+{
+protected:
+    NetAddr addr_;
+
+public:
+    Connection(NetAddr a) : addr_(a) {}
+    virtual ~Connection() {}
+
+    bool isMe(const NetAddr &o)
+    {
+        return addr_.str() == o.str();
+    }
+
+    const NetAddr addr() const {
+        return addr_;
+    }
+};
+
 class NetframeworkEngine
 {
 public:
@@ -17,9 +36,10 @@ public:
 
     virtual std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) = 0;
 
-    virtual void addConn(std::shared_ptr<NetAbility> ) = 0;
+    virtual void addConn(std::shared_ptr<Connection>) = 0;
 
     virtual void start() = 0;
+    virtual void shutdown() {};
 };
 
 #endif

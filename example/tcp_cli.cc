@@ -8,7 +8,9 @@
 
 using namespace std;
 
-class TcpCliLogic : public Logic
+const string SHUTDOWN_STR = "shutdown";
+
+class TcpCliLogic : public LogicWrite
 {
 private:
     /* data */
@@ -23,7 +25,16 @@ public:
     void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size) override
     {
         string str(reinterpret_cast<char *>(data.get()));
+        str = str.substr(0, size);
         cout << str;
+
+        write(data, size);
+
+        if (str == SHUTDOWN_STR)
+        {
+            auto eg = Netframework::getEngine();
+            eg->shutdown(); // 这里会导致数据还没有发出去
+        }
     };
 };
 

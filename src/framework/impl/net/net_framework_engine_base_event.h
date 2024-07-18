@@ -14,14 +14,14 @@ class NetFrameworkEngineBaseEvent : public NetframeworkEngine, public std::enabl
 private:
     std::shared_ptr<EventBaseWrap> base_;
     std::vector<std::shared_ptr<event>> events_; // only persist event need to add
-    std::map<NetAddr, NetAbility> ctxs_;
+    std::map<std::string, std::shared_ptr<Connection>> ctxs_;
     bool init_ = false;
 
     void init_check();
 
 public:
     NetFrameworkEngineBaseEvent(std::shared_ptr<EventBaseWrap> b)
-        : base_(b){};
+        : base_(b) {};
     ~NetFrameworkEngineBaseEvent()
     {
         base_ = nullptr;
@@ -32,13 +32,12 @@ public:
     std::shared_ptr<UdpServer> addUdpServer(const NetAddr &addr) override;
     std::shared_ptr<TcpCli> connectWithTcp(const NetAddr &peer) override;
     std::shared_ptr<UdpCli> connectWithUdp(const NetAddr &peer) override;
-    void addConn(std::shared_ptr<NetAbility>) override;
+    void addConn(std::shared_ptr<Connection>) override;
     void start() override;
+    void shutdown() override;
 
     void unregisterUdpCli(const NetAddr &addr) override;
     std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) override;
-
-    void shutdown();
 };
 
 #endif

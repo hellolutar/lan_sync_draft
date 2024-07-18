@@ -1,12 +1,14 @@
 #include <gtest/gtest.h>
 
+#include <cstring>
+
 #include "dep/framework_engine_for_test.h"
 
 using namespace std;
 
 const string test_case_worlds = "hello world";
 
-class TcpServerDemoLogic : public Logic
+class TcpServerDemoLogic : public LogicWrite
 {
 private:
     string buf;

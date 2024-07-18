@@ -23,14 +23,14 @@ private:
     SessionState state_ = SessionState::DISCONNECT;
     std::shared_ptr<TcpCli> tcli_;
 
-    std::shared_ptr<Logic> core_logic_;
+    std::shared_ptr<LogicWrite> core_logic_;
 
     void handleDisconnect(LanSyncPkt &pkt, const NetAddr &from);
 
     void reply_hello_ack();
 
 public:
-    ProtoSession(std::shared_ptr<Logic> logic)
+    ProtoSession(std::shared_ptr<LogicWrite> logic)
         : core_logic_(logic)
     {
     }

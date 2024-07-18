@@ -20,7 +20,7 @@ public:
         srvs_.clear();
     };
 
-    void start(std::shared_ptr<Logic> core);
+    void start(std::shared_ptr<LogicWrite> core);
 
     void write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
 
