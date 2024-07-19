@@ -1,26 +1,9 @@
 #ifndef __NET_FRAMEWORK_H_
 #define __NET_FRAMEWORK_H_
 
+#include "framework/dep/connection.h"
 #include "framework/itf/net/transport_proto.h"
 
-class Connection
-{
-protected:
-    NetAddr addr_;
-
-public:
-    Connection(NetAddr a) : addr_(a) {}
-    virtual ~Connection() {}
-
-    bool isMe(const NetAddr &o)
-    {
-        return addr_.str() == o.str();
-    }
-
-    const NetAddr addr() const {
-        return addr_;
-    }
-};
 
 class NetframeworkEngine
 {
@@ -40,6 +23,7 @@ public:
 
     virtual void start() = 0;
     virtual void shutdown() {};
+    virtual void unRegister(const NetAddr &addr) {};
 };
 
 #endif

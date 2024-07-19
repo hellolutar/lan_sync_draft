@@ -12,7 +12,9 @@ private:
 public:
     OutputstreamBaseEvent(std::shared_ptr<BuffereventWrap> buf)
         : buf_(buf) {}
-    ~OutputstreamBaseEvent() {}
+    ~OutputstreamBaseEvent() {
+        auto c = buf_.use_count();
+    }
 
     void write(std::shared_ptr<uint8_t[]> data, const uint64_t size) override;
 };

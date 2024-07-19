@@ -30,14 +30,14 @@ public:
     }
 };
 
-class TcpConn : public Connection
+class TcpConn : public ConnectionBaseEvent
 {
 private:
     std::shared_ptr<NetAbility> ne_;
 
 public:
     TcpConn(NetAddr peer, std::shared_ptr<NetAbility> ne)
-        : Connection(peer), ne_(ne) {}
+        : ConnectionBaseEvent(nullptr, peer), ne_(ne) {}
     ~TcpConn() {}
 
     NetAddr getPeer()
@@ -50,7 +50,7 @@ public:
     }
 };
 
-class UdpConn : public Connection
+class UdpConn : public ConnectionBaseEvent
 {
 private:
     std::shared_ptr<NetAbility> ne_;
@@ -58,7 +58,7 @@ private:
 
 public:
     UdpConn(NetAddr peer, std::shared_ptr<NetAbility> ne, int sk)
-        : Connection(peer), ne_(ne), sock_(sk) {}
+        : ConnectionBaseEvent(nullptr, peer), ne_(ne), sock_(sk) {}
     ~UdpConn() {}
 
     std::shared_ptr<NetAbility> getNe()

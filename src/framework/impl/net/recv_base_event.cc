@@ -147,14 +147,15 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
     bufferevent_setwatermark(bevp, EV_WRITE, 0, hw);
 
     auto conn = std::make_shared<TcpConn>(peer, cli);
+    auto event_wrap = std::make_shared<BuffereventWrap>(bevp);
+    conn->setEvent(event_wrap);
     engine->addConn(conn);
+
+    // todo conn->setEvent()
 
     bufferevent_setcb(bevp, read_cb, write_cb, event_cb, conn.get());
     bufferevent_enable(bevp, EV_READ | EV_WRITE);
 
-    auto buf = std::make_shared<BuffereventWrap>(bevp);
-    bevp = nullptr;
-
-    auto os = std::make_shared<OutputstreamBaseEvent>(buf);
+    auto os = std::make_shared<OutputstreamBaseEvent>(event_wrap);
     cli->setOutputStream(os);
 }

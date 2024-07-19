@@ -12,7 +12,7 @@ void NetAbility::recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint
 
 void NetAbility::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
-    os_->write(data, size);
+    logic_->write(data, size);
 }
 
 void NetAbility::setOutputStream(std::shared_ptr<OutputStream> os)
@@ -24,6 +24,7 @@ void NetAbility::bind(std::shared_ptr<LogicWrite> logic)
 {
     logic_ = logic;
     logic_->setOutputStream(os_);
+    os_ = nullptr;
 }
 
 std::shared_ptr<OutputStream> NetAbility::getOutputStream()

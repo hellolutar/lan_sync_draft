@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const string SHUTDOWN_STR = "shutdown";
+const string CLOSE_STR = "close";
 
 class TcpCliLogic : public LogicWrite
 {
@@ -30,10 +30,11 @@ public:
 
         write(data, size);
 
-        if (str == SHUTDOWN_STR)
+        if (str == CLOSE_STR)
         {
             auto eg = Netframework::getEngine();
-            eg->shutdown(); // 这里会导致数据还没有发出去
+            eg->unRegister(peer);
+            close();
         }
     };
 };
@@ -42,9 +43,9 @@ int main(int argc, char const *argv[])
 {
     cout << "hello world" << endl;
 
-    auto base = make_shared<EventBaseWrap>(event_base_new());
-
-    Netframework::init(make_shared<NetFrameworkEngineBaseEvent>(base));
+    auto _base = make_shared<EventBaseWrap>(event_base_new());
+    auto _eg = make_shared<NetFrameworkEngineBaseEvent>(_base);
+    Netframework::init(_eg);
 
     auto engine = Netframework::getEngine();
 
@@ -57,9 +58,9 @@ int main(int argc, char const *argv[])
     std::shared_ptr<uint8_t[]> data(new uint8_t[2]());
     memcpy(data.get(), "hi", 2);
 
-    cli->write(data, 2);
-
+    cli->write(data, 2); 
     engine->start();
+    cli = nullptr;
 
     return 0;
 }

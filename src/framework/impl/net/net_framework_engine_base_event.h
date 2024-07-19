@@ -21,7 +21,7 @@ private:
 
 public:
     NetFrameworkEngineBaseEvent(std::shared_ptr<EventBaseWrap> b)
-        : base_(b) {};
+        : base_(b){};
     ~NetFrameworkEngineBaseEvent()
     {
         base_ = nullptr;
@@ -35,6 +35,7 @@ public:
     void addConn(std::shared_ptr<Connection>) override;
     void start() override;
     void shutdown() override;
+    void unRegister(const NetAddr &addr) override;
 
     void unregisterUdpCli(const NetAddr &addr) override;
     std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) override;

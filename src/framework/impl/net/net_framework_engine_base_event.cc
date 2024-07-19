@@ -66,7 +66,10 @@ std::shared_ptr<TcpServer> NetFrameworkEngineBaseEvent::addTcpServer(const NetAd
     event_add(accept_event_persist, nullptr);
 
     auto srv = std::make_shared<TcpServer>(addr);
-    // addConn(srv);
+    auto conn = std::make_shared<TcpConn>(addr, srv);
+    auto event_wrap = std::make_shared<EventWrap>(accept_event_persist);
+    conn->setEvent(event_wrap);
+    addConn(conn);
 
     return srv;
 }
@@ -104,11 +107,14 @@ std::shared_ptr<UdpServer> NetFrameworkEngineBaseEvent::addUdpServer(const NetAd
     auto srv = std::make_shared<UdpServer>(addr);
 
     auto conn = std::make_shared<UdpConn>(addr, srv, udp_sock);
+
     addConn(conn);
 
     auto read_e = event_new(base_->getBase(), udp_sock, EV_READ | EV_PERSIST, udp_read_cb, conn.get());
 
     event_add(read_e, nullptr);
+    auto event_wrap = std::make_shared<EventWrap>(read_e);
+    conn->setEvent(event_wrap);
 
     return srv;
 }
@@ -138,12 +144,14 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::connectWithTcp(const NetAdd
 
     auto cli = std::make_shared<TcpCli>(peer);
 
-    std::shared_ptr<BuffereventWrap> buf = std::make_shared<BuffereventWrap>(bevp);
-    auto os = std::make_shared<OutputstreamBaseEvent>(buf);
+    auto event_wrap = std::make_shared<BuffereventWrap>(bevp);
+    auto os = std::make_shared<OutputstreamBaseEvent>(event_wrap);
     cli->setOutputStream(os);
 
     auto conn = std::make_shared<TcpConn>(peer, cli);
     addConn(conn);
+
+    conn->setEvent(event_wrap);
 
     bufferevent_setcb(bevp, read_cb, write_cb, event_cb, conn.get());
     bufferevent_enable(bevp, EV_READ | EV_WRITE);
@@ -179,6 +187,9 @@ std::shared_ptr<UdpCli> NetFrameworkEngineBaseEvent::connectWithUdp(const NetAdd
     auto read_e = event_new(base_->getBase(), peer_sock, EV_READ | EV_PERSIST, udp_read_cb, conn.get());
     event_add(read_e, nullptr);
 
+    auto event_wrap = std::make_shared<EventWrap>(read_e);
+    conn->setEvent(event_wrap);
+
     return cli;
 }
 
@@ -204,4 +215,15 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::findTcpCli(const NetAddr &a
 void NetFrameworkEngineBaseEvent::shutdown()
 {
     base_->shutdown();
+}
+
+void NetFrameworkEngineBaseEvent::unRegister(const NetAddr &addr)
+{
+    auto iter = ctxs_.find(addr.str());
+    if (iter != ctxs_.end())
+    {
+        // 取消事件
+        ctxs_.erase(iter);
+        return;
+    }
 }

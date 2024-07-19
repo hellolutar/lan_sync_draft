@@ -1,10 +1,22 @@
 #ifndef __EVENT_WRAP_H_
 #define __EVENT_WRAP_H_
 
+#include <iostream>
+#include <memory>
+
 #include <event2/event.h>
 #include <event2/bufferevent.h>
 
-class EventBaseWrap
+#include "framework/dep/connection.h"
+
+class EventAbs
+{
+public:
+    EventAbs(/* args */) {}
+    virtual ~EventAbs() {}
+};
+
+class EventBaseWrap : public EventAbs
 {
 private:
     event_base *base_;
@@ -37,7 +49,7 @@ public:
     }
 };
 
-class BuffereventWrap
+class BuffereventWrap : public EventAbs
 {
 private:
     bufferevent *buf_;
@@ -51,13 +63,49 @@ public:
     {
         if (buf_ != nullptr)
         {
-            bufferevent_free(buf_);
+            bufferevent_free(buf_); // todo 没有找到移除bufferevent的方法，请确定如何移除bufferevent
             buf_ = nullptr;
         }
     }
     bufferevent *getBuf() const
     {
         return buf_;
+    }
+};
+
+class EventWrap : public EventAbs
+{
+private:
+    event *ev_;
+
+public:
+    EventWrap(event *ev) : ev_(ev) {}
+    ~EventWrap()
+    {
+        event_del(ev_);
+
+        event_free(ev_);
+        ev_ = nullptr;
+    }
+};
+
+class ConnectionBaseEvent : public Connection
+{
+private:
+    std::shared_ptr<EventAbs> ev_;
+
+public:
+    ConnectionBaseEvent(std::shared_ptr<EventAbs> ev, const NetAddr &a) : ev_(ev), Connection(a) {}
+    ~ConnectionBaseEvent()
+    {
+        auto c = ev_.use_count();
+        std::cout << " ~ConnectionBaseEvent" << std::endl;
+        ev_ = nullptr;
+    }
+
+    void setEvent(std::shared_ptr<EventAbs> ev)
+    {
+        ev_ = ev;
     }
 };
 

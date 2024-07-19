@@ -36,6 +36,13 @@ class LogicWrite : public Logic
 private:
     std::shared_ptr<OutputStream> os_;
 
+protected:
+    void close()
+    {
+        auto c = os_.use_count();
+        os_ = nullptr;
+    }
+
 public:
     LogicWrite(/* args */) {}
     virtual ~LogicWrite() {}
@@ -49,7 +56,8 @@ public:
      */
     virtual void write(std::shared_ptr<uint8_t[]> data, uint64_t size)
     {
-        os_->write(data, size);
+        if (os_ != nullptr)
+            os_->write(data, size);
     };
 
     /**
