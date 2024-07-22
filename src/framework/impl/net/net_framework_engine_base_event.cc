@@ -145,8 +145,8 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::connectWithTcp(const NetAdd
     auto cli = std::make_shared<TcpCli>(peer);
 
     auto event_wrap = std::make_shared<BuffereventWrap>(bevp);
-    auto os = std::make_shared<OutputstreamBaseEvent>(event_wrap);
-    cli->setOutputStream(os);
+    auto os = std::make_unique<OutputstreamBaseEvent>(event_wrap);
+    cli->setOutputStream(std::move(os));
 
     auto conn = std::make_shared<TcpConn>(peer, cli);
     addConn(conn);
@@ -179,7 +179,7 @@ std::shared_ptr<UdpCli> NetFrameworkEngineBaseEvent::connectWithUdp(const NetAdd
 
     INFO("UDP connect :", peer.str().data());
 
-    auto cli = std::make_shared<UdpCli>(peer);
+    auto cli = std::make_shared<UdpCli>(peer_sock, peer);
 
     auto conn = std::make_shared<UdpConn>(peer, cli, peer_sock);
     addConn(conn);

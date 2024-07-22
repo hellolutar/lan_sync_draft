@@ -137,7 +137,8 @@ protected:
 
     optional<LanSyncPkt> popPktFromOs(std::shared_ptr<NetAbility> net)
     {
-        auto os = dynamic_pointer_cast<OutputStreamForTest>(net->getOutputStream());
+        auto &os = reinterpret_cast<const std::unique_ptr<OutputStreamForTest> &>(net->getOutputStream());
+
         auto recvBuf = os->front();
         if (recvBuf == nullptr)
             return nullopt;
@@ -146,7 +147,7 @@ protected:
     }
     LanSyncPkt justReadPktFromOs(std::shared_ptr<NetAbility> net)
     {
-        auto os = dynamic_pointer_cast<OutputStreamForTest>(net->getOutputStream());
+        auto &os = reinterpret_cast<const std::unique_ptr<OutputStreamForTest> &>(net->getOutputStream());
         auto recvBuf = os->front();
         LanSyncPkt recvPkt(recvBuf->data());
         return recvPkt;

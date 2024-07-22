@@ -9,11 +9,11 @@
 class NetAbility
 {
 protected:
-    std::shared_ptr<OutputStream> os_ = nullptr;
+    std::unique_ptr<OutputStream> os_ = nullptr;
     std::shared_ptr<LogicWrite> logic_ = nullptr;
 
 public:
-    NetAbility() {};
+    NetAbility(){};
     virtual ~NetAbility()
     {
         os_ = nullptr;
@@ -23,10 +23,10 @@ public:
     virtual void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
     virtual void write(std::shared_ptr<uint8_t[]> data, uint64_t size);
 
-    void setOutputStream(std::shared_ptr<OutputStream> os); // 由engine调用
+    void setOutputStream(std::unique_ptr<OutputStream> &&os); // 由engine调用
     void bind(std::shared_ptr<LogicWrite> logic);
 
-    std::shared_ptr<OutputStream> getOutputStream();
+    const std::unique_ptr<OutputStream> &getOutputStream();
 };
 
 class ConnCli : public NetAbility
@@ -36,7 +36,7 @@ protected:
 
 public:
     ConnCli(/* args */) {}
-    ConnCli(NetAddr peer) : peer_(peer) {};
+    ConnCli(NetAddr peer) : peer_(peer){};
     virtual ~ConnCli() {}
 
     const NetAddr &peer() const;
@@ -46,19 +46,21 @@ class TcpCli : public ConnCli
 {
 public:
     TcpCli(NetAddr peer) : ConnCli(peer) {}
-    ~TcpCli()
-    {
-        logic_ = nullptr;
-    }
+    ~TcpCli();
 };
 
 class UdpCli : public ConnCli
 {
 
+private:
+    int sock_;
+
 public:
-    UdpCli() {};
-    UdpCli(NetAddr peer) : ConnCli(peer) {}
-    ~UdpCli() {}
+    UdpCli(){};
+    UdpCli(int sock, NetAddr peer) : sock_(sock), ConnCli(peer) {}
+    virtual ~UdpCli();
+
+    virtual void write(std::shared_ptr<uint8_t[]> data, uint64_t size) override;
 };
 
 class TcpServer : public NetAbility

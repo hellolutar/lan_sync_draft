@@ -108,8 +108,8 @@ void udp_read_cb(evutil_socket_t fd, short events, void *ctx)
     }
 
     NetAddr peer(target_addr);
-    auto os = std::make_shared<OutputstreamForUdp>(peer, sock);
-    ne->setOutputStream(os);
+    auto os = std::make_unique<OutputstreamForUdp>(peer, sock);
+    ne->setOutputStream(std::move(os));
 
     ne->recv(peer, data, receive);
 }
@@ -156,6 +156,6 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
     bufferevent_setcb(bevp, read_cb, write_cb, event_cb, conn.get());
     bufferevent_enable(bevp, EV_READ | EV_WRITE);
 
-    auto os = std::make_shared<OutputstreamBaseEvent>(event_wrap);
-    cli->setOutputStream(os);
+    auto os = std::make_unique<OutputstreamBaseEvent>(event_wrap);
+    cli->setOutputStream(std::move(os));
 }

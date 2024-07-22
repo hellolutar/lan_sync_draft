@@ -1,4 +1,5 @@
 #include "transport_proto.h"
+#include "log/log.h"
 
 const uint64_t NetAbility::isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
@@ -12,24 +13,29 @@ void NetAbility::recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint
 
 void NetAbility::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
-    logic_->write(data, size);
+    if (os_ != nullptr)
+        os_->write(data, size);
+    else
+        logic_->write(data, size);
 }
 
-void NetAbility::setOutputStream(std::shared_ptr<OutputStream> os)
+void NetAbility::setOutputStream(std::unique_ptr<OutputStream> &&os)
 {
-    os_ = os;
+    os_ = std::move(os);
 }
 
 void NetAbility::bind(std::shared_ptr<LogicWrite> logic)
 {
     logic_ = logic;
-    logic_->setOutputStream(os_);
+    logic_->setOutputStream(std::move(os_));
     os_ = nullptr;
 }
 
-std::shared_ptr<OutputStream> NetAbility::getOutputStream()
+const std::unique_ptr<OutputStream> &NetAbility::getOutputStream()
 {
-    return os_;
+    if (os_ != nullptr)
+        return os_;
+    return logic_->getOutputStream();
 }
 
 void OutputStream::close()
@@ -45,4 +51,20 @@ bool OutputStream::isClosed()
 const NetAddr &ConnCli::peer() const
 {
     return peer_;
+}
+
+UdpCli::~UdpCli() {
+    DEBUG("UdpCli::~UdpCli(): destroy (", peer_.str(), ")");
+}
+
+void UdpCli::write(std::shared_ptr<uint8_t[]> data, uint64_t size) {
+  auto peer_addr = peer_.sockaddrV4();
+  sendto(sock_, data.get(), size, 0, reinterpret_cast<sockaddr *>(&peer_addr),
+         sizeof(sockaddr_in));
+}
+
+TcpCli::~TcpCli()
+{
+    logic_ = nullptr;
+    DEBUG("TcpCli::~TcpCli(): destroy (", peer_.str(), ")");
 }

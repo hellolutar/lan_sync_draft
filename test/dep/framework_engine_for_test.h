@@ -43,6 +43,19 @@ public:
   void clear();
 };
 
+class UdpCliForTest : public UdpCli
+{
+public:
+  UdpCliForTest(/* args */) {}
+  UdpCliForTest(int sock, NetAddr peer) : UdpCli(sock, peer) {}
+  ~UdpCliForTest() {}
+
+  void write(std::shared_ptr<uint8_t[]> data, uint64_t size) override
+  {
+    os_->write(data, size);
+  }
+};
+
 class NetFrameworkEngineForTest : public NetframeworkEngine
 {
 private:
@@ -59,8 +72,8 @@ public:
   std::shared_ptr<UdpServer> addUdpServer(const NetAddr &addr) override;
   std::shared_ptr<TcpCli> connectWithTcp(const NetAddr &addr) override;
   std::shared_ptr<UdpCli> connectWithUdp(const NetAddr &addr) override;
-  void addConn(std::shared_ptr<Connection> ) override {};
-  void start(){};
+  void addConn(std::shared_ptr<Connection>) override{};
+  void start() {};
 
   void unregisterUdpCli(const NetAddr &addr) override;
 

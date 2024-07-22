@@ -62,8 +62,8 @@ NetFrameworkEngineForTest::~NetFrameworkEngineForTest()
 std::shared_ptr<TcpServer> NetFrameworkEngineForTest::addTcpServer(const NetAddr &addr)
 {
     auto srv = std::make_shared<TcpServer>(addr);
-    auto os = std::make_shared<OutputStreamForTest>();
-    srv->setOutputStream(os);
+    auto os = std::make_unique<OutputStreamForTest>();
+    srv->setOutputStream(std::move(os));
     tcpsrv_[addr] = srv;
     return srv;
 }
@@ -71,8 +71,8 @@ std::shared_ptr<TcpServer> NetFrameworkEngineForTest::addTcpServer(const NetAddr
 std::shared_ptr<UdpServer> NetFrameworkEngineForTest::addUdpServer(const NetAddr &addr)
 {
     auto srv = std::make_shared<UdpServer>(addr);
-    auto os = std::make_shared<OutputStreamForTest>();
-    srv->setOutputStream(os);
+    auto os = std::make_unique<OutputStreamForTest>();
+    srv->setOutputStream(std::move(os));
     udpsrv_[addr] = srv;
     return srv;
 }
@@ -80,17 +80,17 @@ std::shared_ptr<UdpServer> NetFrameworkEngineForTest::addUdpServer(const NetAddr
 std::shared_ptr<TcpCli> NetFrameworkEngineForTest::connectWithTcp(const NetAddr &addr)
 {
     auto cli = std::make_shared<TcpCli>(addr);
-    auto os = std::make_shared<OutputStreamForTest>();
-    cli->setOutputStream(os);
+    auto os = std::make_unique<OutputStreamForTest>();
+    cli->setOutputStream(std::move(os));
     tcpcli_[addr] = cli;
     return cli;
 }
 
 std::shared_ptr<UdpCli> NetFrameworkEngineForTest::connectWithUdp(const NetAddr &addr)
 {
-    auto cli = std::make_shared<UdpCli>(addr);
-    auto os = std::make_shared<OutputStreamForTest>();
-    cli->setOutputStream(os);
+    auto cli = std::make_shared<UdpCliForTest>(1, addr);
+    auto os = std::make_unique<OutputStreamForTest>();
+    cli->setOutputStream(std::move(os));
     udpcli_[addr] = cli;
     return cli;
 }

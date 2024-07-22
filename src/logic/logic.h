@@ -34,12 +34,11 @@ public:
 class LogicWrite : public Logic
 {
 private:
-    std::shared_ptr<OutputStream> os_;
+    std::unique_ptr<OutputStream> os_;
 
 protected:
     void close()
     {
-        auto c = os_.use_count();
         os_ = nullptr;
     }
 
@@ -65,9 +64,14 @@ public:
      *
      * @param os
      */
-    void setOutputStream(std::shared_ptr<OutputStream> os)
+    void setOutputStream(std::unique_ptr<OutputStream>&& os)
     {
-        os_ = os;
+        os_ = std::move(os);
+    }
+
+    const std::unique_ptr<OutputStream> &getOutputStream()
+    {
+        return os_;
     }
 };
 
