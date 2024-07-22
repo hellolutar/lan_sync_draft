@@ -34,13 +34,24 @@ bool TriggerWrap::remove(std::shared_ptr<Trigger> tr)
     return false;
 }
 
-void TriggerWrap::trigger()
+void TriggerWrap::tick(uint64_t t)
 {
-    for (auto it = trgs_.begin(); it != trgs_.end(); it++)
+    since_last_second_ += t;
+    if (since_last_second_ >= interval_)
     {
-        auto t = *it;
-        t->trigger();
+        since_last_second_ = 0;
+
+        for (auto it = trgs_.begin(); it != trgs_.end(); it++)
+        {
+            auto t = *it;
+            t->trigger();
+        }
     }
+}
+
+void TriggerWrap::setInterval(uint64_t i)
+{
+    interval_ = i;
 }
 
 void timeout_cb(evutil_socket_t, short, void *arg)
@@ -62,8 +73,18 @@ bool TimerFrameworkEngineBaseEvent::addTrg(std::shared_ptr<Trigger> tr)
     {
         uint64_t k = tr->getPeriod().tv_sec;
 
-        auto &tw = trg_map_[k];
-        return tw.add(tr);
+        auto it = trg_map_.find(k);
+        if (it == trg_map_.end())
+        {
+            trg_map_[k] = TriggerWrap(k);
+            auto &v = trg_map_[k];
+            v.add(tr);
+        }
+        else
+        {
+            auto &tw = trg_map_[k];
+            return tw.add(tr);
+        }
     }
     else
     {
@@ -138,6 +159,6 @@ void TimerFrameworkEngineBaseEvent::tick()
     for (auto &&kv : trg_map_)
     {
         auto &v = kv.second;
-        v.trigger();
+        v.tick(tv_.tv_sec);
     }
 }

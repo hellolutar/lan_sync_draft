@@ -9,15 +9,19 @@
 class TriggerWrap
 {
 private:
+    uint64_t interval_ = 0;
+    uint64_t since_last_second_ = 0;
     std::set<std::shared_ptr<Trigger>> trgs_;
 
 public:
-    TriggerWrap() {}
+    TriggerWrap(){};
+    TriggerWrap(uint64_t interval) : interval_(interval) {}
     ~TriggerWrap() {}
 
     bool add(std::shared_ptr<Trigger> trg);
     bool remove(std::shared_ptr<Trigger> trg);
-    void trigger();
+    void tick(uint64_t t);
+    void setInterval(uint64_t);
 };
 
 class TimerFrameworkEngineBaseEvent : public TimerFrameworkEngine, public std::enable_shared_from_this<TimerFrameworkEngineBaseEvent>
