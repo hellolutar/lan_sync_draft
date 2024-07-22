@@ -11,6 +11,8 @@ private:
 
     std::vector<NetAddr> query_local_ports();
 
+    std::vector<NetAddr> query_broad_ports();
+
     const ProtoSession &findSession(const NetAddr &peer);
 
 public:

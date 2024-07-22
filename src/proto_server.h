@@ -50,8 +50,14 @@ public:
 
         auto net = Netframework::getEngine();
 
-        tcpser_ = net->addTcpServer(port);
-        udpser_ = net->addUdpServer(port);
+        NetAddr udp_port(port);
+        NetAddr tcp_port(port);
+
+        udp_port.setPort(58080);
+        tcp_port.setPort(58081);
+
+        udpser_ = net->addUdpServer(udp_port);
+        tcpser_ = net->addTcpServer(tcp_port);
 
         tcpser_->bind(server_logic_);
         udpser_->bind(server_logic_);

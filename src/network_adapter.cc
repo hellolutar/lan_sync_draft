@@ -1,10 +1,103 @@
 #include "network_adapter.h"
 
+#include <cstring>
+
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+
+using namespace std;
+
 std::vector<NetAddr> NetworkAdapter::query_local_ports()
 {
-    auto addr = NetAddr("0.0.0.10:8080");
-    auto addr2 = NetAddr("0.0.0.20:8080");
-    return {addr, addr2};
+    vector<NetAddr> ports;
+
+    int fd;
+    if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        close(fd);
+        return {};
+    }
+
+    struct ifreq ifreqs[10];
+
+    struct ifconf ifc;
+    ifc.ifc_len = sizeof(ifreqs);
+    ifc.ifc_buf = (caddr_t)ifreqs;
+
+    if (ioctl(fd, SIOCGIFCONF, (char *)&ifc) < 0)
+    {
+        close(fd);
+        return {};
+    }
+
+    uint16_t interface_num = ifc.ifc_len / sizeof(struct ifreq);
+
+    for (size_t i = 0; i < interface_num; i++)
+    {
+
+        auto broad_addr = *(struct sockaddr_in *)&(ifreqs[i].ifr_broadaddr);
+        if (broad_addr.sin_addr.s_addr == 0)
+            continue; // is loopback
+
+        // // 获取ip，并将其存储到ifreq中
+        if (ioctl(fd, SIOCGIFADDR, &ifreqs[i]) < 0)
+            continue;
+
+        auto if_addr = *(struct sockaddr_in *)&(ifreqs[i].ifr_addr);
+
+        NetAddr addr(if_addr);
+
+        ports.push_back(addr);
+    }
+
+    close(fd);
+
+    return ports;
+}
+
+std::vector<NetAddr> NetworkAdapter::query_broad_ports()
+{
+    vector<NetAddr> ports;
+
+    int fd;
+    if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+        close(fd);
+        return {};
+    }
+
+    struct ifreq ifreqs[10];
+
+    struct ifconf ifc;
+    ifc.ifc_len = sizeof(ifreqs);
+    ifc.ifc_buf = (caddr_t)ifreqs;
+
+    if (ioctl(fd, SIOCGIFCONF, (char *)&ifc) < 0)
+    {
+        close(fd);
+        return {};
+    }
+    
+    uint16_t interface_num = ifc.ifc_len / sizeof(struct ifreq);
+
+    for (size_t i = 0; i < interface_num; i++)
+    {
+
+        auto broad_addr = *(struct sockaddr_in *)&(ifreqs[i].ifr_broadaddr);
+        if (broad_addr.sin_addr.s_addr == 0)
+            continue; // is loopback
+
+        NetAddr addr(broad_addr);
+
+        ports.push_back(addr);
+    }
+
+    close(fd);
+
+    return ports;
 }
 
 const ProtoSession &NetworkAdapter::findSession(const NetAddr &peer)

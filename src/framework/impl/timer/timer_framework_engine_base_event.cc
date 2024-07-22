@@ -79,6 +79,7 @@ bool TimerFrameworkEngineBaseEvent::addTrg(std::shared_ptr<Trigger> tr)
             trg_map_[k] = TriggerWrap(k);
             auto &v = trg_map_[k];
             v.add(tr);
+            return true;
         }
         else
         {
