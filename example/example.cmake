@@ -7,7 +7,7 @@ macro(compile_example name)
         libevent::pthreads
         $<TARGET_OBJECTS:lansync_common_obj>
     )
-    message("compile example: " ${name})
+    # message("compile example: " ${name})
 endmacro(compile_example)
 
 
@@ -15,3 +15,4 @@ compile_example(tcp_cli)
 compile_example(tcp_srv)
 compile_example(udp_cli)
 compile_example(udp_srv)
+compile_example(timer)

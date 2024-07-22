@@ -27,7 +27,7 @@ macro(ttest name fpath)
     $<TARGET_OBJECTS:lansync_common_obj>
     $<TARGET_OBJECTS:test_env_obj>
   )
-  message("compile test: " ${name})
+  # message("compile test: " ${name})
   gtest_discover_tests(${name})
 endmacro(ttest)
 

@@ -1,7 +1,7 @@
 #ifndef __OUTPUTSTREAM_BASE_EVENT_H_
 #define __OUTPUTSTREAM_BASE_EVENT_H_
 
-#include "event_wrap.h"
+#include "framework/dep/event_wrap.h"
 #include "framework/itf/net/transport_proto.h"
 
 class OutputstreamBaseEvent : public OutputStream

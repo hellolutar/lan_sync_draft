@@ -6,7 +6,6 @@
 
 #include <event2/event.h>
 
-#include "framework/impl/net/event_wrap.h"
 #include "framework/impl/net/recv_base_event.h"
 #include "framework/itf/net/net_framework_engine.h"
 

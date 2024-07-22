@@ -2,7 +2,6 @@
 #include <cassert>
 #include <cstring>
 
-#include "framework/impl/net/event_wrap.h"
 #include "framework/itf/net/net_framework.h"
 #include "framework/impl/net/net_framework_engine_base_event.h"
 
