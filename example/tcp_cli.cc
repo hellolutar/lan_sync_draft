@@ -18,10 +18,6 @@ public:
     TcpCliLogic(/* args */) {}
     ~TcpCliLogic() {}
 
-    const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, uint64_t data_len) const override
-    {
-        return data_len;
-    };
     void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size) override
     {
         string str(reinterpret_cast<char *>(data.get()));
@@ -58,7 +54,7 @@ int main(int argc, char const *argv[])
     std::shared_ptr<uint8_t[]> data(new uint8_t[2]());
     memcpy(data.get(), "hi", 2);
 
-    cli->write(data, 2); 
+    cli->write(data, 2);
     engine->start();
     cli = nullptr;
 

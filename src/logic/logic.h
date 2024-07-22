@@ -37,7 +37,6 @@ private:
     std::unique_ptr<OutputStream> os_;
 
 protected:
-
     /**
      * release the outputstream
      */
@@ -49,6 +48,11 @@ protected:
 public:
     LogicWrite(/* args */) {}
     virtual ~LogicWrite() {}
+
+    virtual const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, uint64_t data_len) const override
+    {
+        return data_len;
+    };
 
     /**
      * @brief called by user
@@ -68,7 +72,7 @@ public:
      *
      * @param os
      */
-    void setOutputStream(std::unique_ptr<OutputStream>&& os)
+    void setOutputStream(std::unique_ptr<OutputStream> &&os)
     {
         os_ = std::move(os);
     }

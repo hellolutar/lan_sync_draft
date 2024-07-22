@@ -19,10 +19,6 @@ public:
     TcpSrvLogic(/* args */) {}
     ~TcpSrvLogic() {}
 
-    const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, uint64_t data_len) const override
-    {
-        return data_len;
-    };
     void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size) override
     {
         string str(reinterpret_cast<char *>(data.get()));

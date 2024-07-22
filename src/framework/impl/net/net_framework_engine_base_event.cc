@@ -57,8 +57,6 @@ std::shared_ptr<TcpServer> NetFrameworkEngineBaseEvent::addTcpServer(const NetAd
         shutdown();
         return nullptr;
     }
-    // todo 是否需要保存tcp_sock
-
     INFO("TCP listen: ", addr.str());
     auto srv = std::make_shared<TcpServer>(addr);
     accept_dto_ = std::make_unique<BaseEngineDto>(base_, shared_from_this(), srv);
@@ -103,10 +101,10 @@ std::shared_ptr<UdpServer> NetFrameworkEngineBaseEvent::addUdpServer(const NetAd
 
     NetAddr addr_will_be_udpate_follow;
 
+    INFO("UDP listen: ", addr.str());
     auto srv = std::make_shared<UdpServer>(addr);
 
     auto conn = std::make_shared<UdpConn>(addr, srv, udp_sock);
-
     addConn(conn);
 
     auto read_e = event_new(base_->getBase(), udp_sock, EV_READ | EV_PERSIST, udp_read_cb, conn.get());
