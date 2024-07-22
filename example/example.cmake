@@ -12,3 +12,4 @@ endmacro(compile_example)
 
 
 compile_example(tcp_cli)
+compile_example(tcp_srv)

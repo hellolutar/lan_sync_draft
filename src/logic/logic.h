@@ -37,6 +37,10 @@ private:
     std::unique_ptr<OutputStream> os_;
 
 protected:
+
+    /**
+     * release the outputstream
+     */
     void close()
     {
         os_ = nullptr;

@@ -8,31 +8,42 @@
 // #include <event2/bufferevent.h>
 
 #include "log/log.h"
+#include "framework/itf/net/net_framework.h"
 
 void event_cb(struct bufferevent *bev, short events, void *ctx)
 {
+    auto dto = reinterpret_cast<TcpConn *>(ctx);
+    auto ne = dto->getNe();
+    auto peer = dto->getPeer();
+
+    auto ng = Netframework::getEngine();
+
     switch (events)
     {
     case BEV_EVENT_EOF:
-        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_EOF : {}", strerror(errno));
+        ERROR("event_cb() : BEV_EVENT_EOF : {}", strerror(errno));
+        ng->unRegister(peer);
         break;
     case BEV_EVENT_ERROR:
-        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_ERROR : {}", strerror(errno));
+        ERROR("event_cb() : BEV_EVENT_ERROR : {}", strerror(errno));
+        ng->unRegister(peer);
         break;
     case BEV_EVENT_TIMEOUT:
-        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_TIMEOUT : {}", strerror(errno));
+        ERROR("event_cb() : BEV_EVENT_TIMEOUT : {}", strerror(errno));
+        ng->unRegister(peer);
         break;
     case BEV_EVENT_CONNECTED:
-        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_CONNECTED : {}", strerror(errno));
+        ERROR("event_cb() : BEV_EVENT_CONNECTED : {}", strerror(errno));
         break;
     case BEV_EVENT_READING:
-        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_READING : {}", strerror(errno));
+        ERROR("event_cb() : BEV_EVENT_READING : {}", strerror(errno));
         break;
     case BEV_EVENT_WRITING:
-        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : BEV_EVENT_WRITING : {}", strerror(errno));
+        ERROR("event_cb() : BEV_EVENT_WRITING : {}", strerror(errno));
         break;
     default:
-        // LOG_ERROR("NetFrameworkEngineBaseEvent::event_cb : OTHER : {}", strerror(errno));
+        ERROR("event_cb() : OTHER : {}", strerror(errno));
+        ng->unRegister(peer);
         break;
     }
 }
@@ -119,7 +130,7 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
     auto dto = reinterpret_cast<BaseEngineDto *>(ctx);
     auto engine = dto->getEngine();
     auto base = dto->getBase();
-    delete dto;
+    auto t_srv = dto->getTcpServer();
 
     struct sockaddr_in peer_addr;
     socklen_t slen = sizeof(struct sockaddr_in);
@@ -138,8 +149,9 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
         exit(-1);
     }
 
-    NetAddr peer(peer_addr);
+    NetAddr peer(peer_addr, TransportType::TCP);
     auto cli = std::make_shared<TcpCli>(peer);
+    cli->bind(t_srv->getLogic());
 
     uint64_t hw = 0;
     uint64_t lw = 0;
@@ -158,4 +170,13 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
 
     auto os = std::make_unique<OutputstreamBaseEvent>(event_wrap);
     cli->setOutputStream(std::move(os));
+}
+
+BaseEngineDto::~BaseEngineDto()
+{
+    DEBUG("BaseEngineDto::~BaseEngineDto()");
+
+    base_ = nullptr;
+    engine_ = nullptr;
+    srv_ = nullptr;
 }

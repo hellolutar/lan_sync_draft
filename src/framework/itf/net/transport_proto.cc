@@ -22,13 +22,20 @@ void NetAbility::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
 void NetAbility::setOutputStream(std::unique_ptr<OutputStream> &&os)
 {
     os_ = std::move(os);
+    if (logic_ != nullptr)
+    {
+        logic_->setOutputStream(std::move(os_));
+    }
 }
 
 void NetAbility::bind(std::shared_ptr<LogicWrite> logic)
 {
     logic_ = logic;
-    logic_->setOutputStream(std::move(os_));
-    os_ = nullptr;
+    if (os_ != nullptr)
+    {
+        logic_->setOutputStream(std::move(os_));
+        os_ = nullptr;
+    }
 }
 
 const std::unique_ptr<OutputStream> &NetAbility::getOutputStream()
@@ -53,18 +60,37 @@ const NetAddr &ConnCli::peer() const
     return peer_;
 }
 
-UdpCli::~UdpCli() {
+UdpCli::~UdpCli()
+{
     DEBUG("UdpCli::~UdpCli(): destroy (", peer_.str(), ")");
 }
 
-void UdpCli::write(std::shared_ptr<uint8_t[]> data, uint64_t size) {
-  auto peer_addr = peer_.sockaddrV4();
-  sendto(sock_, data.get(), size, 0, reinterpret_cast<sockaddr *>(&peer_addr),
-         sizeof(sockaddr_in));
+void UdpCli::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
+{
+    auto peer_addr = peer_.sockaddrV4();
+    sendto(sock_, data.get(), size, 0, reinterpret_cast<sockaddr *>(&peer_addr),
+           sizeof(sockaddr_in));
 }
 
 TcpCli::~TcpCli()
 {
     logic_ = nullptr;
     DEBUG("TcpCli::~TcpCli(): destroy (", peer_.str(), ")");
+}
+
+TcpServer::~TcpServer()
+{
+    logic_ = nullptr;
+    DEBUG("TcpServer::~TcpServer(): destroy (", port_.str(), ")");
+}
+
+const std::shared_ptr<LogicWrite> TcpServer::getLogic() const
+{
+    return logic_;
+}
+
+UdpServer::~UdpServer()
+{
+    logic_ = nullptr;
+    DEBUG("UdpServer::~UdpServer(): destroy (", port_.str(), ")");
 }

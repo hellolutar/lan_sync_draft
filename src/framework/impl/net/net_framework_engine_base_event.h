@@ -7,6 +7,7 @@
 #include <event2/event.h>
 
 #include "framework/impl/net/event_wrap.h"
+#include "framework/impl/net/recv_base_event.h"
 #include "framework/itf/net/net_framework_engine.h"
 
 class NetFrameworkEngineBaseEvent : public NetframeworkEngine, public std::enable_shared_from_this<NetFrameworkEngineBaseEvent>
@@ -17,6 +18,8 @@ private:
     std::map<std::string, std::shared_ptr<Connection>> ctxs_;
     bool init_ = false;
 
+    std::unique_ptr<BaseEngineDto> accept_dto_;
+
     void init_check();
 
 public:
@@ -25,6 +28,7 @@ public:
     ~NetFrameworkEngineBaseEvent()
     {
         base_ = nullptr;
+        accept_dto_ = nullptr;
         events_.clear();
     };
 

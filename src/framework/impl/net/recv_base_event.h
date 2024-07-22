@@ -10,15 +10,13 @@ class BaseEngineDto
 private:
     std::shared_ptr<EventBaseWrap> base_;
     std::shared_ptr<NetframeworkEngine> engine_;
+    std::shared_ptr<TcpServer> srv_;
 
 public:
-    BaseEngineDto(std::shared_ptr<EventBaseWrap> base, std::shared_ptr<NetframeworkEngine> engine)
-        : base_(base), engine_(engine) {}
-    ~BaseEngineDto()
-    {
-        base_ = nullptr;
-        engine_ = nullptr;
-    }
+    BaseEngineDto(){};
+    BaseEngineDto(std::shared_ptr<EventBaseWrap> base, std::shared_ptr<NetframeworkEngine> engine, std::shared_ptr<TcpServer> srv)
+        : base_(base), engine_(engine),srv_(srv) {}
+    ~BaseEngineDto();
 
     std::shared_ptr<EventBaseWrap> getBase()
     {
@@ -27,6 +25,10 @@ public:
     std::shared_ptr<NetframeworkEngine> getEngine()
     {
         return engine_;
+    }
+
+    std::shared_ptr<TcpServer> getTcpServer(){
+        return srv_;
     }
 };
 

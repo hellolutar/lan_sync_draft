@@ -71,7 +71,9 @@ private:
 public:
     TcpServer() {}
     TcpServer(NetAddr port) : port_(port) {}
-    ~TcpServer() {}
+    ~TcpServer();
+
+    const std::shared_ptr<LogicWrite> getLogic() const;
 };
 
 class UdpServer : public NetAbility
@@ -82,7 +84,7 @@ private:
 public:
     UdpServer() {}
     UdpServer(NetAddr port) : port_(port) {}
-    ~UdpServer() {}
+    ~UdpServer();
 };
 
 #endif

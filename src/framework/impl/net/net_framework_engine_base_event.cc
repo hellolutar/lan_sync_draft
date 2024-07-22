@@ -8,7 +8,6 @@
 
 #include <netinet/tcp.h>
 
-#include "recv_base_event.h"
 #include "log/log.h"
 
 void NetFrameworkEngineBaseEvent::init_check()
@@ -61,11 +60,11 @@ std::shared_ptr<TcpServer> NetFrameworkEngineBaseEvent::addTcpServer(const NetAd
     // todo 是否需要保存tcp_sock
 
     INFO("TCP listen: ", addr.str());
-    auto dto = new BaseEngineDto(base_, shared_from_this());
-    auto accept_event_persist = event_new(base_->getBase(), tcp_sock, EV_READ | EV_PERSIST, tcp_accept, dto);
+    auto srv = std::make_shared<TcpServer>(addr);
+    accept_dto_ = std::make_unique<BaseEngineDto>(base_, shared_from_this(), srv);
+    auto accept_event_persist = event_new(base_->getBase(), tcp_sock, EV_READ | EV_PERSIST, tcp_accept, accept_dto_.get());
     event_add(accept_event_persist, nullptr);
 
-    auto srv = std::make_shared<TcpServer>(addr);
     auto conn = std::make_shared<TcpConn>(addr, srv);
     auto event_wrap = std::make_shared<EventWrap>(accept_event_persist);
     conn->setEvent(event_wrap);
