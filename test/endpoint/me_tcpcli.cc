@@ -1,12 +1,13 @@
 #include "dep/setup_road_test.h"
 
+uint16_t port = 58081;
+
 /**
  * 1. me.udp_server <- hello
  * 2. me.tcp_cli -> hello_ack
  */
 TEST_F(EndPointTestCaseSimple, server_recv_hello_then_reply_helloack)
 {
-    uint16_t port = 8080;
     my_udp_srv_receive_from(peer_udp_cli_addr, pkt_hello(&port, sizeof(uint16_t)));
     assert_my_tcp_cli_sended_to(peer_tcp_srv_addr, pkt_hello_ack());
 }
@@ -19,7 +20,6 @@ TEST_F(EndPointTestCaseSimple, server_recv_hello_then_reply_helloack)
  */
 TEST_F(EndPointTestCaseSimple, communication_for_req__replyIdx_base_server)
 {
-    uint16_t port = 8080;
     my_udp_srv_receive_from(peer_udp_cli_addr, pkt_hello(&port, sizeof(uint16_t)));
     assert_my_tcp_cli_sended_to(peer_tcp_srv_addr, pkt_hello_ack());
 
@@ -45,7 +45,6 @@ TEST_F(EndPointTestCaseSimple, peer_tcp_server_get_rs_single_block)
 {
     teg_->tick(2000);
 
-    uint16_t port = 8080;
     my_udp_srv_receive_from(peer_udp_cli_addr, pkt_hello(&port, sizeof(uint16_t)));
     assert_my_tcp_cli_sended_to(peer_tcp_srv_addr, pkt_hello_ack());
 
@@ -69,7 +68,6 @@ TEST_F(EndPointTestCaseSimple, peer_tcp_server_get_rs_many_block)
 {
     teg_->tick(2000);
 
-    uint16_t port = 8080;
     my_udp_srv_receive_from(peer_udp_cli_addr, pkt_hello(&port, sizeof(uint16_t)));
     assert_my_tcp_cli_sended_to(peer_tcp_srv_addr, pkt_hello_ack());
 

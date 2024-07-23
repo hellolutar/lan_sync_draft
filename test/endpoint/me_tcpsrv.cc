@@ -1,4 +1,7 @@
 #include "dep/setup_road_test.h"
+#include "dep/test_sync_proto.h"
+
+uint16_t port = 58081;
 
 /**
  * 1. me.udp_cli -> hello
@@ -7,8 +10,7 @@ TEST_F(EndPointTestCaseSimple, trigger_send_hello_with_udp)
 {
     teg_->tick(2000);
 
-    uint16_t port = 8080;
-    assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(&port, sizeof(uint16_t)));
+    assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(const_cast<uint16_t *>(&default_udp_srv_port), sizeof(uint16_t)));
 }
 
 /**
@@ -23,8 +25,7 @@ TEST_F(EndPointTestCaseSimple, me_tcp_server_get_rs)
 {
     teg_->tick(2000);
 
-    uint16_t port = 8080;
-    assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(&port, sizeof(uint16_t)));
+    assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(const_cast<uint16_t *>(&default_udp_srv_port), sizeof(uint16_t)));
 
     neg_->connectWithTcp(peer_tcp_cli_addr); // register peer tcpcli to netframework, that we can found it in follow code.
 

@@ -172,4 +172,15 @@ public:
   std::optional<std::shared_ptr<uint8_t[]>> queryReadFromHistory(uri_block k);
 };
 
+class NetworkAdapterForTest : public NetworkAdapter
+{
+protected:
+  std::vector<NetAddr> query_local_ports() override;
+  std::vector<NetAddr> query_broad_ports() override;
+
+public:
+  NetworkAdapterForTest(/* args */) {}
+  ~NetworkAdapterForTest() {}
+};
+
 #endif

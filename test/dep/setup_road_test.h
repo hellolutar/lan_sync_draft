@@ -9,6 +9,7 @@
 #include "dep/framework_engine_for_test.h"
 #include "proto/lan_share_protocol.h"
 #include "buf/buf_base_on_event.h"
+#include "dep/test_sync_proto.h"
 
 using namespace std;
 
@@ -94,14 +95,14 @@ protected:
     shared_ptr<TaskManagerForTest> tm_;
 
     NetAddr my_udp_cli_addr_{"0.0.0.10:18080", TransportType::UDP};
-    NetAddr my_udp_srv_addr_{"0.0.0.10:8080", TransportType::UDP};
+    NetAddr my_udp_srv_addr_{"0.0.0.10:" +  to_string(default_udp_srv_port), TransportType::UDP};
     NetAddr my_tcp_cli_addr_{"0.0.0.10:18080", TransportType::TCP};
-    NetAddr my_tcp_srv_addr_{"0.0.0.10:8080", TransportType::TCP};
+    NetAddr my_tcp_srv_addr_{"0.0.0.10:" +  to_string(default_tcp_srv_port), TransportType::TCP};
 
-    NetAddr peer_udp_cli_addr{"0.0.0.1:18080", TransportType::UDP};
-    NetAddr peer_udp_srv_addr{"0.0.0.1:8080", TransportType::UDP};
-    NetAddr peer_tcp_cli_addr{"0.0.0.1:18080", TransportType::TCP};
-    NetAddr peer_tcp_srv_addr{"0.0.0.1:8080", TransportType::TCP};
+    NetAddr peer_udp_cli_addr{peer_udp_cli_addr_str, TransportType::UDP};
+    NetAddr peer_udp_srv_addr{peer_udp_srv_addr_str, TransportType::UDP};
+    NetAddr peer_tcp_cli_addr{peer_tcp_cli_addr_str, TransportType::TCP};
+    NetAddr peer_tcp_srv_addr{peer_tcp_srv_addr_str, TransportType::TCP};
 
     void SetUp() override
     {
@@ -115,6 +116,9 @@ protected:
 
         teg_ = make_shared<TimerFrameworkEngineForTest>();
         TimerFramework::init(teg_);
+
+        auto na = make_shared<NetworkAdapterForTest>();
+        ed_.setNetworkAdapter(na);
 
         ed_.setTaskManager(tm_);
         ed_.init();

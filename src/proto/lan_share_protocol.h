@@ -7,6 +7,9 @@
 #include "buf/abs_buf.h"
 #include "constants/proto_constants.h"
 
+const std::uint16_t default_udp_srv_port = 58080;
+const std::uint16_t default_tcp_srv_port = 58081;
+
 enum class lan_sync_version : uint8_t
 {
     VER_0_1 = 1,

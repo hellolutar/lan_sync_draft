@@ -27,6 +27,7 @@ public:
     virtual void run();
 
     void setTaskManager(std::shared_ptr<TaskManager> tm);
+    void setNetworkAdapter(std::shared_ptr<NetworkAdapter> tm);
 };
 
 #endif

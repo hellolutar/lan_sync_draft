@@ -53,8 +53,8 @@ public:
         NetAddr udp_port(port);
         NetAddr tcp_port(port);
 
-        udp_port.setPort(58080);
-        tcp_port.setPort(58081);
+        udp_port.setPort(default_udp_srv_port);
+        tcp_port.setPort(default_tcp_srv_port);
 
         udpser_ = net->addUdpServer(udp_port);
         tcpser_ = net->addTcpServer(tcp_port);

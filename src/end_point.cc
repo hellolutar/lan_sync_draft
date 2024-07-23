@@ -23,7 +23,7 @@ void Endpoint::init()
 
     if (hello_trg_ == nullptr)
     {
-        NetworkContext ctx(na_, NetAddr("0.0.0.1:8080"));
+        NetworkContext ctx(na_, NetAddr("0.0.0.1:" + to_string(default_udp_srv_port)));
         hello_trg_ = std::make_shared<UdpCliTrigger>(ctx, Trigger::second(2), true);
     }
 
@@ -47,4 +47,9 @@ void Endpoint::run()
 void Endpoint::setTaskManager(std::shared_ptr<TaskManager> tm)
 {
     tm_ = tm;
+}
+
+void Endpoint::setNetworkAdapter(std::shared_ptr<NetworkAdapter> na)
+{
+    na_ = na;
 }

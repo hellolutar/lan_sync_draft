@@ -6,18 +6,18 @@
 
 class NetworkAdapter
 {
-private:
+protected:
     std::vector<std::shared_ptr<ProtoServer>> srvs_;
 
-    std::vector<NetAddr> query_local_ports();
+    virtual std::vector<NetAddr> query_local_ports();
 
-    std::vector<NetAddr> query_broad_ports();
+    virtual std::vector<NetAddr> query_broad_ports();
 
     const ProtoSession &findSession(const NetAddr &peer);
 
 public:
     NetworkAdapter(){};
-    ~NetworkAdapter()
+    virtual ~NetworkAdapter()
     {
         srvs_.clear();
     };
