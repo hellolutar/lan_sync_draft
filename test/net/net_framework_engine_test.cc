@@ -39,7 +39,7 @@ TEST(NetFrameworkEngine, tcpCli)
     Netframework::init(ep_);
 
     auto engine = Netframework::getEngine();
-    auto addr = NetAddr("192.168.233.1:8080");
+    auto addr = NetAddr("192.168.233.1:8080",TransportType::UDP);
     auto srv = engine->addTcpServer(addr);
     auto logic = std::make_shared<TcpServerDemoLogic>();
     srv->bind(logic);
@@ -56,7 +56,7 @@ TEST(NetFrameworkEngine, tcpCli)
 
 TEST(NetAddrTest, str2Test)
 {
-    ASSERT_EQ("udp://0.0.225.202:0", NetAddr("0.0.225.202").str());
+    ASSERT_EQ("udp://0.0.225.202:0", NetAddr("0.0.225.202",TransportType::UDP).str());
 }
 
 void ipv4_generateor(string &pre, int pos)
@@ -64,7 +64,7 @@ void ipv4_generateor(string &pre, int pos)
     if (pos > 3)
     {
         // cout << NetAddr(pre).str() << endl;
-        ASSERT_EQ("udp://" + pre + ":0", NetAddr(pre).str()) << "pos:" << pos << "\texpected:" << pre << "\tactual:" << NetAddr(pre).str();
+        ASSERT_EQ("udp://" + pre + ":0", NetAddr(pre,TransportType::UDP).str()) << "pos:" << pos << "\texpected:" << pre << "\tactual:" << NetAddr(pre,TransportType::UDP).str();
         return;
     }
 
@@ -90,7 +90,7 @@ TEST(NetAddrTest, str_test_simple)
     {
         string each = to_string(i);
         string ip = each + "." + each + "." + each + "." + each;
-        ASSERT_EQ("udp://" + ip + ":0", NetAddr(ip).str()) << "\texpected:" << ip << "\tactual:" << NetAddr(ip).str();
+        ASSERT_EQ("udp://" + ip + ":0", NetAddr(ip, TransportType::UDP).str()) << "\texpected:" << ip << "\tactual:" << NetAddr(ip, TransportType::UDP).str();
     }
 
     cout << "test NetAddr.str() -> done!" << endl;

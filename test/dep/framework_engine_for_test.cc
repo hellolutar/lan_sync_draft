@@ -237,8 +237,8 @@ std::string uri_block::str() const
 
 std::vector<NetAddr> NetworkAdapterForTest::query_local_ports()
 {
-    auto addr = NetAddr("0.0.0.10:" +  to_string(default_udp_srv_port));
-    auto addr2 = NetAddr("0.0.0.20:" +  to_string(default_udp_srv_port));
+    auto addr = NetAddr("0.0.0.10:" + to_string(default_udp_srv_port), TransportType::UDP);
+    auto addr2 = NetAddr("0.0.0.20:" + to_string(default_udp_srv_port), TransportType::UDP);
     return {addr, addr2};
 }
 

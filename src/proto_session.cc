@@ -57,26 +57,36 @@ void ProtoSession::write(std::shared_ptr<uint8_t[]> data, uint64_t size) const
     throw NotFoundException("the tcli_ is nullptr!");
 }
 
-void ProtoSession::bind(const NetAddr &from, const LanSyncPkt &pkt)
+bool ProtoSession::bind(const NetAddr &from, const LanSyncPkt &pkt)
 {
     if (tcli_ != nullptr)
-        throw NotFoundException("the tcli_ has been bound!");
+    {
+        // throw NotFoundException("the tcli_ has been bound!");
+        return false;
+    }
 
     NetAddr peer(from);
     peer.setType(TransportType::TCP);
 
     auto eg = Netframework::getEngine();
     tcli_ = eg->findTcpCli(peer);
+    if (tcli_ == nullptr)
+        return false;
+
     tcli_->bind(core_logic_);
     state_ = SessionState::ESTABLISED;
+    return true;
 }
 
-void ProtoSession::call(const NetAddr &from, const LanSyncPkt &pkt)
+bool ProtoSession::call(const NetAddr &from, const LanSyncPkt &pkt)
 {
     if (tcli_ != nullptr)
-        throw NotFoundException("the tcli_ has already been created!");
+    {
+        // throw NotFoundException("the tcli_ has already been created!");
+        return false;
+    }
 
-    uint16_t peerPort = *(reinterpret_cast<uint16_t*>(pkt.getPayload().get()));
+    uint16_t peerPort = *(reinterpret_cast<uint16_t *>(pkt.getPayload().get()));
     NetAddr peer(from);
     peer.setType(TransportType::TCP);
     peer.setPort(peerPort);
@@ -84,10 +94,17 @@ void ProtoSession::call(const NetAddr &from, const LanSyncPkt &pkt)
     auto eg = Netframework::getEngine();
     state_ = SessionState::CONNECTING;
     tcli_ = eg->connectWithTcp(peer);
+    if (tcli_ == nullptr)
+    {
+        eg->unRegister(peer);
+        return false;
+    }
+
     tcli_->bind(core_logic_);
 
     reply_hello_ack();
     state_ = SessionState::ESTABLISED;
+    return true;
 }
 
 void ProtoSession::handleDisconnect(LanSyncPkt &pkt, const NetAddr &from)

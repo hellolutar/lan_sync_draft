@@ -31,7 +31,8 @@ vector<string> splitstr(string str, const char split)
 
 LanSyncPkt::LanSyncPkt(lan_sync_header_t *header)
 {
-    if (header->total_len < LEN_LAN_SYNC_HEADER_T)
+    total_len = ntohl(header->total_len);
+    if (total_len < LEN_LAN_SYNC_HEADER_T)
     {
         total_len = 0;
         header_len = 0;
@@ -40,7 +41,6 @@ LanSyncPkt::LanSyncPkt(lan_sync_header_t *header)
     version = header->version;
     type = header->type;
     header_len = ntohs(header->header_len);
-    total_len = ntohl(header->total_len);
 
     uint16_t xheader_len = header_len - LEN_LAN_SYNC_HEADER_T;
     if (xheader_len > 0)
@@ -173,7 +173,7 @@ bool LanSyncPkt::operator==(const LanSyncPkt &p) const
 
 std::shared_ptr<uint8_t[]> LanSyncPkt::getPayload()
 {
-    return const_cast<LanSyncPkt &>(*this).getPayload();
+    return const_cast<const LanSyncPkt &>(*this).getPayload();
 }
 
 std::shared_ptr<uint8_t[]> LanSyncPkt::getPayload() const

@@ -10,7 +10,8 @@
 enum class TransportType
 {
     TCP,
-    UDP
+    UDP,
+    UNKNOWN
 };
 
 class NetAddr
@@ -21,10 +22,10 @@ private:
     TransportType type_;
 
 public:
-    NetAddr(TransportType type = TransportType::UDP) : type_(type)
+    NetAddr() : type_(TransportType::UNKNOWN)
     {
     }
-    NetAddr(std::string ip_port, TransportType type = TransportType::UDP)
+    NetAddr(std::string ip_port, TransportType type)
         : type_(type)
     {
         uint64_t pos = ip_port.find(':');
@@ -46,13 +47,13 @@ public:
         }
     };
 
-    NetAddr(std::uint32_t l_addr, std::uint16_t l_port, TransportType type = TransportType::UDP)
-        : l_addr_(l_addr), l_port_(l_port), type_(type){};
+    NetAddr(std::uint32_t l_addr, std::uint16_t l_port, TransportType type)
+        : l_addr_(l_addr), l_port_(l_port), type_(type) {};
 
-    NetAddr(sockaddr_in addr, TransportType type = TransportType::UDP);
+    NetAddr(sockaddr_in addr, TransportType type);
 
     NetAddr(const NetAddr &other)
-        : l_addr_(other.l_addr_), l_port_(other.l_port_), type_(other.type_){};
+        : l_addr_(other.l_addr_), l_port_(other.l_port_), type_(other.type_) {};
 
     ~NetAddr() {}
 

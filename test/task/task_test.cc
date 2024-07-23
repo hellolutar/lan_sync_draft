@@ -23,7 +23,7 @@ protected:
     void SetUp() override
     {
         cor = new TaskCoordinator(tm);
-        
+
         shared_ptr<ResourceManager> rm = make_shared<ResourceManagerForTest>();
         cor->setResourceManager(rm);
 
@@ -57,7 +57,7 @@ public:
 
         for (size_t i = 0; i < ctx_num; i++)
         {
-            cor->add_resource(uri, Range(0, size), {na, NetAddr(to_string(i))});
+            cor->add_resource(uri, Range(0, size), {na, NetAddr(to_string(i),TransportType::UDP)});
         }
 
         ASSERT_EQ(ctx_num, tmft->tasks_ctx_num(uri));
@@ -110,7 +110,7 @@ public:
 
         for (size_t i = 0; i < ctx_num; i++)
         {
-            cor->add_resource(uri, Range(0, size), {na, NetAddr(to_string(i))});
+            cor->add_resource(uri, Range(0, size), {na, NetAddr(to_string(i),TransportType::UDP)});
         }
 
         ASSERT_EQ(ctx_num, tmft->tasks_ctx_num(uri));
@@ -157,7 +157,7 @@ public:
         uint64_t pos = 0;
         for (size_t i = 0; i < ctx_num; i++)
         {
-            cor->add_resource(uri, Range(0, size), {na, NetAddr(to_string(i))});
+            cor->add_resource(uri, Range(0, size), {na, NetAddr(to_string(i), TransportType::UDP)});
 
             cor->tick(1000 * 60);
 

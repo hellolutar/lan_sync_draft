@@ -50,8 +50,8 @@ public:
     void write(std::shared_ptr<uint8_t[]> data, uint64_t size);
     void write(std::shared_ptr<uint8_t[]> data, uint64_t size) const;
 
-    void bind(const NetAddr &peer, const LanSyncPkt & pkt);
-    void call(const NetAddr &peer, const LanSyncPkt & pkt);
+    bool bind(const NetAddr &peer, const LanSyncPkt & pkt);
+    bool call(const NetAddr &peer, const LanSyncPkt & pkt);
 };
 
 #endif

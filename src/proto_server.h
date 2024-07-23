@@ -55,6 +55,7 @@ public:
 
         udp_port.setPort(default_udp_srv_port);
         tcp_port.setPort(default_tcp_srv_port);
+        tcp_port.setType(TransportType::TCP);
 
         udpser_ = net->addUdpServer(udp_port);
         tcpser_ = net->addTcpServer(tcp_port);

@@ -25,7 +25,7 @@ void Endpoint::init()
 
     if (hello_trg_ == nullptr)
     {
-        NetworkContext ctx(na_, NetAddr("0.0.0.1:" + to_string(default_udp_srv_port)));
+        NetworkContext ctx(na_, NetAddr("0.0.0.1:" + to_string(default_udp_srv_port), TransportType::UDP));
         hello_trg_ = std::make_shared<UdpCliTrigger>(ctx, Trigger::second(2), true);
     }
 

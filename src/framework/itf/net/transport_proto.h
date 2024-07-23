@@ -13,7 +13,7 @@ protected:
     std::shared_ptr<LogicWrite> logic_ = nullptr;
 
 public:
-    NetAbility(){};
+    NetAbility() {};
     virtual ~NetAbility()
     {
         os_ = nullptr;
@@ -35,8 +35,8 @@ protected:
     NetAddr peer_;
 
 public:
-    ConnCli(/* args */) {}
-    ConnCli(NetAddr peer) : peer_(peer){};
+    ConnCli(/* args */) : peer_() {}
+    ConnCli(NetAddr peer) : peer_(peer) {};
     virtual ~ConnCli() {}
 
     const NetAddr &peer() const;
@@ -56,7 +56,7 @@ private:
     int sock_;
 
 public:
-    UdpCli(){};
+    UdpCli() {};
     UdpCli(int sock, NetAddr peer) : sock_(sock), ConnCli(peer) {}
     virtual ~UdpCli();
 

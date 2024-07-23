@@ -48,7 +48,7 @@ std::vector<NetAddr> NetworkAdapter::query_local_ports()
 
         auto if_addr = *(struct sockaddr_in *)&(ifreqs[i].ifr_addr);
 
-        NetAddr addr(if_addr);
+        NetAddr addr(if_addr, TransportType::UDP);
 
         ports.push_back(addr);
     }
@@ -80,7 +80,7 @@ std::vector<NetAddr> NetworkAdapter::query_broad_ports()
         close(fd);
         return {};
     }
-    
+
     uint16_t interface_num = ifc.ifc_len / sizeof(struct ifreq);
 
     for (size_t i = 0; i < interface_num; i++)
@@ -90,7 +90,7 @@ std::vector<NetAddr> NetworkAdapter::query_broad_ports()
         if (broad_addr.sin_addr.s_addr == 0)
             continue; // is loopback
 
-        NetAddr addr(broad_addr);
+        NetAddr addr(broad_addr,TransportType::UDP);
 
         ports.push_back(addr);
     }

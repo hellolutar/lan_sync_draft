@@ -118,7 +118,7 @@ void udp_read_cb(evutil_socket_t fd, short events, void *ctx)
         return;
     }
 
-    NetAddr peer(target_addr);
+    NetAddr peer(target_addr, TransportType::UDP);
     auto os = std::make_unique<OutputstreamForUdp>(peer, sock);
     ne->setOutputStream(std::move(os));
 
