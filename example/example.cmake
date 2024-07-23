@@ -5,6 +5,7 @@ macro(compile_example name)
     target_link_libraries( ${name}
         libevent::core
         libevent::pthreads
+        ${gflags_TARGET}
         $<TARGET_OBJECTS:lansync_common_obj>
     )
     # message("compile example: " ${name})

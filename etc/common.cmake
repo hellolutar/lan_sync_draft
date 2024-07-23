@@ -24,6 +24,8 @@ find_package(Libevent REQUIRED)
 #   message(STATUS "OpenSSL Found!")
 # endif()
 
+find_package(gflags REQUIRED)
+
 add_compile_options(-Wno-format-contains-nul -DRELEASE)
 
 file(GLOB_RECURSE src_codes ${PROJECT_SOURCE_DIR}/src/*.cc)

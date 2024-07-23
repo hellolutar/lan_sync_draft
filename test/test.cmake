@@ -24,6 +24,7 @@ macro(ttest name fpath)
     GTest::gtest_main
     libevent::core
     libevent::pthreads
+    ${gflags_TARGET}
     $<TARGET_OBJECTS:lansync_common_obj>
     $<TARGET_OBJECTS:test_env_obj>
   )

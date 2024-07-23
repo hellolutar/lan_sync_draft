@@ -75,6 +75,7 @@
         "filesystem": "cpp",
         "codecvt": "cpp",
         "iomanip": "cpp",
-        "cassert": "cpp"
+        "cassert": "cpp",
+        "fstream": "cpp"
     }
 }
