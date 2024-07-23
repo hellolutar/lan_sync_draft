@@ -5,6 +5,8 @@
 #include <sstream>
 #include <chrono>
 #include <iomanip>
+#include <vector>
+
 template <typename S>
 void _log(S &ss)
 {
@@ -60,6 +62,65 @@ void _debug_log(Args... arg)
     std::stringstream ss;
     std::string flag(" [DEBUG] ");
     _append_flag(ss, flag, arg...);
+}
+
+template <typename... Args>
+void _format_log(std::string &format, Args... args)
+{
+    std::vector<std::string> v;
+    std::stringstream ss;
+
+    auto concat_str = [&v, &ss](auto a)
+    { ss<< a;  v.push_back(ss.str()); ss.str(""); };
+
+    (..., concat_str(args));
+
+    int last_idx = 0;
+    for (auto &&s : v)
+    {
+        last_idx = format.find_first_of("{}", last_idx);
+        format = format.replace(last_idx, 2, s);
+    }
+    std::cout << format << std::endl;
+}
+
+template <typename... Args>
+void _prefix_format_log(std::string &tip, std::string &format, Args... args)
+{
+    std::stringstream ss;
+    _append_timestamp(ss);
+    ss << " " << tip;
+    ss << format;
+    format = ss.str();
+    _format_log(format, args...);
+}
+
+template <typename... Args>
+void ERROR_F(std::string format, Args... args)
+{
+    std::string tip = "[ERROR] ";
+    _prefix_format_log(tip, format, args...);
+}
+
+template <typename... Args>
+void WARN_F(std::string format, Args... args)
+{
+    std::string tip = "[WARN] ";
+    _prefix_format_log(tip, format, args...);
+}
+
+template <typename... Args>
+void INFO_F(std::string format, Args... args)
+{
+    std::string tip = "[INFO] ";
+    _prefix_format_log(tip, format, args...);
+}
+
+template <typename... Args>
+void DEBUG_F(std::string format, Args... args)
+{
+    std::string tip = "[DEBUG] ";
+    _prefix_format_log(tip, format, args...);
 }
 
 #endif

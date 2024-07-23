@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "buf/buf_base_on_event.h"
+#include "log/log.h"
 
 using namespace std;
 
@@ -21,7 +22,6 @@ const Resource &ResourceManagerBaseFilesystem::query(string uri) const
 
 vector<Resource> ResourceManagerBaseFilesystem::idx()
 {
-    // filesystem::path p(rsHome);
     auto rss = recur_walk({rsHome});
     for (auto &&r : rss)
         table_[r.getUri()] = r;
@@ -126,7 +126,7 @@ string ResourceManagerBaseFilesystem::mapping(string uri) const
 
 bool ResourceManagerBaseFilesystem::save(string uri, std::shared_ptr<uint8_t[]> data, uint64_t offset, uint64_t data_len)
 {
-    // LOG_DEBUG("ResourceManagerBaseFilesystem::save() : URI:{} offset:{} data_len:{}", uri, offset, data_len);
+    DEBUG("ResourceManagerBaseFilesystem::save() : URI:{} offset:{} data_len:{}", uri, offset, data_len);
     string pathstr = mapping(uri);
 
     auto path = filesystem::path(pathstr);

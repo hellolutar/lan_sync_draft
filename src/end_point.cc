@@ -1,5 +1,7 @@
 #include "end_point.h"
 
+#include "conf/properties_parse.h"
+
 using namespace std;
 
 void Endpoint::registerTrg()
@@ -32,6 +34,7 @@ void Endpoint::init()
 
     core_->setNetworkAdapter(na_);
     core_->setTaskCoordinator(coor_trg_->getTaskCoordinator());
+    core_->setResourceManager(rm_);
 }
 
 void Endpoint::run()
@@ -52,4 +55,9 @@ void Endpoint::setTaskManager(std::shared_ptr<TaskManager> tm)
 void Endpoint::setNetworkAdapter(std::shared_ptr<NetworkAdapter> na)
 {
     na_ = na;
+}
+
+void Endpoint::setResourceManager(std::shared_ptr<ResourceManager> rm)
+{
+    rm_ = rm;
 }

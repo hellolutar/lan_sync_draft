@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
     TimerFramework::init(timer_);
 
     Endpoint ed;
+    ed.setResourceManager(make_shared<ResourceManagerBaseFilesystem>(p.query(PropertiesParse::RESOURCE_HOME)));
+    
     ed.init();
     ed.run();
 

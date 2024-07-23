@@ -4,6 +4,12 @@
 #include <fstream>
 #include <sstream>
 
+const std::string PropertiesParse::DISCOVER_IPS = "ip.discovery";
+const std::string PropertiesParse::PROTO_DISCOVER_SERVER_UDP_PORT = "proto.udp.server.port";
+const std::string PropertiesParse::PROTO_SYNC_SERVER_TCP_PORT = "proto.tcp.server.port";
+const std::string PropertiesParse::RESOURCE_HOME = "resource.home";
+const std::string PropertiesParse::LOG_LEVEL = "log.level";
+
 string trim(string s)
 {
     if (s.empty())

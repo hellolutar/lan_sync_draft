@@ -18,6 +18,7 @@ protected:
     std::shared_ptr<UdpCliTrigger> hello_trg_;
     std::shared_ptr<TaskCoordinatorTrigger> coor_trg_;
     std::shared_ptr<TaskManager> tm_;
+    std::shared_ptr<ResourceManager> rm_;
 
 public:
     Endpoint() {}
@@ -28,6 +29,7 @@ public:
 
     void setTaskManager(std::shared_ptr<TaskManager> tm);
     void setNetworkAdapter(std::shared_ptr<NetworkAdapter> tm);
+    void setResourceManager(std::shared_ptr<ResourceManager> rm);
 };
 
 #endif

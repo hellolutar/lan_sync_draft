@@ -122,7 +122,7 @@ protected:
 
         ed_.setTaskManager(tm_);
         ed_.init();
-        ed_.getLogicCore()->setResourceManager(rm_);
+        ed_.setResourceManager(rm_);
 
         ed_.run();
     }
