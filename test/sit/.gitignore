@@ -1,3 +1,7 @@
 veth0
 veth1
 main.bin
+*.bin
+*.o
+main
+lansync
