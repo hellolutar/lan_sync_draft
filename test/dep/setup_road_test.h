@@ -13,6 +13,19 @@
 
 using namespace std;
 
+class PropertiesParseForTest : public PropertiesParse
+{
+public:
+    PropertiesParseForTest(/* args */) {}
+    PropertiesParseForTest(string filepath) : PropertiesParse(filepath) {};
+    ~PropertiesParseForTest() {}
+
+    void setProperties(const map<string, string> &p)
+    {
+        properties = p;
+    }
+};
+
 class TaskManagerForTest : public TaskManager
 {
 private:
@@ -26,32 +39,9 @@ public:
         return tasks_;
     }
 
-    const std::vector<Task> getAllTasks() const
-    {
-        std::vector<Task> ret;
-        for (auto &&kv : tasks_)
-        {
-            for (auto &&t : kv.second)
-            {
-                ret.push_back(t);
-            }
-        }
-        return ret;
-    }
+    const std::vector<Task> getAllTasks() const;
 
-    const std::vector<Task> getTasksByStatus(TaskStatusEnum st) const
-    {
-        std::vector<Task> ret;
-        for (auto &&kv : tasks_)
-        {
-            for (auto &&t : kv.second)
-            {
-                if (t.getStatus() == st)
-                    ret.push_back(t);
-            }
-        }
-        return ret;
-    }
+    const std::vector<Task> getTasksByStatus(TaskStatusEnum st) const;
 
     const std::vector<Task> getSyncingTasks() const
     {
@@ -95,205 +85,47 @@ protected:
     shared_ptr<TaskManagerForTest> tm_;
 
     NetAddr my_udp_cli_addr_{"0.0.0.10:18080", TransportType::UDP};
-    NetAddr my_udp_srv_addr_{"0.0.0.10:" +  to_string(default_udp_srv_port), TransportType::UDP};
+    NetAddr my_udp_srv_addr_{"0.0.0.10:" + to_string(default_udp_srv_port), TransportType::UDP};
     NetAddr my_tcp_cli_addr_{"0.0.0.10:18080", TransportType::TCP};
-    NetAddr my_tcp_srv_addr_{"0.0.0.10:" +  to_string(default_tcp_srv_port), TransportType::TCP};
+    NetAddr my_tcp_srv_addr_{"0.0.0.10:" + to_string(default_tcp_srv_port), TransportType::TCP};
 
     NetAddr peer_udp_cli_addr{peer_udp_cli_addr_str, TransportType::UDP};
     NetAddr peer_udp_srv_addr{peer_udp_srv_addr_str, TransportType::UDP};
     NetAddr peer_tcp_cli_addr{peer_tcp_cli_addr_str, TransportType::TCP};
     NetAddr peer_tcp_srv_addr{peer_tcp_srv_addr_str, TransportType::TCP};
 
-    void SetUp() override
-    {
-        printf("SetUp \n");
+    void SetUp() override;
 
-        rm_ = make_shared<ResourceManagerForTest>();
-        tm_ = make_shared<TaskManagerForTest>();
+    void TearDown() override {};
 
-        neg_ = make_shared<NetFrameworkEngineForTest>();
-        Netframework::init(neg_);
+    void recv(std::shared_ptr<NetAbility> net, const NetAddr &peer, LanSyncPkt &pkt);
 
-        teg_ = make_shared<TimerFrameworkEngineForTest>();
-        TimerFramework::init(teg_);
+    optional<LanSyncPkt> popPktFromOs(std::shared_ptr<NetAbility> net);
 
-        auto na = make_shared<NetworkAdapterForTest>();
-        ed_.setNetworkAdapter(na);
-
-        ed_.setTaskManager(tm_);
-        ed_.init();
-        ed_.setResourceManager(rm_);
-
-        ed_.run();
-    }
-
-    void TearDown() override
-    {
-        printf("TearDown \n");
-    }
-
-    void recv(std::shared_ptr<NetAbility> net, const NetAddr &peer, LanSyncPkt &pkt)
-    {
-        BufBaseonEvent buf;
-        pkt.writeTo(buf);
-        net->recv(peer, buf.data(), buf.size());
-    }
-
-    optional<LanSyncPkt> popPktFromOs(std::shared_ptr<NetAbility> net)
-    {
-        auto &os = reinterpret_cast<const std::unique_ptr<OutputStreamForTest> &>(net->getOutputStream());
-
-        auto recvBuf = os->front();
-        if (recvBuf == nullptr)
-            return nullopt;
-        os->pop();
-        return make_optional<LanSyncPkt>(recvBuf->data());
-    }
-    LanSyncPkt justReadPktFromOs(std::shared_ptr<NetAbility> net)
-    {
-        auto &os = reinterpret_cast<const std::unique_ptr<OutputStreamForTest> &>(net->getOutputStream());
-        auto recvBuf = os->front();
-        LanSyncPkt recvPkt(recvBuf->data());
-        return recvPkt;
-    }
+    optional<LanSyncPkt> justReadPktFromOs(std::shared_ptr<NetAbility> net);
 
 public:
-    void env(NetAddr local)
-    {
-    }
+    void my_udp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt);
 
-    void my_udp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt)
-    {
-        auto srv = neg_->queryUdpSerNetAbility(my_udp_srv_addr_);
-        recv(srv, peer, pkt);
-    }
-    void my_tcp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt)
-    {
-        auto srv = neg_->queryTcpSerNetAbility(my_tcp_srv_addr_);
-        recv(srv, peer, pkt);
-    }
-    void my_tcp_srv_receive_reply_rs_from(NetAddr &peer)
-    {
-        auto srv = neg_->queryTcpSerNetAbility(my_tcp_srv_addr_);
-        auto syncingTasks = tm_->getSyncingTasks();
-        ASSERT_LT(syncingTasks.size(), DOWNLOAD_LIMIT + 1);
+    void my_tcp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt);
 
-        for (auto &&t : syncingTasks)
-        {
-            auto &blk = t.getBlock();
-            LanSyncPkt pkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_REPLY_RESOURCE);
-            if (blk.size() > 0)
-            {
-                string range_hdr = Range(blk.start, blk.end).to_string();
-                pkt.addXheader(XHEADER_URI, t.getUri());
-                pkt.addXheader(XHEADER_RANGE, range_hdr);
+    void my_tcp_srv_receive_reply_rs_from(NetAddr &peer);
 
-                auto str = gen_u8_array(blk.size());
-                pkt.setPayload(str.get(), blk.size());
-            }
-            recv(srv, peer, pkt);
-        }
-    }
-    void my_tcp_cli_receive_from(NetAddr &peer, LanSyncPkt &&pkt)
-    {
-        peer.setType(TransportType::TCP);
-        auto srv = neg_->queryTcpCliNetAbility(peer);
-        recv(srv, peer, pkt);
-    }
+    void my_tcp_cli_receive_from(NetAddr &peer, LanSyncPkt &&pkt);
 
-    void assert_my_tcp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
-    {
-        auto cli = neg_->queryTcpCliNetAbility(peer);
-        auto sentPkt = popPktFromOs(cli);
-        ASSERT_TRUE(sentPkt.has_value());
-        auto &p = sentPkt.value();
-        ASSERT_EQ(pkt, p);
-    }
+    void assert_my_tcp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt);
 
-    void assert_my_tcp_cli_sended_replyRs_to(const NetAddr &peer)
-    {
-        auto cli = neg_->queryTcpCliNetAbility(peer);
+    void assert_my_tcp_cli_notsend_any_pkt_to(const NetAddr &peer);
 
-        uint16_t limit = 100;
-        uint16_t i = 0;
-        while (true)
-        {
-            ASSERT_LT(i++, limit);
+    void assert_my_tcp_cli_sended_replyRs_to(const NetAddr &peer);
 
-            auto sentPktOpt = popPktFromOs(cli);
-            if (!sentPktOpt.has_value())
-                return;
+    void assert_my_udp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt);
 
-            auto sentPkt = sentPktOpt.value();
+    void assert_my_tcp_srv_sended_to(const NetAddr &peer, LanSyncPkt &&pkt);
 
-            auto uri_opt = sentPkt.queryXheader(XHEADER_URI);
-            auto range_opt = sentPkt.queryXheader(XHEADER_RANGE);
-            Range range(range_opt.value());
-            uint64_t offset = range.getStart();
+    void assert_my_tcp_srv_sended_getrs_to(const NetAddr &peer);
 
-            uint64_t size = min(BLOCK_SIZE, (range.getEnd() - offset));
-
-            Block b(offset, offset + size);
-            Range r(b.start, b.end);
-
-            auto data_opt = rm_->queryReadFromHistory({uri_opt.value(), b});
-
-            ASSERT_TRUE(data_opt.has_value());
-
-            LanSyncPkt p = {lan_sync_version::VER_0_1, LAN_SYNC_TYPE_REPLY_RESOURCE};
-            p.addXheader(XHEADER_RANGE, r.to_string());
-            p.addXheader(XHEADER_URI, uri_opt.value());
-            p.setPayload(data_opt.value().get(), b.size());
-
-            ASSERT_EQ(sentPkt, p);
-
-            offset += b.size();
-        }
-    }
-
-    void assert_my_udp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
-    {
-        auto cli = neg_->queryUdpCliNetAbility(peer);
-        auto sentPkt = popPktFromOs(cli);
-        ASSERT_TRUE(sentPkt.has_value());
-        ASSERT_EQ(pkt, sentPkt.value());
-    }
-
-    void assert_my_tcp_srv_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
-    {
-        // 根据peer查找session，然后session.write，故tcp_srv的send的内容，存放在peer的session的outputstream中
-        auto cli = neg_->queryTcpCliNetAbility(peer);
-        auto sentPkt = popPktFromOs(cli);
-        ASSERT_TRUE(sentPkt.has_value());
-        ASSERT_EQ(pkt, sentPkt.value());
-    }
-    void assert_my_tcp_srv_sended_getrs_to(const NetAddr &peer)
-    {
-        // 根据peer查找session，然后session.write，故tcp_srv的send的内容，存放在peer的session的outputstream中
-        auto cli = neg_->queryTcpCliNetAbility(peer);
-        auto sentPkt = justReadPktFromOs(cli);
-        ASSERT_EQ(sentPkt.getType(), lan_sync_type_enum::LAN_SYNC_TYPE_GET_RESOURCE);
-    }
-
-    void renderReadFrom()
-    {
-        auto uri_tasks = tm_->getTasks();
-        for (auto &&kv : uri_tasks)
-        {
-            auto tasks = kv.second;
-            for (auto &&t : tasks)
-            {
-                uri_block ub{t.getUri(), t.getBlock()};
-                rm_->setReadFrom(ub, gen_u8_array(t.getBlock().size()));
-            }
-        }
-    }
-
-    LanSyncPkt pkt_hello(void *payload = nullptr, uint64_t size = 0);
-    LanSyncPkt pkt_hello_ack(void *payload = nullptr, uint64_t size = 0);
-    LanSyncPkt pkt_req_idx();
-    LanSyncPkt pkt_reply_idx(vector<Resource> tb);
-    LanSyncPkt pkt_req_rs(Resource r);
+    void renderReadFrom();
 };
 
 #endif

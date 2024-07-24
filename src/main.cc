@@ -6,6 +6,7 @@
 #include "framework/impl/net/net_framework_engine_base_event.h"
 #include "framework/itf/timer/timer_trigger_framework.h"
 #include "framework/impl/timer/timer_framework_engine_base_event.h"
+#include "framework/impl/persist/persist_framework_egine_filesystem.h"
 
 using namespace std;
 
@@ -14,8 +15,6 @@ int main(int argc, char *argv[])
     Usage u(argc, argv);
     u.parse();
 
-    PropertiesParse p(FLAGS_config_path);
-
     auto _base = make_shared<EventBaseWrap>(event_base_new());
     auto _eg = make_shared<NetFrameworkEngineBaseEvent>(_base);
     Netframework::init(_eg);
@@ -23,9 +22,15 @@ int main(int argc, char *argv[])
     auto timer_ = make_shared<TimerFrameworkEngineBaseEvent>(_base);
     TimerFramework::init(timer_);
 
+    auto persister_ = make_shared<PersistFrameworkEgineImplWithFileSystem>();
+    PersistFramework::init(persister_);
+
     Endpoint ed;
-    ed.setResourceManager(make_shared<ResourceManagerBaseFilesystem>(p.query(PropertiesParse::RESOURCE_HOME)));
-    
+
+    auto conf = make_shared<PropertiesParse>(FLAGS_config_path);
+    ed.setResourceManager(make_shared<ResourceManagerBaseFilesystem>(conf->query(PropertiesParse::RESOURCE_HOME)));
+    ed.setPropertiesParse(conf);
+
     ed.init();
     ed.run();
 

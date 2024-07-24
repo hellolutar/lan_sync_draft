@@ -12,6 +12,7 @@ class ProtoServerRecv : public LogicWrite
 protected:
     std::shared_ptr<std::vector<std::shared_ptr<ProtoSession>>> sess_;
     std::shared_ptr<LogicWrite> core_logic_;
+    std::shared_ptr<ProtoSession> findSession(const NetAddr& peer);
 
 public:
     ProtoServerRecv(std::shared_ptr<LogicWrite> logic, std::shared_ptr<std::vector<std::shared_ptr<ProtoSession>>> sess)

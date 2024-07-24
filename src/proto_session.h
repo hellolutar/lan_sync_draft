@@ -18,7 +18,7 @@ enum class SessionState
 
 class ProtoSession
 {
-private:
+protected:
     std::uint32_t id_;
     SessionState state_ = SessionState::DISCONNECT;
     std::shared_ptr<TcpCli> tcli_;
@@ -36,7 +36,7 @@ public:
     }
     ProtoSession(ProtoSession &&m){};
 
-    ~ProtoSession()
+    virtual ~ProtoSession()
     {
         tcli_ = nullptr;
         core_logic_ = nullptr;

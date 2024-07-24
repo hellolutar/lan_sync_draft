@@ -5,6 +5,7 @@
 #include "framework/itf/timer/timer_trigger_framework.h"
 #include "logic/logic_core.h"
 #include "task/task_coordinator_trigger.h"
+#include "conf/properties_parse.h"
 #include "udp_cli_trigger.h"
 
 class Endpoint
@@ -19,6 +20,7 @@ protected:
     std::shared_ptr<TaskCoordinatorTrigger> coor_trg_;
     std::shared_ptr<TaskManager> tm_;
     std::shared_ptr<ResourceManager> rm_;
+    std::shared_ptr<PropertiesParse> conf_;
 
 public:
     Endpoint() {}
@@ -30,6 +32,8 @@ public:
     void setTaskManager(std::shared_ptr<TaskManager> tm);
     void setNetworkAdapter(std::shared_ptr<NetworkAdapter> tm);
     void setResourceManager(std::shared_ptr<ResourceManager> rm);
+    void setPropertiesParse(std::shared_ptr<PropertiesParse> conf);
+    
 };
 
 #endif

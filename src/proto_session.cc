@@ -30,7 +30,12 @@ void ProtoSession::recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, ui
         handleDisconnect(pkt, peer);
         break;
     case SessionState::ESTABLISED:
+        if (pkt.getType() == lan_sync_type_enum::LAN_SYNC_TYPE_HELLO)
+        {
+            return;
+        }
         core_logic_->recv(peer, data, size);
+
         break;
     case SessionState::DISRUPTION:
         // if (trg_.isRunning())

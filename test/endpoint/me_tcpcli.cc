@@ -87,3 +87,15 @@ TEST_F(EndPointTestCaseSimple, peer_tcp_server_get_rs_many_block)
 
     assert_my_tcp_cli_sended_replyRs_to(peer_tcp_srv_addr);
 }
+
+TEST_F(EndPointTestCaseSimple, check_session_duplicate_to_receive_hello_pkt)
+{
+    my_udp_srv_receive_from(peer_udp_cli_addr, pkt_hello(&port, sizeof(uint16_t)));
+    assert_my_tcp_cli_sended_to(peer_tcp_srv_addr, pkt_hello_ack());
+
+    for (size_t i = 0; i < 10; i++)
+    {
+        my_udp_srv_receive_from(peer_udp_cli_addr, pkt_hello(&port, sizeof(uint16_t)));
+        assert_my_tcp_cli_notsend_any_pkt_to(peer_tcp_srv_addr);
+    }
+}

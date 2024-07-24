@@ -1,34 +1,54 @@
 #include "proto_server.h"
 
-void ProtoServerRecv::recv(const NetAddr &from, std::shared_ptr<uint8_t[]> data, uint64_t size)
+std::shared_ptr<ProtoSession> ProtoServerRecv::findSession(const NetAddr &from)
 {
-    // 寻找session
     for (auto &&s : *sess_)
     {
         if (s->isMe(from))
+            return s;
+    }
+    return nullptr;
+}
+
+void ProtoServerRecv::recv(const NetAddr &from, std::shared_ptr<uint8_t[]> data, uint64_t size)
+{
+    LanSyncPkt pkt(data);
+
+    if (pkt.getType() == lan_sync_type_enum::LAN_SYNC_TYPE_HELLO)
+    {
+        uint16_t peerPort = *(reinterpret_cast<uint16_t *>(pkt.getPayload().get()));
+        NetAddr peer(from);
+        peer.setType(TransportType::TCP);
+        peer.setPort(peerPort);
+
+        auto s = findSession(peer);
+        if (s != nullptr)
         {
             s->recv(from, data, size);
             return;
         }
-    }
-
-    LanSyncPkt pkt(data);
-    auto s = std::make_shared<ProtoSession>(core_logic_);
-    if (from.type() == TransportType::UDP)
-    {
+        s = std::make_shared<ProtoSession>(core_logic_);
         if (s->call(from, pkt))
+        {
+            // 注意这里绑定的session应该是tcpcli;
             sess_->push_back(s);
+        }
     }
-    else if (from.type() == TransportType::TCP)
+    else
     {
+        auto s = findSession(from);
+        if (s != nullptr)
+        {
+            s->recv(from, data, size);
+            return;
+        }
+        s = std::make_shared<ProtoSession>(core_logic_);
         if (s->bind(from, pkt))
         {
             sess_->push_back(s);
             s->recv(from, data, size);
         }
     }
-    else
-        throw "the type is unknow";
 }
 
 const ProtoSession &ProtoServer::findSession(const NetAddr &peer)

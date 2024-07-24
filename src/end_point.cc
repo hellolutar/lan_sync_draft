@@ -25,7 +25,10 @@ void Endpoint::init()
 
     if (hello_trg_ == nullptr)
     {
-        NetworkContext ctx(na_, NetAddr("0.0.0.1:" + to_string(default_udp_srv_port), TransportType::UDP));
+        auto discover_ip = conf_->query(PropertiesParse::DISCOVER_IPS);
+        auto discover_port = conf_->query(PropertiesParse::PROTO_DISCOVER_SERVER_UDP_PORT);
+        auto peer = discover_ip + ":" + discover_port;
+        NetworkContext ctx(na_, NetAddr(peer, TransportType::UDP));
         hello_trg_ = std::make_shared<UdpCliTrigger>(ctx, Trigger::second(2), true);
     }
 
@@ -60,4 +63,9 @@ void Endpoint::setNetworkAdapter(std::shared_ptr<NetworkAdapter> na)
 void Endpoint::setResourceManager(std::shared_ptr<ResourceManager> rm)
 {
     rm_ = rm;
+}
+
+void Endpoint::setPropertiesParse(std::shared_ptr<PropertiesParse> conf)
+{
+    conf_ = conf;
 }

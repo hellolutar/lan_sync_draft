@@ -3,7 +3,7 @@
 void UdpCliTrigger::trigger()
 {
     LanSyncPkt pkt(lan_sync_version::VER_0_1, lan_sync_type_enum::LAN_SYNC_TYPE_HELLO);
-    uint16_t port = default_udp_srv_port;
+    uint16_t port = default_tcp_srv_port;
     pkt.setPayload(&port, sizeof(uint16_t));
     BufBaseonEvent buf;
     pkt.writeTo(buf);

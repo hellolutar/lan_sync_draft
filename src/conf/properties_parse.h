@@ -8,15 +8,16 @@ using namespace std;
 
 class PropertiesParse
 {
-private:
+protected:
     string filepath;
     map<string, string> properties;
 
 public:
+    PropertiesParse() {};
     PropertiesParse(string filepath);
-    ~PropertiesParse();
+    virtual ~PropertiesParse();
 
-    string query(string key);
+    virtual string query(string key);
 
     static const std::string DISCOVER_IPS;
     static const std::string PROTO_DISCOVER_SERVER_UDP_PORT;

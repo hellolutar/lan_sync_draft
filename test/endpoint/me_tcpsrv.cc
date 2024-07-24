@@ -10,7 +10,7 @@ TEST_F(EndPointTestCaseSimple, trigger_send_hello_with_udp)
 {
     teg_->tick(2000);
 
-    assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(const_cast<uint16_t *>(&default_udp_srv_port), sizeof(uint16_t)));
+    assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(const_cast<uint16_t *>(&default_tcp_srv_port), sizeof(uint16_t)));
 }
 
 /**
@@ -25,7 +25,7 @@ TEST_F(EndPointTestCaseSimple, me_tcp_server_get_rs)
 {
     teg_->tick(2000);
 
-    assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(const_cast<uint16_t *>(&default_udp_srv_port), sizeof(uint16_t)));
+    assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(const_cast<uint16_t *>(&default_tcp_srv_port), sizeof(uint16_t)));
 
     neg_->connectWithTcp(peer_tcp_cli_addr); // register peer tcpcli to netframework, that we can found it in follow code.
 
