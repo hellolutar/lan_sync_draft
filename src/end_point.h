@@ -5,7 +5,6 @@
 #include "framework/itf/timer/timer_trigger_framework.h"
 #include "logic/logic_core.h"
 #include "task/task_coordinator_trigger.h"
-#include "conf/properties_parse.h"
 #include "udp_cli_trigger.h"
 
 class Endpoint
@@ -33,6 +32,8 @@ public:
     void setNetworkAdapter(std::shared_ptr<NetworkAdapter> tm);
     void setResourceManager(std::shared_ptr<ResourceManager> rm);
     void setPropertiesParse(std::shared_ptr<PropertiesParse> conf);
+
+    std::shared_ptr<UdpCliTrigger> getUdpCliTrigger();
     
 };
 

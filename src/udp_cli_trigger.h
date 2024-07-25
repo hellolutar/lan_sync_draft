@@ -10,18 +10,25 @@
 class UdpCliTrigger : public Trigger
 {
 private:
-    NetworkContext ctx_;
+    std::vector<NetworkContext> ctxs_;
     bool running_ = false;
 
 public:
-    UdpCliTrigger(NetworkContext ctx, struct timeval period, bool persist)
-        : Trigger(period, persist), ctx_(ctx) {}
+    UdpCliTrigger(const NetworkContext &ctx, struct timeval period, bool persist)
+        : Trigger(period, persist)
+    {
+        ctxs_.push_back(ctx);
+    }
     ~UdpCliTrigger() {}
 
     void trigger() override;
 
     const bool isRunning() const;
     std::uint16_t getId() const;
+
+    void addCtx(const NetworkContext &ctx);
+    void delCtx(const NetAddr& addr);
+    uint64_t ctxSize();
 };
 
 #endif

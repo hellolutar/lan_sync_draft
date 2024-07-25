@@ -23,6 +23,7 @@ TEST_F(EndPointTestCaseSimple, trigger_send_hello_with_udp)
  */
 TEST_F(EndPointTestCaseSimple, me_tcp_server_get_rs)
 {
+    auto ctxs_size = ed_.getUdpCliTrigger()->ctxSize();
     teg_->tick(2000);
 
     assert_my_udp_cli_sended_to(peer_udp_srv_addr, pkt_hello(const_cast<uint16_t *>(&default_tcp_srv_port), sizeof(uint16_t)));
@@ -30,6 +31,8 @@ TEST_F(EndPointTestCaseSimple, me_tcp_server_get_rs)
     neg_->connectWithTcp(peer_tcp_cli_addr); // register peer tcpcli to netframework, that we can found it in follow code.
 
     my_tcp_srv_receive_from(peer_tcp_cli_addr, pkt_hello_ack());
+    ASSERT_NE(ctxs_size, ed_.getUdpCliTrigger()->ctxSize());
+
     assert_my_tcp_srv_sended_to(peer_tcp_cli_addr, pkt_req_idx());
 
     vector<Resource> tb = {{"java", "uri.java", "java.lang.string", "path", 18}, {"C++", "uri.C++", "since 1985", "path", 10 * BLOCK_SIZE}};

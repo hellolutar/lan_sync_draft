@@ -1,5 +1,6 @@
 #include "logic_core.h"
 #include "log/log.h"
+#include "framework/itf/timer/timer_trigger_framework.h"
 
 using namespace std;
 
@@ -8,6 +9,14 @@ void LogicCore::helloAck(const NetAddr &peer, const LanSyncPkt &pkt)
     auto idx = rm_->idx();
     auto dto = ResourceSerializer::serialize(idx);
     LanSyncPkt p = {lan_sync_version::VER_0_1, LAN_SYNC_TYPE_GET_TABLE_INDEX};
+
+    // todo 取消udp的定时请求
+    auto discover_ip = conf_->query(PropertiesParse::DISCOVER_IPS);
+    auto discover_port = conf_->query(PropertiesParse::PROTO_DISCOVER_SERVER_UDP_PORT);
+    NetAddr wantoDel(discover_ip + ":" + discover_port, TransportType::UDP);
+    hello_trg_->delCtx(wantoDel);
+
+    DEBUG_F("LogicCore::helloAck(): send get idx pkt!");
 
     BufBaseonEvent buf;
     p.writeTo(buf);
@@ -179,4 +188,14 @@ void LogicCore::setTaskCoordinator(std::shared_ptr<TaskCoordinator> coor)
 
     if (rm_ != nullptr)
         coor_->setResourceManager(rm_);
+}
+
+void LogicCore::setUdpCliTrigger(std::shared_ptr<UdpCliTrigger> trg)
+{
+    hello_trg_ = trg;
+}
+
+void LogicCore::setPropertiesParse(std::shared_ptr<PropertiesParse> conf)
+{
+    conf_ = conf;
 }

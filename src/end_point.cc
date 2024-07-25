@@ -44,6 +44,8 @@ void Endpoint::init()
     core_->setNetworkAdapter(na_);
     core_->setTaskCoordinator(coor_trg_->getTaskCoordinator());
     core_->setResourceManager(rm_);
+    core_->setUdpCliTrigger(hello_trg_);
+    core_->setPropertiesParse(conf_);
 }
 
 void Endpoint::run()
@@ -74,4 +76,9 @@ void Endpoint::setResourceManager(std::shared_ptr<ResourceManager> rm)
 void Endpoint::setPropertiesParse(std::shared_ptr<PropertiesParse> conf)
 {
     conf_ = conf;
+}
+
+std::shared_ptr<UdpCliTrigger> Endpoint::getUdpCliTrigger()
+{
+    return hello_trg_;
 }
