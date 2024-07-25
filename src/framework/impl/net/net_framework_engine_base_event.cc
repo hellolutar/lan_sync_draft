@@ -122,6 +122,15 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::connectWithTcp(const NetAdd
 
     INFO("TCP connect : ", peer.str());
 
+    auto it = ctxs_.find(peer.str());
+    if (it != ctxs_.end())
+    {
+        auto conn = it->second;
+        auto tconn = std::reinterpret_pointer_cast<TcpConn>(conn);
+        auto tcli = std::reinterpret_pointer_cast<TcpCli>(tconn->getNe());
+        return tcli;
+    }
+
     int peer_sock = socket(AF_INET, SOCK_STREAM, 0);
 
     sockaddr_in be_addr = peer.sockaddrV4();
@@ -161,6 +170,17 @@ std::shared_ptr<UdpCli> NetFrameworkEngineBaseEvent::connectWithUdp(const NetAdd
 {
     init_check();
 
+    INFO("UDP connect :", peer.str().data());
+
+    auto it = ctxs_.find(peer.str());
+    if (it != ctxs_.end())
+    {
+        auto conn = it->second;
+        auto uconn = std::reinterpret_pointer_cast<UdpConn>(conn);
+        auto ucli = std::reinterpret_pointer_cast<UdpCli>(uconn->getNe());
+        return ucli;
+    }
+
     int peer_sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (peer_sock <= 0)
     {
@@ -173,8 +193,6 @@ std::shared_ptr<UdpCli> NetFrameworkEngineBaseEvent::connectWithUdp(const NetAdd
     setsockopt(peer_sock, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(int));
     setsockopt(peer_sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
     evutil_make_socket_nonblocking(peer_sock);
-
-    INFO("UDP connect :", peer.str().data());
 
     auto cli = std::make_shared<UdpCli>(peer_sock, peer);
 
@@ -200,12 +218,17 @@ void NetFrameworkEngineBaseEvent::start()
     base_->dispatch();
 }
 
-void NetFrameworkEngineBaseEvent::unregisterUdpCli(const NetAddr &addr)
-{
-}
-
 std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::findTcpCli(const NetAddr &addr)
 {
+    auto iter = ctxs_.find(addr.str());
+    if (iter != ctxs_.end())
+    {
+        auto conn = iter->second;
+        auto tcp_conn = std::reinterpret_pointer_cast<TcpConn>(conn);
+        auto ne = tcp_conn->getNe();
+        auto tcli = std::reinterpret_pointer_cast<TcpCli>(ne);
+        return tcli;
+    }
     return nullptr;
 }
 
@@ -220,6 +243,9 @@ void NetFrameworkEngineBaseEvent::unRegister(const NetAddr &addr)
     if (iter != ctxs_.end())
     {
         // 取消事件
+        DEBUG_F("NetFrameworkEngineBaseEvent::unRegister(): {}", addr.str());
+        if (addr.type() == TransportType::TCP && tcp_disconn_cb_ != nullptr)
+            tcp_disconn_cb_(addr);
         ctxs_.erase(iter);
         return;
     }

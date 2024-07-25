@@ -36,11 +36,7 @@ public:
     }
     ProtoSession(ProtoSession &&m){};
 
-    virtual ~ProtoSession()
-    {
-        tcli_ = nullptr;
-        core_logic_ = nullptr;
-    }
+    virtual ~ProtoSession();
 
     const uint16_t getId() const;
 

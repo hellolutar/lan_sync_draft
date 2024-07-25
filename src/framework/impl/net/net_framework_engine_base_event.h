@@ -40,7 +40,6 @@ public:
     void shutdown() override;
     void unRegister(const NetAddr &addr) override;
 
-    void unregisterUdpCli(const NetAddr &addr) override;
     std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) override;
 };
 

@@ -25,17 +25,19 @@ void Task::req()
     pkt.addXheader(XHEADER_URI, uri_);
     pkt.addXheader(XHEADER_RANGE, range_hdr);
 
-    // todo(20240715, lutar) this logic belong to reply resource 读取数据
-    // auto data_opt = rm_->readFrom(uri_, block_);
-    // if (data_opt.has_value())
-    // {
-    //     pkt.setPayload(data_opt.value().get(), block_.size());
-    // }
-
     BufBaseonEvent buf;
     pkt.writeTo(buf);
 
-    ctx_.write(buf.data(), buf.size());
+    try
+    {
+        ctx_.write(buf.data(), buf.size());
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+        retry_++;
+        status_ = TaskStatusEnum::Failed;
+    }
 }
 
 void Task::tick(uint64_t t)

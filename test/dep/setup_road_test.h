@@ -83,6 +83,7 @@ protected:
     shared_ptr<TimerFrameworkEngineForTest> teg_;
     shared_ptr<ResourceManagerForTest> rm_;
     shared_ptr<TaskManagerForTest> tm_;
+    shared_ptr<NetworkAdapterForTest> na_;
 
     NetAddr my_udp_cli_addr_{"0.0.0.10:18080", TransportType::UDP};
     NetAddr my_udp_srv_addr_{"0.0.0.10:" + to_string(default_udp_srv_port), TransportType::UDP};

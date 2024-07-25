@@ -90,7 +90,7 @@ std::vector<NetAddr> NetworkAdapter::query_broad_ports()
         if (broad_addr.sin_addr.s_addr == 0)
             continue; // is loopback
 
-        NetAddr addr(broad_addr,TransportType::UDP);
+        NetAddr addr(broad_addr, TransportType::UDP);
 
         ports.push_back(addr);
     }
@@ -113,7 +113,7 @@ const ProtoSession &NetworkAdapter::findSession(const NetAddr &peer)
         {
         }
     }
-    throw;
+    throw NotFoundException("");
 }
 
 void NetworkAdapter::start(std::shared_ptr<LogicWrite> core)
@@ -143,5 +143,12 @@ void NetworkAdapter::udp_write(const NetAddr &peer, std::shared_ptr<uint8_t[]> d
     auto eg = Netframework::getEngine();
     auto u_cli = eg->connectWithUdp(peer);
     u_cli->write(data, size);
-    // eg->unregisterUdpCli(u_cli->peer());
+}
+void NetworkAdapter::rmSessionCallBack(const NetAddr &addr)
+{
+    for (auto &&s : srvs_)
+    {
+        if (s->rmSessionIfExist(addr))
+            return;
+    }
 };

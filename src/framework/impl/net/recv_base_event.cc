@@ -180,3 +180,7 @@ BaseEngineDto::~BaseEngineDto()
     engine_ = nullptr;
     srv_ = nullptr;
 }
+
+TcpConn::~TcpConn() {
+    DEBUG_F("TcpConn::~TcpConn() : {}", addr_.str());
+}

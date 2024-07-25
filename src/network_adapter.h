@@ -15,6 +15,7 @@ protected:
 
     const ProtoSession &findSession(const NetAddr &peer);
 
+
 public:
     NetworkAdapter(){};
     virtual ~NetworkAdapter()
@@ -27,6 +28,8 @@ public:
     void write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
 
     void udp_write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
+    
+    void rmSessionCallBack(const NetAddr &addr);
 };
 
 #endif

@@ -41,8 +41,8 @@ void EndPointTestCaseSimple::SetUp()
     teg_ = make_shared<TimerFrameworkEngineForTest>();
     TimerFramework::init(teg_);
 
-    auto na = make_shared<NetworkAdapterForTest>();
-    ed_.setNetworkAdapter(na);
+    na_ = make_shared<NetworkAdapterForTest>();
+    ed_.setNetworkAdapter(na_);
 
     map<string, string> properties;
     properties[PropertiesParse::DISCOVER_IPS] = "0.0.0.1";
@@ -81,10 +81,13 @@ optional<LanSyncPkt> EndPointTestCaseSimple::popPktFromOs(std::shared_ptr<NetAbi
 optional<LanSyncPkt> EndPointTestCaseSimple::justReadPktFromOs(std::shared_ptr<NetAbility> net)
 {
     auto &os = reinterpret_cast<const std::unique_ptr<OutputStreamForTest> &>(net->getOutputStream());
+    if (os->size() == 0)
+        return nullopt;
+
     auto recvBuf = os->front();
     if (recvBuf == nullptr)
         return nullopt;
-    return  make_optional<LanSyncPkt>(recvBuf->data());
+    return make_optional<LanSyncPkt>(recvBuf->data());
 }
 
 void EndPointTestCaseSimple::my_udp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt)

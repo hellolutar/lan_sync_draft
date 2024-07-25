@@ -62,3 +62,17 @@ const ProtoSession &ProtoServer::findSession(const NetAddr &peer)
 
     throw NotFoundException("ProtoServer::findSession can not found the peer !");
 }
+
+bool ProtoServer::rmSessionIfExist(const NetAddr &addr)
+{
+    for (auto it = sess_->begin(); it != sess_->end(); it++)
+    {
+        auto a = *it;
+        if (a->isMe(addr))
+        {
+            sess_->erase(it);
+            return true;
+        }
+    }
+    return false;
+}

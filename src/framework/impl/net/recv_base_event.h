@@ -40,7 +40,7 @@ private:
 public:
     TcpConn(NetAddr peer, std::shared_ptr<NetAbility> ne)
         : ConnectionBaseEvent(nullptr, peer), ne_(ne) {}
-    ~TcpConn() {}
+    ~TcpConn();
 
     NetAddr getPeer()
     {

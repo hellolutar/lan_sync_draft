@@ -1,4 +1,5 @@
 #include "logic_core.h"
+#include "log/log.h"
 
 using namespace std;
 
@@ -10,10 +11,7 @@ void LogicCore::helloAck(const NetAddr &peer, const LanSyncPkt &pkt)
 
     BufBaseonEvent buf;
     p.writeTo(buf);
-    adapter_->write(peer, buf.data(), buf.size());
-    // todo
-    // 这里存在虚假指针问题，因为outputstream是放入缓冲区，放完以后，执行到此，执行到
-    // 括号外，buf被释放，会导致buf.data被释放。
+    write(buf.data(), buf.size());
 }
 
 void LogicCore::reqIdx(const NetAddr &peer, const LanSyncPkt &pkt)
@@ -26,10 +24,7 @@ void LogicCore::reqIdx(const NetAddr &peer, const LanSyncPkt &pkt)
 
     BufBaseonEvent buf;
     p.writeTo(buf);
-    adapter_->write(peer, buf.data(), buf.size());
-    // todo
-    // 这里存在虚假指针问题，因为outputstream是放入缓冲区，放完以后，执行到此，执行到
-    // 括号外，buf被释放，会导致buf.data被释放。
+    write(buf.data(), buf.size());
 }
 
 void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt)
@@ -82,7 +77,7 @@ void LogicCore::readDataThenReplyRs(const std::string &uri, const Block &b, cons
 
     BufBaseonEvent buf;
     p.writeTo(buf);
-    adapter_->write(peer, buf.data(), buf.size());
+    write(buf.data(), buf.size());
 }
 
 void LogicCore::recvIdx(const NetAddr &peer, const LanSyncPkt &pkt)
@@ -135,6 +130,9 @@ const uint64_t LogicCore::isExtraAllDataNow(std::shared_ptr<uint8_t[]> data,
 void LogicCore::recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     LanSyncPkt pkt(data);
+
+    DEBUG_F("LogicCore::recv(): from:{}\ttype:{}", peer.str(), convert_lan_sync_type_enum(pkt.getType()));
+
     switch (pkt.getType())
     {
     case lan_sync_type_enum::LAN_SYNC_TYPE_HELLO_ACK:

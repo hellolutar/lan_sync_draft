@@ -12,7 +12,7 @@ class ProtoServerRecv : public LogicWrite
 protected:
     std::shared_ptr<std::vector<std::shared_ptr<ProtoSession>>> sess_;
     std::shared_ptr<LogicWrite> core_logic_;
-    std::shared_ptr<ProtoSession> findSession(const NetAddr& peer);
+    std::shared_ptr<ProtoSession> findSession(const NetAddr &peer);
 
 public:
     ProtoServerRecv(std::shared_ptr<LogicWrite> logic, std::shared_ptr<std::vector<std::shared_ptr<ProtoSession>>> sess)
@@ -25,7 +25,7 @@ public:
     /**
      * 由TcpServer、UdpServer 调用； tcpcli 直接调用的core_logic_
      */
-    void recv(const NetAddr &from, std::shared_ptr<uint8_t[]>data, uint64_t size) override;
+    void recv(const NetAddr &from, std::shared_ptr<uint8_t[]> data, uint64_t size) override;
     const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, uint64_t data_len) const override
     {
         return core_logic_->isExtraAllDataNow(data, data_len);
@@ -75,6 +75,8 @@ public:
     }
 
     const ProtoSession &findSession(const NetAddr &peer);
+
+    bool rmSessionIfExist(const NetAddr&);
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "proto_session.h"
+#include "log/log.h"
 
 static std::atomic<uint16_t> incr_{0};
 
@@ -9,10 +10,14 @@ const uint16_t genSeesionId(uint16_t server_id)
     return server_id << 16 | incr_.load();
 }
 
-const uint16_t ProtoSession::getId() const
+ProtoSession::~ProtoSession()
 {
-    return id_;
+    DEBUG_F("ProtoSession::~ProtoSession()" );
+    tcli_ = nullptr;
+    core_logic_ = nullptr;
 }
+
+const uint16_t ProtoSession::getId() const { return id_; }
 
 bool ProtoSession::isMe(const NetAddr &peer)
 {
@@ -66,7 +71,7 @@ bool ProtoSession::bind(const NetAddr &from, const LanSyncPkt &pkt)
 {
     if (tcli_ != nullptr)
     {
-        // throw NotFoundException("the tcli_ has been bound!");
+        WARN_F("ProtoSession::bind() : repetitive bind tcli!");
         return false;
     }
 
@@ -76,7 +81,10 @@ bool ProtoSession::bind(const NetAddr &from, const LanSyncPkt &pkt)
     auto eg = Netframework::getEngine();
     tcli_ = eg->findTcpCli(peer);
     if (tcli_ == nullptr)
+    {
+        WARN_F("ProtoSession::bind() : call findTcpCli, but no tcpcli be found.");
         return false;
+    }
 
     tcli_->bind(core_logic_);
     state_ = SessionState::ESTABLISED;

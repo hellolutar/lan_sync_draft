@@ -41,6 +41,7 @@ public:
   std::shared_ptr<buf_data> front();
   void pop(uint16_t size = 1);
   void clear();
+  uint64_t size();
 };
 
 class UdpCliForTest : public UdpCli
@@ -75,7 +76,7 @@ public:
   void addConn(std::shared_ptr<Connection>) override{};
   void start() {};
 
-  void unregisterUdpCli(const NetAddr &addr) override;
+  void unRegister(const NetAddr &addr) override;
 
   std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) override;
 
@@ -84,6 +85,8 @@ public:
   std::shared_ptr<NetAbility> queryUdpSerNetAbility(const NetAddr &addr);
   std::shared_ptr<NetAbility> queryUdpCliNetAbility(const NetAddr &addr);
   std::shared_ptr<NetAbility> queryNetAbility(const NetAddr &addr);
+
+  void tcp_disconn(const NetAddr &addr);
 };
 
 class TimerFrameworkEngineForTest : public TimerFrameworkEngine
@@ -181,6 +184,8 @@ protected:
 public:
   NetworkAdapterForTest(/* args */) {}
   ~NetworkAdapterForTest() {}
+
+  bool isSessionExists(const NetAddr &peer);
 };
 
 #endif

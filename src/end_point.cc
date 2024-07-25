@@ -17,11 +17,17 @@ void Endpoint::init()
     if (na_ == nullptr)
         na_ = std::make_shared<NetworkAdapter>();
 
+    auto cb = std::bind(&NetworkAdapter::rmSessionCallBack, na_.get(), std::placeholders::_1);
+    auto ng = Netframework::getEngine();
+    ng->setTcpDisConnCB(cb);
+
     if (core_ == nullptr)
         core_ = std::make_shared<LogicCore>();
 
     if (tm_ == nullptr)
         tm_ = std::make_shared<TaskManager>();
+
+    auto eg = Netframework::getEngine();
 
     if (hello_trg_ == nullptr)
     {

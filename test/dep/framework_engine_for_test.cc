@@ -51,6 +51,11 @@ void OutputStreamForTest::clear()
     }
 }
 
+uint64_t OutputStreamForTest::size()
+{
+    return bufs_.size();
+}
+
 NetFrameworkEngineForTest::~NetFrameworkEngineForTest()
 {
     tcpsrv_.clear();
@@ -95,11 +100,20 @@ std::shared_ptr<UdpCli> NetFrameworkEngineForTest::connectWithUdp(const NetAddr 
     return cli;
 }
 
-void NetFrameworkEngineForTest::unregisterUdpCli(const NetAddr &addr)
+void NetFrameworkEngineForTest::unRegister(const NetAddr &addr)
 {
-    auto iter = udpcli_.find(addr);
-    if (iter != udpcli_.end())
-        udpcli_.erase(iter);
+    auto uiter = udpcli_.find(addr);
+    if (uiter != udpcli_.end())
+        udpcli_.erase(uiter);
+
+    auto titer = tcpcli_.find(addr);
+    if (titer != tcpcli_.end())
+        tcpcli_.erase(titer);
+
+    if (tcp_disconn_cb_ != nullptr)
+    {
+        tcp_disconn_cb_(addr);
+    }
 }
 
 std::shared_ptr<TcpCli> NetFrameworkEngineForTest::findTcpCli(const NetAddr &addr)
@@ -161,6 +175,11 @@ std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryNetAbility(const Net
         return udpcli_.find(addr)->second;
 
     throw NotFoundException("NetFrameworkEngineForTest::queryNetAbility(): ", addr);
+}
+
+void NetFrameworkEngineForTest::tcp_disconn(const NetAddr &addr)
+{
+    unRegister(addr);
 }
 
 std::shared_ptr<Trigger> TimerFrameworkEngineForTest::findTrigger(std::uint16_t id)
@@ -245,4 +264,17 @@ std::vector<NetAddr> NetworkAdapterForTest::query_local_ports()
 std::vector<NetAddr> NetworkAdapterForTest::query_broad_ports()
 {
     return std::vector<NetAddr>();
+}
+
+bool NetworkAdapterForTest::isSessionExists(const NetAddr &peer)
+{
+    try
+    {
+        findSession(peer);
+        return true;
+    }
+    catch (const std::exception &e)
+    {
+        return false;
+    }
 }

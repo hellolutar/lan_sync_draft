@@ -99,3 +99,12 @@ TEST_F(EndPointTestCaseSimple, check_session_duplicate_to_receive_hello_pkt)
         assert_my_tcp_cli_notsend_any_pkt_to(peer_tcp_srv_addr);
     }
 }
+
+TEST_F(EndPointTestCaseSimple, release_tcpcli_when_disconnect)
+{
+    my_udp_srv_receive_from(peer_udp_cli_addr, pkt_hello(&port, sizeof(uint16_t)));
+    assert_my_tcp_cli_sended_to(peer_tcp_srv_addr, pkt_hello_ack());
+    ASSERT_TRUE(na_->isSessionExists(peer_tcp_srv_addr));
+    neg_->tcp_disconn(peer_tcp_srv_addr);
+    ASSERT_FALSE(na_->isSessionExists(peer_tcp_srv_addr));
+}
