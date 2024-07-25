@@ -61,11 +61,7 @@ public:
      * @param data
      * @param size
      */
-    virtual void write(std::shared_ptr<uint8_t[]> data, uint64_t size)
-    {
-        if (os_ != nullptr)
-            os_->write(data, size);
-    };
+    virtual void write(std::shared_ptr<uint8_t[]> data, uint64_t size);
 
     /**
      * @brief Set the Output Stream object, called by the net_framekwork

@@ -14,10 +14,9 @@ private:
     bool running_ = false;
 
 public:
-    UdpCliTrigger(const NetworkContext &ctx, struct timeval period, bool persist)
+    UdpCliTrigger(struct timeval period, bool persist)
         : Trigger(period, persist)
     {
-        ctxs_.push_back(ctx);
     }
     ~UdpCliTrigger() {}
 
@@ -27,7 +26,7 @@ public:
     std::uint16_t getId() const;
 
     void addCtx(const NetworkContext &ctx);
-    void delCtx(const NetAddr& addr);
+    void delCtx(const NetAddr &addr);
     uint64_t ctxSize();
 };
 

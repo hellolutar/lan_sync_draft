@@ -31,11 +31,16 @@ void Endpoint::init()
 
     if (hello_trg_ == nullptr)
     {
+        hello_trg_ = std::make_shared<UdpCliTrigger>(Trigger::second(2), true);
+
         auto discover_ip = conf_->query(PropertiesParse::DISCOVER_IPS);
         auto discover_port = conf_->query(PropertiesParse::PROTO_DISCOVER_SERVER_UDP_PORT);
-        auto peer = discover_ip + ":" + discover_port;
-        NetworkContext ctx(na_, NetAddr(peer, TransportType::UDP));
-        hello_trg_ = std::make_shared<UdpCliTrigger>(ctx, Trigger::second(2), true);
+        if (discover_ip.size() != 0 && discover_port.size() != 0)
+        {
+            auto peer = discover_ip + ":" + discover_port;
+            NetworkContext ctx(na_, NetAddr(peer, TransportType::UDP));
+            hello_trg_->addCtx(ctx);
+        }
     }
 
     if (coor_trg_ == nullptr)
