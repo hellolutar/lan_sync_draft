@@ -9,7 +9,7 @@
 class NetAbility
 {
 protected:
-    std::shared_ptr<LogicWrite> logic_ = nullptr;
+    std::shared_ptr<LogicProto> logic_ = nullptr;
 
 public:
     NetAbility() {};
@@ -20,7 +20,7 @@ public:
     virtual const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, uint64_t size);
     virtual void recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> data, uint64_t size);
 
-    void bind(std::shared_ptr<LogicWrite> logic);
+    void bind(std::shared_ptr<LogicProto> logic);
 };
 
 class ConnCli : public NetAbility
@@ -70,7 +70,7 @@ public:
     TcpServer(NetAddr port) : port_(port) {}
     virtual ~TcpServer();
 
-    virtual const std::shared_ptr<LogicWrite> getLogic() const;
+    virtual const std::shared_ptr<LogicProto> getLogic() const;
 };
 
 class UdpServer : public NetAbility

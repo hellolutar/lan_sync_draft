@@ -150,17 +150,18 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::connectWithTcp(const NetAdd
 
     auto cli = std::make_shared<TcpCli>(peer);
 
-    auto bev_wrap = std::make_shared<BuffereventWrap>(bevp);
-    auto os = std::make_shared<OutputstreamBaseEvent>(bev_wrap);
-    cli->setOutputStream(os);
+    auto bev_wrap = std::make_shared<BuffereventWrap>(bevp); // 1 bev_wrap
 
+    auto os = std::make_shared<OutputstreamBaseEvent>(bev_wrap); // 2 bev_wrap
+    cli->setOutputStream(os);
     auto conn = std::make_shared<TcpConn>(peer, cli);
     addConn(conn);
 
-    conn->setEvent(bev_wrap);
+    conn->setEvent(bev_wrap); // 3 bev_wrap
 
     bufferevent_setcb(bevp, read_cb, write_cb, event_cb, conn.get());
     bufferevent_enable(bevp, EV_READ | EV_WRITE);
+
     bevp = nullptr;
 
     return cli;

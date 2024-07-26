@@ -13,7 +13,7 @@ using namespace std;
 
 const string CLOSE_STR = "close";
 
-class UdpCliLogic : public LogicWrite
+class UdpCliLogic : public LogicProto
 {
 private:
     std::stringstream ss;
@@ -43,7 +43,6 @@ public:
         {
             auto eg = Netframework::getEngine();
             eg->unRegister(ctx.from());
-            close();
         }
     };
 };

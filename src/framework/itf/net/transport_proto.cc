@@ -11,10 +11,10 @@ void NetAbility::recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> data, u
     logic_->recv(ctx, data, size);
 }
 
-void NetAbility::bind(std::shared_ptr<LogicWrite> logic)
+void NetAbility::bind(std::shared_ptr<LogicProto> logic)
 {
     // todo(lutar,20240726) 这里的代码如此写，非常不合理
-    if (logic_ != nullptr && logic_->getOutputStream() != nullptr)
+    if (logic_ != nullptr)
         return;
 
     logic_ = logic;
@@ -35,8 +35,9 @@ const NetAddr &ConnCli::peer() const
     return peer_;
 }
 
-void ConnCli::write(std::shared_ptr<uint8_t[]> data, uint64_t size) {
-    os_->write(data,size);
+void ConnCli::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
+{
+    os_->write(data, size);
 }
 
 void ConnCli::setOutputStream(std::shared_ptr<OutputStream> os)
@@ -66,7 +67,7 @@ TcpServer::~TcpServer()
     DEBUG("TcpServer::~TcpServer(): destroy (", port_.str(), ")");
 }
 
-const std::shared_ptr<LogicWrite> TcpServer::getLogic() const
+const std::shared_ptr<LogicProto> TcpServer::getLogic() const
 {
     return logic_;
 }
@@ -79,6 +80,7 @@ UdpServer::~UdpServer()
 
 void NetAbilityContext::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
+    auto a = os_.use_count();
     os_->write(data, size);
 }
 

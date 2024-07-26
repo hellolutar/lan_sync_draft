@@ -88,11 +88,14 @@ void read_cb(struct bufferevent *bev, void *ctx)
 
         assert(actual_extra_len == ne_wanto_extra_len);
 
-        auto bev_wrap = dto->getBuffereventWrap();
+        auto bev_wrap = dto->getBuffereventWrap(); // 3个
         auto os = std::make_shared<OutputstreamBaseEvent>(bev_wrap);
+        {
+            NetAbilityContext na_ctx(os, peer);
+            auto a = os.use_count();
+            ne->recv(na_ctx, head, actual_extra_len);
+        }
 
-        NetAbilityContext na_ctx(os, peer);
-        ne->recv(na_ctx, head, actual_extra_len);
         if (i++ >= limit)
         {
             // LOG_WARN("NetFrameworkEngineBaseEvent::read_cb : READ TIMES must <= LIMIT({})", limit);
@@ -163,8 +166,8 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
     bufferevent_setwatermark(bevp, EV_WRITE, 0, hw);
 
     auto conn = std::make_shared<TcpConn>(peer, cli);
-    auto event_wrap = std::make_shared<BuffereventWrap>(bevp);
-    conn->setEvent(event_wrap);
+    auto bev_wrap = std::make_shared<BuffereventWrap>(bevp);
+    conn->setEvent(bev_wrap);
     engine->addConn(conn);
 
     // todo conn->setEvent()
