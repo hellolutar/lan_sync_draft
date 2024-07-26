@@ -99,11 +99,11 @@ protected:
 
     void TearDown() override {};
 
-    void recv(std::shared_ptr<NetAbility> net, const NetAddr &peer, LanSyncPkt &pkt);
+    void recv(std::shared_ptr<NetAbility> net, std::shared_ptr<OutputStream> os, const NetAddr &peer, LanSyncPkt &pkt);
 
-    optional<LanSyncPkt> popPktFromOs(std::shared_ptr<NetAbility> net);
+    optional<LanSyncPkt> popPktFromOs(std::shared_ptr<OutputStreamForTest>);
 
-    optional<LanSyncPkt> justReadPktFromOs(std::shared_ptr<NetAbility> net);
+    optional<LanSyncPkt> justReadPktFromOs(std::shared_ptr<OutputStreamForTest>);
 
 public:
     void my_udp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt);

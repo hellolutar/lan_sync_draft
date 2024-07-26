@@ -150,14 +150,14 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::connectWithTcp(const NetAdd
 
     auto cli = std::make_shared<TcpCli>(peer);
 
-    auto event_wrap = std::make_shared<BuffereventWrap>(bevp);
-    auto os = std::make_unique<OutputstreamBaseEvent>(event_wrap);
-    cli->setOutputStream(std::move(os));
+    auto bev_wrap = std::make_shared<BuffereventWrap>(bevp);
+    auto os = std::make_shared<OutputstreamBaseEvent>(bev_wrap);
+    cli->setOutputStream(os);
 
     auto conn = std::make_shared<TcpConn>(peer, cli);
     addConn(conn);
 
-    conn->setEvent(event_wrap);
+    conn->setEvent(bev_wrap);
 
     bufferevent_setcb(bevp, read_cb, write_cb, event_cb, conn.get());
     bufferevent_enable(bevp, EV_READ | EV_WRITE);
@@ -195,6 +195,9 @@ std::shared_ptr<UdpCli> NetFrameworkEngineBaseEvent::connectWithUdp(const NetAdd
     evutil_make_socket_nonblocking(peer_sock);
 
     auto cli = std::make_shared<UdpCli>(peer_sock, peer);
+
+    auto os = std::make_shared<OutputstreamForUdp>(peer, peer_sock);
+    cli->setOutputStream(os);
 
     auto conn = std::make_shared<UdpConn>(peer, cli, peer_sock);
     addConn(conn);

@@ -24,9 +24,10 @@ bool ProtoSession::isMe(const NetAddr &peer)
     return tcli_->peer() == peer;
 }
 
-void ProtoSession::recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size)
+void ProtoSession::recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     LanSyncPkt pkt(data);
+    NetAddr peer = ctx.from();
 
     auto st = state_;
     switch (st)
@@ -39,7 +40,7 @@ void ProtoSession::recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, ui
         {
             return;
         }
-        core_logic_->recv(peer, data, size);
+        core_logic_->recv(ctx, data, size);
 
         break;
     case SessionState::DISRUPTION:

@@ -57,14 +57,15 @@ public:
 
 class ConnectionBaseEvent : public Connection
 {
-private:
+protected:
     std::shared_ptr<EventAbs> ev_;
 
 public:
     ConnectionBaseEvent(std::shared_ptr<EventAbs> ev, const NetAddr &a) : ev_(ev), Connection(a) {}
     ~ConnectionBaseEvent();
 
-    void setEvent(std::shared_ptr<EventAbs> ev);
+    virtual void setEvent(std::shared_ptr<EventAbs> ev);
+    virtual std::shared_ptr<EventAbs> getEventAbs();
 };
 
 #endif

@@ -60,17 +60,18 @@ void EndPointTestCaseSimple::SetUp()
 }
 
 void EndPointTestCaseSimple::recv(std::shared_ptr<NetAbility> net,
+                                  std::shared_ptr<OutputStream> os,
                                   const NetAddr &peer, LanSyncPkt &pkt)
 {
     BufBaseonEvent buf;
     pkt.writeTo(buf);
-    net->recv(peer, buf.data(), buf.size());
+
+    NetAbilityContext na_ctx(os, peer);
+    net->recv(na_ctx, buf.data(), buf.size());
 }
 
-optional<LanSyncPkt> EndPointTestCaseSimple::popPktFromOs(std::shared_ptr<NetAbility> net)
+optional<LanSyncPkt> EndPointTestCaseSimple::popPktFromOs(std::shared_ptr<OutputStreamForTest> os)
 {
-    auto &os = reinterpret_cast<const std::unique_ptr<OutputStreamForTest> &>(net->getOutputStream());
-
     auto recvBuf = os->front();
     if (recvBuf == nullptr)
         return nullopt;
@@ -78,9 +79,8 @@ optional<LanSyncPkt> EndPointTestCaseSimple::popPktFromOs(std::shared_ptr<NetAbi
     return make_optional<LanSyncPkt>(recvBuf->data());
 }
 
-optional<LanSyncPkt> EndPointTestCaseSimple::justReadPktFromOs(std::shared_ptr<NetAbility> net)
+optional<LanSyncPkt> EndPointTestCaseSimple::justReadPktFromOs(std::shared_ptr<OutputStreamForTest> os)
 {
-    auto &os = reinterpret_cast<const std::unique_ptr<OutputStreamForTest> &>(net->getOutputStream());
     if (os->size() == 0)
         return nullopt;
 
@@ -93,12 +93,13 @@ optional<LanSyncPkt> EndPointTestCaseSimple::justReadPktFromOs(std::shared_ptr<N
 void EndPointTestCaseSimple::my_udp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt)
 {
     auto srv = neg_->queryUdpSerNetAbility(my_udp_srv_addr_);
-    recv(srv, peer, pkt);
+    recv(srv, srv->os(), peer, pkt);
 }
 void EndPointTestCaseSimple::my_tcp_srv_receive_from(NetAddr &peer, LanSyncPkt &&pkt)
 {
     auto srv = neg_->queryTcpSerNetAbility(my_tcp_srv_addr_);
-    recv(srv, peer, pkt);
+    auto cli = neg_->queryTcpCliNetAbility(peer);
+    recv(srv, cli->os(), peer, pkt);
 }
 
 void EndPointTestCaseSimple::my_tcp_srv_receive_reply_rs_from(NetAddr &peer)
@@ -120,7 +121,7 @@ void EndPointTestCaseSimple::my_tcp_srv_receive_reply_rs_from(NetAddr &peer)
             auto str = gen_u8_array(blk.size());
             pkt.setPayload(str.get(), blk.size());
         }
-        recv(srv, peer, pkt);
+        recv(srv, srv->os(), peer, pkt);
     }
 }
 
@@ -128,13 +129,13 @@ void EndPointTestCaseSimple::my_tcp_cli_receive_from(NetAddr &peer, LanSyncPkt &
 {
     peer.setType(TransportType::TCP);
     auto srv = neg_->queryTcpCliNetAbility(peer);
-    recv(srv, peer, pkt);
+    recv(srv, srv->os(), peer, pkt);
 }
 
 void EndPointTestCaseSimple::assert_my_tcp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
 {
     auto cli = neg_->queryTcpCliNetAbility(peer);
-    auto sentPkt = popPktFromOs(cli);
+    auto sentPkt = popPktFromOs(reinterpret_pointer_cast<OutputStreamForTest>(cli->os()));
     ASSERT_TRUE(sentPkt.has_value());
     auto &p = sentPkt.value();
     ASSERT_EQ(pkt, p);
@@ -143,7 +144,7 @@ void EndPointTestCaseSimple::assert_my_tcp_cli_sended_to(const NetAddr &peer, La
 void EndPointTestCaseSimple::assert_my_tcp_cli_notsend_any_pkt_to(const NetAddr &peer)
 {
     auto cli = neg_->queryTcpCliNetAbility(peer);
-    auto sentPkt = justReadPktFromOs(cli);
+    auto sentPkt = justReadPktFromOs(reinterpret_pointer_cast<OutputStreamForTest>(cli->os()));
     ASSERT_FALSE(sentPkt.has_value());
 }
 
@@ -157,7 +158,7 @@ void EndPointTestCaseSimple::assert_my_tcp_cli_sended_replyRs_to(const NetAddr &
     {
         ASSERT_LT(i++, limit);
 
-        auto sentPktOpt = popPktFromOs(cli);
+        auto sentPktOpt = popPktFromOs(reinterpret_pointer_cast<OutputStreamForTest>(cli->os()));
         if (!sentPktOpt.has_value())
             return;
 
@@ -191,7 +192,7 @@ void EndPointTestCaseSimple::assert_my_tcp_cli_sended_replyRs_to(const NetAddr &
 void EndPointTestCaseSimple::assert_my_udp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt)
 {
     auto cli = neg_->queryUdpCliNetAbility(peer);
-    auto sentPkt = popPktFromOs(cli);
+    auto sentPkt = popPktFromOs(reinterpret_pointer_cast<OutputStreamForTest>(cli->os()));
     ASSERT_TRUE(sentPkt.has_value());
     ASSERT_EQ(pkt, sentPkt.value());
 }
@@ -201,7 +202,8 @@ void EndPointTestCaseSimple::assert_my_tcp_srv_sended_to(const NetAddr &peer, La
 {
     // 根据peer查找session，然后session.write，故tcp_srv的send的内容，存放在peer的session的outputstream中
     auto cli = neg_->queryTcpCliNetAbility(peer);
-    auto sentPktOpt = popPktFromOs(cli);
+    auto os = reinterpret_pointer_cast<OutputStreamForTest>(cli->os());
+    auto sentPktOpt = popPktFromOs(os);
     ASSERT_TRUE(sentPktOpt.has_value());
     auto sendPkt = sentPktOpt.value();
     ASSERT_EQ(pkt, sendPkt);
@@ -212,7 +214,7 @@ void EndPointTestCaseSimple::assert_my_tcp_srv_sended_getrs_to(const NetAddr &pe
 {
     // 根据peer查找session，然后session.write，故tcp_srv的send的内容，存放在peer的session的outputstream中
     auto cli = neg_->queryTcpCliNetAbility(peer);
-    auto sentPkt = justReadPktFromOs(cli);
+    auto sentPkt = justReadPktFromOs(reinterpret_pointer_cast<OutputStreamForTest>(cli->os()));
     ASSERT_TRUE(sentPkt.has_value());
     ASSERT_EQ(sentPkt.value().getType(), lan_sync_type_enum::LAN_SYNC_TYPE_GET_RESOURCE);
 }

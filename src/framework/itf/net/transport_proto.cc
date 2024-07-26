@@ -6,43 +6,18 @@ const uint64_t NetAbility::isExtraAllDataNow(std::shared_ptr<uint8_t[]> data, ui
     return logic_->isExtraAllDataNow(data, size);
 }
 
-void NetAbility::recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size)
+void NetAbility::recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
-    logic_->recv(peer, data, size);
-}
-
-void NetAbility::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
-{
-    if (os_ != nullptr)
-        os_->write(data, size);
-    else
-        logic_->write(data, size);
-}
-
-void NetAbility::setOutputStream(std::unique_ptr<OutputStream> &&os)
-{
-    os_ = std::move(os);
-    if (logic_ != nullptr)
-    {
-        logic_->setOutputStream(std::move(os_));
-    }
+    logic_->recv(ctx, data, size);
 }
 
 void NetAbility::bind(std::shared_ptr<LogicWrite> logic)
 {
-    logic_ = logic;
-    if (os_ != nullptr)
-    {
-        logic_->setOutputStream(std::move(os_));
-        os_ = nullptr;
-    }
-}
+    // todo(lutar,20240726) 这里的代码如此写，非常不合理
+    if (logic_ != nullptr && logic_->getOutputStream() != nullptr)
+        return;
 
-const std::unique_ptr<OutputStream> &NetAbility::getOutputStream()
-{
-    if (os_ != nullptr)
-        return os_;
-    return logic_->getOutputStream();
+    logic_ = logic;
 }
 
 void OutputStream::close()
@@ -60,16 +35,23 @@ const NetAddr &ConnCli::peer() const
     return peer_;
 }
 
+void ConnCli::write(std::shared_ptr<uint8_t[]> data, uint64_t size) {
+    os_->write(data,size);
+}
+
+void ConnCli::setOutputStream(std::shared_ptr<OutputStream> os)
+{
+    os_ = os;
+}
+
+std::shared_ptr<OutputStream> ConnCli::os()
+{
+    return os_;
+}
+
 UdpCli::~UdpCli()
 {
     DEBUG("UdpCli::~UdpCli(): destroy (", peer_.str(), ")");
-}
-
-void UdpCli::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
-{
-    auto peer_addr = peer_.sockaddrV4();
-    sendto(sock_, data.get(), size, 0, reinterpret_cast<sockaddr *>(&peer_addr),
-           sizeof(sockaddr_in));
 }
 
 TcpCli::~TcpCli()
@@ -93,4 +75,14 @@ UdpServer::~UdpServer()
 {
     logic_ = nullptr;
     DEBUG("UdpServer::~UdpServer(): destroy (", port_.str(), ")");
+}
+
+void NetAbilityContext::write(std::shared_ptr<uint8_t[]> data, uint64_t size)
+{
+    os_->write(data, size);
+}
+
+const NetAddr &NetAbilityContext::from() const
+{
+    return from_;
 }

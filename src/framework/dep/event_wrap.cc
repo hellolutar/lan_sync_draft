@@ -64,3 +64,8 @@ void ConnectionBaseEvent::setEvent(std::shared_ptr<EventAbs> ev)
 {
     ev_ = ev;
 }
+
+std::shared_ptr<EventAbs> ConnectionBaseEvent::getEventAbs()
+{
+    return ev_;
+}

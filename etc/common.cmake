@@ -10,6 +10,7 @@ include_directories(
   /usr/local/include
   /usr/include
   ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_SOURCE_DIR}/example
   ${PROJECT_SOURCE_DIR}/libs/include
 )
 

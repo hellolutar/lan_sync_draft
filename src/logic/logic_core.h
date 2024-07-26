@@ -16,17 +16,17 @@ private:
     std::shared_ptr<UdpCliTrigger> hello_trg_;
     std::shared_ptr<PropertiesParse> conf_;
 
-    void helloAck(const NetAddr &peer, const LanSyncPkt &pkt);
-    void reqIdx(const NetAddr &peer, const LanSyncPkt &pkt);
-    void reqRs(const NetAddr &peer, const LanSyncPkt &pkt);
-    void recvIdx(const NetAddr &peer, const LanSyncPkt &pkt);
-    void recvRs(const NetAddr &peer, const LanSyncPkt &pkt);
-    void shutdown(const NetAddr &peer, const LanSyncPkt &pkt);
+    void helloAck(NetAbilityContext &ctx, const LanSyncPkt &pkt);
+    void reqIdx(NetAbilityContext &ctx, const LanSyncPkt &pkt);
+    void reqRs(NetAbilityContext &ctx, const LanSyncPkt &pkt);
+    void recvIdx(NetAbilityContext &ctx, const LanSyncPkt &pkt);
+    void recvRs(NetAbilityContext &ctx, const LanSyncPkt &pkt);
+    void shutdown(NetAbilityContext &ctx, const LanSyncPkt &pkt);
 
-    void readDataThenReplyRs(const std::string &uri, const Block &b, const NetAddr &peer);
+    void readDataThenReplyRs(const std::string &uri, const Block &b, NetAbilityContext &ctx);
 
 public:
-    LogicCore(){};
+    LogicCore() {};
     LogicCore(std::shared_ptr<NetworkAdapter> adapter,
               std::shared_ptr<ResourceManager> rm)
         : adapter_(adapter), rm_(rm) {}
@@ -34,14 +34,13 @@ public:
 
     const uint64_t isExtraAllDataNow(std::shared_ptr<uint8_t[]> data,
                                      uint64_t data_len) const override;
-    void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size) override;
+    void recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> data, uint64_t size) override;
 
     void setNetworkAdapter(std::shared_ptr<NetworkAdapter> ad);
     void setResourceManager(std::shared_ptr<ResourceManager> rm);
     void setTaskCoordinator(std::shared_ptr<TaskCoordinator> coor);
     void setUdpCliTrigger(std::shared_ptr<UdpCliTrigger> trg);
     void setPropertiesParse(std::shared_ptr<PropertiesParse> conf);
-
 };
 
 #endif

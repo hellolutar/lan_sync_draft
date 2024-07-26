@@ -88,7 +88,11 @@ void read_cb(struct bufferevent *bev, void *ctx)
 
         assert(actual_extra_len == ne_wanto_extra_len);
 
-        ne->recv(peer, head, actual_extra_len);
+        auto bev_wrap = dto->getBuffereventWrap();
+        auto os = std::make_shared<OutputstreamBaseEvent>(bev_wrap);
+
+        NetAbilityContext na_ctx(os, peer);
+        ne->recv(na_ctx, head, actual_extra_len);
         if (i++ >= limit)
         {
             // LOG_WARN("NetFrameworkEngineBaseEvent::read_cb : READ TIMES must <= LIMIT({})", limit);
@@ -120,9 +124,9 @@ void udp_read_cb(evutil_socket_t fd, short events, void *ctx)
 
     NetAddr peer(target_addr, TransportType::UDP);
     auto os = std::make_unique<OutputstreamForUdp>(peer, sock);
-    ne->setOutputStream(std::move(os));
+    NetAbilityContext na_ctx(std::move(os), peer);
 
-    ne->recv(peer, data, receive);
+    ne->recv(na_ctx, data, receive);
 }
 
 void tcp_accept(evutil_socket_t listener, short event, void *ctx)
@@ -167,9 +171,6 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
 
     bufferevent_setcb(bevp, read_cb, write_cb, event_cb, conn.get());
     bufferevent_enable(bevp, EV_READ | EV_WRITE);
-
-    auto os = std::make_unique<OutputstreamBaseEvent>(event_wrap);
-    cli->setOutputStream(std::move(os));
 }
 
 BaseEngineDto::~BaseEngineDto()
@@ -181,6 +182,7 @@ BaseEngineDto::~BaseEngineDto()
     srv_ = nullptr;
 }
 
-TcpConn::~TcpConn() {
+TcpConn::~TcpConn()
+{
     DEBUG_F("TcpConn::~TcpConn() : {}", addr_.str());
 }

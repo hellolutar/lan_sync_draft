@@ -47,8 +47,14 @@ public:
 class UdpCliForTest : public UdpCli
 {
 public:
-  UdpCliForTest(/* args */) {}
-  UdpCliForTest(int sock, NetAddr peer) : UdpCli(sock, peer) {}
+  UdpCliForTest(/* args */)
+  {
+    os_ = std::make_shared<OutputStreamForTest>();
+  }
+  UdpCliForTest(int sock, NetAddr peer) : UdpCli(sock, peer)
+  {
+    os_ = std::make_shared<OutputStreamForTest>();
+  }
   ~UdpCliForTest() {}
 
   void write(std::shared_ptr<uint8_t[]> data, uint64_t size) override
@@ -57,13 +63,56 @@ public:
   }
 };
 
+class TcpCliForTest : public TcpCli
+{
+public:
+  TcpCliForTest(NetAddr peer) : TcpCli(peer)
+  {
+    os_ = std::make_shared<OutputStreamForTest>();
+  }
+  ~TcpCliForTest() {}
+
+  void write(std::shared_ptr<uint8_t[]> data, uint64_t size) override
+  {
+    os_->write(data, size);
+  }
+};
+
+class TcpServerForTest : public TcpServer
+{
+private:
+  NetAddr port_;
+  std::shared_ptr<OutputStreamForTest> os_ = std::make_shared<OutputStreamForTest>();
+
+public:
+  TcpServerForTest() {}
+  TcpServerForTest(NetAddr port) : TcpServer(port) {}
+  virtual ~TcpServerForTest() {};
+
+  std::shared_ptr<OutputStreamForTest> os() { return os_; };
+};
+
+class UdpServerForTest : public UdpServer
+{
+private:
+  NetAddr port_;
+  std::shared_ptr<OutputStreamForTest> os_ = std::make_shared<OutputStreamForTest>();
+
+public:
+  UdpServerForTest() {}
+  UdpServerForTest(NetAddr port) : port_(port) {}
+  ~UdpServerForTest() {};
+
+  std::shared_ptr<OutputStreamForTest> os() { return os_; };
+};
+
 class NetFrameworkEngineForTest : public NetframeworkEngine
 {
 private:
-  map<NetAddr, shared_ptr<TcpServer>> tcpsrv_;
-  map<NetAddr, shared_ptr<UdpServer>> udpsrv_;
-  map<NetAddr, shared_ptr<TcpCli>> tcpcli_;
-  map<NetAddr, shared_ptr<UdpCli>> udpcli_;
+  map<NetAddr, shared_ptr<TcpServerForTest>> tcpsrv_;
+  map<NetAddr, shared_ptr<UdpServerForTest>> udpsrv_;
+  map<NetAddr, shared_ptr<TcpCliForTest>> tcpcli_;
+  map<NetAddr, shared_ptr<UdpCliForTest>> udpcli_;
 
 public:
   NetFrameworkEngineForTest(/* args */) {}
@@ -80,10 +129,10 @@ public:
 
   std::shared_ptr<TcpCli> findTcpCli(const NetAddr &addr) override;
 
-  std::shared_ptr<NetAbility> queryTcpSerNetAbility(const NetAddr &addr);
-  std::shared_ptr<NetAbility> queryTcpCliNetAbility(const NetAddr &addr);
-  std::shared_ptr<NetAbility> queryUdpSerNetAbility(const NetAddr &addr);
-  std::shared_ptr<NetAbility> queryUdpCliNetAbility(const NetAddr &addr);
+  std::shared_ptr<TcpServerForTest> queryTcpSerNetAbility(const NetAddr &addr);
+  std::shared_ptr<TcpCliForTest> queryTcpCliNetAbility(const NetAddr &addr);
+  std::shared_ptr<UdpServerForTest> queryUdpSerNetAbility(const NetAddr &addr);
+  std::shared_ptr<UdpCliForTest> queryUdpCliNetAbility(const NetAddr &addr);
   std::shared_ptr<NetAbility> queryNetAbility(const NetAddr &addr);
 
   void tcp_disconn(const NetAddr &addr);

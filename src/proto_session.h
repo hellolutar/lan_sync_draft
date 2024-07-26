@@ -42,7 +42,7 @@ public:
 
     bool isMe(const NetAddr &peer);
 
-    void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
+    void recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> data, uint64_t size);
     void write(std::shared_ptr<uint8_t[]> data, uint64_t size);
     void write(std::shared_ptr<uint8_t[]> data, uint64_t size) const;
 

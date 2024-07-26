@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void LogicCore::helloAck(const NetAddr &peer, const LanSyncPkt &pkt)
+void LogicCore::helloAck(NetAbilityContext &ctx, const LanSyncPkt &pkt)
 {
     auto idx = rm_->idx();
     auto dto = ResourceSerializer::serialize(idx);
@@ -20,10 +20,11 @@ void LogicCore::helloAck(const NetAddr &peer, const LanSyncPkt &pkt)
 
     BufBaseonEvent buf;
     p.writeTo(buf);
-    write(buf.data(), buf.size());
+
+    ctx.write(buf.data(), buf.size());
 }
 
-void LogicCore::reqIdx(const NetAddr &peer, const LanSyncPkt &pkt)
+void LogicCore::reqIdx(NetAbilityContext &ctx, const LanSyncPkt &pkt)
 {
     auto idx = rm_->idx();
     auto dto = ResourceSerializer::serialize(idx);
@@ -33,11 +34,12 @@ void LogicCore::reqIdx(const NetAddr &peer, const LanSyncPkt &pkt)
 
     BufBaseonEvent buf;
     p.writeTo(buf);
-    write(buf.data(), buf.size());
+    ctx.write(buf.data(), buf.size());
 }
 
-void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt)
+void LogicCore::reqRs(NetAbilityContext &ctx, const LanSyncPkt &pkt)
 {
+    auto peer = ctx.from();
     auto uri_opt = pkt.queryXheader(XHEADER_URI);
     auto range_opt = pkt.queryXheader(XHEADER_RANGE);
     if (!uri_opt.has_value() || !range_opt.has_value())
@@ -51,7 +53,7 @@ void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt)
     if (range.size() <= BLOCK_SIZE)
     {
         Block b(range.getStart(), range.getEnd());
-        readDataThenReplyRs(uri_opt.value(), b, peer);
+        readDataThenReplyRs(uri_opt.value(), b, ctx);
     }
     else
     {
@@ -63,14 +65,14 @@ void LogicCore::reqRs(const NetAddr &peer, const LanSyncPkt &pkt)
 
             Block b(offset, offset + size);
             // Range r(b.start, b.end);
-            readDataThenReplyRs(uri_opt.value(), b, peer);
+            readDataThenReplyRs(uri_opt.value(), b, ctx);
 
             offset += b.size();
         }
     }
 }
 
-void LogicCore::readDataThenReplyRs(const std::string &uri, const Block &b, const NetAddr &peer)
+void LogicCore::readDataThenReplyRs(const std::string &uri, const Block &b, NetAbilityContext &ctx)
 {
     auto data_opt = rm_->readFrom(uri, b);
     if (!data_opt.has_value())
@@ -86,20 +88,20 @@ void LogicCore::readDataThenReplyRs(const std::string &uri, const Block &b, cons
 
     BufBaseonEvent buf;
     p.writeTo(buf);
-    write(buf.data(), buf.size());
+    ctx.write(buf.data(), buf.size());
 }
 
-void LogicCore::recvIdx(const NetAddr &peer, const LanSyncPkt &pkt)
+void LogicCore::recvIdx(NetAbilityContext &ctx, const LanSyncPkt &pkt)
 {
     // todo
     std::vector<Resource> tb = ResourceSerializer::deserialize(pkt.getPayload(), pkt.getPayloadSize());
     auto need_to_sync_rs = rm_->need_to_sync(tb);
 
     for (auto &&r : need_to_sync_rs)
-        coor_->add_resource(r.getUri(), {0, r.getSize()}, {adapter_, peer});
+        coor_->add_resource(r.getUri(), {0, r.getSize()}, {adapter_, ctx.from()});
 }
 
-void LogicCore::recvRs(const NetAddr &peer, const LanSyncPkt &pkt)
+void LogicCore::recvRs(NetAbilityContext &ctx, const LanSyncPkt &pkt)
 {
     auto uri_opt = pkt.queryXheader(XHEADER_URI);
     auto range_opt = pkt.queryXheader(XHEADER_RANGE);
@@ -121,7 +123,7 @@ void LogicCore::recvRs(const NetAddr &peer, const LanSyncPkt &pkt)
     }
 }
 
-void LogicCore::shutdown(const NetAddr &peer, const LanSyncPkt &pkt) {}
+void LogicCore::shutdown(NetAbilityContext &ctx, const LanSyncPkt &pkt) {}
 
 const uint64_t LogicCore::isExtraAllDataNow(std::shared_ptr<uint8_t[]> data,
                                             uint64_t data_len) const
@@ -136,31 +138,32 @@ const uint64_t LogicCore::isExtraAllDataNow(std::shared_ptr<uint8_t[]> data,
     return pkt.getTotalLen();
 }
 
-void LogicCore::recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size)
+void LogicCore::recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> data, uint64_t size)
 {
     LanSyncPkt pkt(data);
+    NetAddr peer = ctx.from();
 
     DEBUG_F("LogicCore::recv(): from:{}\ttype:{}", peer.str(), convert_lan_sync_type_enum(pkt.getType()));
 
     switch (pkt.getType())
     {
     case lan_sync_type_enum::LAN_SYNC_TYPE_HELLO_ACK:
-        helloAck(peer, pkt);
+        helloAck(ctx, pkt);
         break;
     case lan_sync_type_enum::LAN_SYNC_TYPE_GET_TABLE_INDEX:
-        reqIdx(peer, pkt);
+        reqIdx(ctx, pkt);
         break;
     case lan_sync_type_enum::LAN_SYNC_TYPE_GET_RESOURCE:
-        reqRs(peer, pkt);
+        reqRs(ctx, pkt);
         break;
     case lan_sync_type_enum::LAN_SYNC_TYPE_REPLY_TABLE_INDEX:
-        recvIdx(peer, pkt);
+        recvIdx(ctx, pkt);
         break;
     case lan_sync_type_enum::LAN_SYNC_TYPE_REPLY_RESOURCE:
-        recvRs(peer, pkt);
+        recvRs(ctx, pkt);
         break;
     case lan_sync_type_enum::LAN_SYNC_TYPE_EXIT:
-        shutdown(peer, pkt);
+        shutdown(ctx, pkt);
         break;
     default:
         throw NotFoundException(

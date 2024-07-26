@@ -66,27 +66,21 @@ NetFrameworkEngineForTest::~NetFrameworkEngineForTest()
 
 std::shared_ptr<TcpServer> NetFrameworkEngineForTest::addTcpServer(const NetAddr &addr)
 {
-    auto srv = std::make_shared<TcpServer>(addr);
-    auto os = std::make_unique<OutputStreamForTest>();
-    srv->setOutputStream(std::move(os));
+    auto srv = std::make_shared<TcpServerForTest>(addr);
     tcpsrv_[addr] = srv;
     return srv;
 }
 
 std::shared_ptr<UdpServer> NetFrameworkEngineForTest::addUdpServer(const NetAddr &addr)
 {
-    auto srv = std::make_shared<UdpServer>(addr);
-    auto os = std::make_unique<OutputStreamForTest>();
-    srv->setOutputStream(std::move(os));
+    auto srv = std::make_shared<UdpServerForTest>(addr);
     udpsrv_[addr] = srv;
     return srv;
 }
 
 std::shared_ptr<TcpCli> NetFrameworkEngineForTest::connectWithTcp(const NetAddr &addr)
 {
-    auto cli = std::make_shared<TcpCli>(addr);
-    auto os = std::make_unique<OutputStreamForTest>();
-    cli->setOutputStream(std::move(os));
+    auto cli = std::make_shared<TcpCliForTest>(addr);
     tcpcli_[addr] = cli;
     return cli;
 }
@@ -94,8 +88,6 @@ std::shared_ptr<TcpCli> NetFrameworkEngineForTest::connectWithTcp(const NetAddr 
 std::shared_ptr<UdpCli> NetFrameworkEngineForTest::connectWithUdp(const NetAddr &addr)
 {
     auto cli = std::make_shared<UdpCliForTest>(1, addr);
-    auto os = std::make_unique<OutputStreamForTest>();
-    cli->setOutputStream(std::move(os));
     udpcli_[addr] = cli;
     return cli;
 }
@@ -124,7 +116,7 @@ std::shared_ptr<TcpCli> NetFrameworkEngineForTest::findTcpCli(const NetAddr &add
     throw NotFoundException("NetFrameworkEngineForTest::findTcpCli(): ", addr);
 }
 
-std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryTcpSerNetAbility(const NetAddr &addr)
+std::shared_ptr<TcpServerForTest> NetFrameworkEngineForTest::queryTcpSerNetAbility(const NetAddr &addr)
 {
     auto iter = tcpsrv_.find(addr);
     if (iter != tcpsrv_.end())
@@ -133,7 +125,7 @@ std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryTcpSerNetAbility(con
     throw NotFoundException("NetFrameworkEngineForTest::queryTcpSerNetAbility(): ", addr);
 }
 
-std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryTcpCliNetAbility(const NetAddr &addr)
+std::shared_ptr<TcpCliForTest> NetFrameworkEngineForTest::queryTcpCliNetAbility(const NetAddr &addr)
 {
     auto iter = tcpcli_.find(addr);
     if (iter != tcpcli_.end())
@@ -142,7 +134,7 @@ std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryTcpCliNetAbility(con
     throw NotFoundException("NetFrameworkEngineForTest::queryTcpCliNetAbility(): ", addr);
 }
 
-std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryUdpSerNetAbility(const NetAddr &addr)
+std::shared_ptr<UdpServerForTest> NetFrameworkEngineForTest::queryUdpSerNetAbility(const NetAddr &addr)
 {
     auto iter = udpsrv_.find(addr);
     if (iter != udpsrv_.end())
@@ -151,7 +143,7 @@ std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryUdpSerNetAbility(con
     throw NotFoundException("NetFrameworkEngineForTest::queryUdpSerNetAbility(): ", addr);
 }
 
-std::shared_ptr<NetAbility> NetFrameworkEngineForTest::queryUdpCliNetAbility(const NetAddr &addr)
+std::shared_ptr<UdpCliForTest> NetFrameworkEngineForTest::queryUdpCliNetAbility(const NetAddr &addr)
 {
     auto iter = udpcli_.find(addr);
     if (iter != udpcli_.end())

@@ -13,9 +13,9 @@ private:
     std::shared_ptr<TcpServer> srv_;
 
 public:
-    BaseEngineDto(){};
+    BaseEngineDto() {};
     BaseEngineDto(std::shared_ptr<EventBaseWrap> base, std::shared_ptr<NetframeworkEngine> engine, std::shared_ptr<TcpServer> srv)
-        : base_(base), engine_(engine),srv_(srv) {}
+        : base_(base), engine_(engine), srv_(srv) {}
     ~BaseEngineDto();
 
     std::shared_ptr<EventBaseWrap> getBase()
@@ -27,7 +27,8 @@ public:
         return engine_;
     }
 
-    std::shared_ptr<TcpServer> getTcpServer(){
+    std::shared_ptr<TcpServer> getTcpServer()
+    {
         return srv_;
     }
 };
@@ -36,6 +37,9 @@ class TcpConn : public ConnectionBaseEvent
 {
 private:
     std::shared_ptr<NetAbility> ne_;
+    std::shared_ptr<EventAbs> getEventAbs() override {
+        return ev_;
+    };
 
 public:
     TcpConn(NetAddr peer, std::shared_ptr<NetAbility> ne)
@@ -49,6 +53,12 @@ public:
     std::shared_ptr<NetAbility> getNe()
     {
         return ne_;
+    }
+
+    std::shared_ptr<BuffereventWrap> getBuffereventWrap(){
+        if (ev_ == nullptr)
+            return nullptr;
+        return std::reinterpret_pointer_cast<BuffereventWrap>(ev_);
     }
 };
 

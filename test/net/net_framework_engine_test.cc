@@ -21,10 +21,11 @@ public:
     {
         return data_len == test_case_worlds.size();
     };
-    void recv(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size) override
+    void recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> data, uint64_t size) override
     {
         string world(reinterpret_cast<char *>(data.get()));
         buf = world;
+        ctx.write(data, size);
     }
 
     const string &getBuf() const
@@ -39,7 +40,7 @@ TEST(NetFrameworkEngine, tcpCli)
     Netframework::init(ep_);
 
     auto engine = Netframework::getEngine();
-    auto addr = NetAddr("192.168.233.1:8080",TransportType::UDP);
+    auto addr = NetAddr("192.168.233.1:8080", TransportType::UDP);
     auto srv = engine->addTcpServer(addr);
     auto logic = std::make_shared<TcpServerDemoLogic>();
     srv->bind(logic);
@@ -49,14 +50,18 @@ TEST(NetFrameworkEngine, tcpCli)
     std::shared_ptr<uint8_t[]> sp(new uint8_t[test_case_worlds.size()]());
     memcpy(sp.get(), test_case_worlds.data(), test_case_worlds.size());
 
-    na->recv(addr, sp, test_case_worlds.size());
+    auto os = std::make_shared<OutputStreamForTest>();
+    NetAbilityContext ctx(os, addr);
+
+    na->recv(ctx, sp, test_case_worlds.size());
 
     ASSERT_EQ(test_case_worlds, logic->getBuf());
+    ASSERT_EQ(test_case_worlds, string(reinterpret_cast<char *>(os->front()->data().get())));
 }
 
 TEST(NetAddrTest, str2Test)
 {
-    ASSERT_EQ("udp://0.0.225.202:0", NetAddr("0.0.225.202",TransportType::UDP).str());
+    ASSERT_EQ("udp://0.0.225.202:0", NetAddr("0.0.225.202", TransportType::UDP).str());
 }
 
 void ipv4_generateor(string &pre, int pos)
@@ -64,7 +69,7 @@ void ipv4_generateor(string &pre, int pos)
     if (pos > 3)
     {
         // cout << NetAddr(pre).str() << endl;
-        ASSERT_EQ("udp://" + pre + ":0", NetAddr(pre,TransportType::UDP).str()) << "pos:" << pos << "\texpected:" << pre << "\tactual:" << NetAddr(pre,TransportType::UDP).str();
+        ASSERT_EQ("udp://" + pre + ":0", NetAddr(pre, TransportType::UDP).str()) << "pos:" << pos << "\texpected:" << pre << "\tactual:" << NetAddr(pre, TransportType::UDP).str();
         return;
     }
 
