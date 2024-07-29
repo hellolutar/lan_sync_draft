@@ -27,16 +27,18 @@ void EventBaseWrap::shutdown()
     DEBUG("EventBaseWrap::shutdown()");
 }
 
+void EventBaseWrap::release()
+{
+    if (!isRelease())
+    {
+        release_ = true;
+    }
+    throw "todo EventBaseWrap::release()";
+}
+
 BuffereventWrap::~BuffereventWrap()
 {
-    {
-        if (buf_ != nullptr)
-        {
-            bufferevent_free(buf_); // todo 没有找到移除bufferevent的方法，请确定如何移除bufferevent
-            buf_ = nullptr;
-            DEBUG("BuffereventWrap::~BuffereventWrap()");
-        }
-    }
+    release();
 }
 
 bufferevent *BuffereventWrap::getBuf() const
@@ -44,14 +46,34 @@ bufferevent *BuffereventWrap::getBuf() const
     return buf_;
 }
 
+void BuffereventWrap::release()
+{
+    if (!release_ && buf_ != nullptr)
+    {
+        bufferevent_free(buf_); // todo 没有找到移除bufferevent的方法，请确定如何移除bufferevent
+        buf_ = nullptr;
+        DEBUG("BuffereventWrap::release()");
+        release_ = true;
+    }
+}
+
 EventWrap::~EventWrap()
 {
-    event_del(ev_);
-    DEBUG("EventWrap::~EventWrap(): delete event");
+    release();
+}
 
-    event_free(ev_);
-    ev_ = nullptr;
-    DEBUG("EventWrap::~EventWrap(): free event");
+void EventWrap::release()
+{
+    if (!release_)
+    {
+        release_ = true;
+        event_del(ev_);
+        DEBUG("EventWrap::release(): delete event");
+
+        event_free(ev_);
+        ev_ = nullptr;
+        DEBUG("EventWrap::release(): free event");
+    }
 }
 
 ConnectionBaseEvent::~ConnectionBaseEvent()
@@ -68,4 +90,9 @@ void ConnectionBaseEvent::setEvent(std::shared_ptr<EventAbs> ev)
 std::shared_ptr<EventAbs> ConnectionBaseEvent::getEventAbs()
 {
     return ev_;
+}
+
+bool EventAbs::isRelease() const
+{
+    return release_;
 }

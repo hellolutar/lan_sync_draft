@@ -11,9 +11,14 @@
 
 class EventAbs
 {
+protected:
+    bool release_ = false;
+
 public:
     EventAbs(/* args */) {}
     virtual ~EventAbs() {}
+    virtual bool isRelease() const;
+    virtual void release() = 0;
 };
 
 class EventBaseWrap : public EventAbs
@@ -30,6 +35,8 @@ public:
 
     void dispatch();
     void shutdown();
+
+    void release() override;
 };
 
 class BuffereventWrap : public EventAbs
@@ -43,6 +50,7 @@ public:
     ~BuffereventWrap();
 
     bufferevent *getBuf() const;
+    void release() override;
 };
 
 class EventWrap : public EventAbs
@@ -53,6 +61,8 @@ private:
 public:
     EventWrap(event *ev) : ev_(ev) {}
     ~EventWrap();
+
+    void release() override;
 };
 
 class ConnectionBaseEvent : public Connection

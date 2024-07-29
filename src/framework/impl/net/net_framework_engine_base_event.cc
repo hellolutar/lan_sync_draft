@@ -214,7 +214,7 @@ std::shared_ptr<UdpCli> NetFrameworkEngineBaseEvent::connectWithUdp(const NetAdd
 
 void NetFrameworkEngineBaseEvent::addConn(std::shared_ptr<Connection> ne)
 {
-    ctxs_[ne->addr().str()] = ne;
+    ctxs_[ne->addr().str()] = std::reinterpret_pointer_cast<ConnectionBaseEvent>(ne);
 }
 
 void NetFrameworkEngineBaseEvent::start()
@@ -250,6 +250,9 @@ void NetFrameworkEngineBaseEvent::unRegister(const NetAddr &addr)
         DEBUG_F("NetFrameworkEngineBaseEvent::unRegister(): {}", addr.str());
         if (addr.type() == TransportType::TCP && tcp_disconn_cb_ != nullptr)
             tcp_disconn_cb_(addr);
+
+        auto e = iter->second->getEventAbs();
+        e->release();
         ctxs_.erase(iter);
         return;
     }

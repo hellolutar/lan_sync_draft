@@ -14,7 +14,7 @@ class NetFrameworkEngineBaseEvent : public NetframeworkEngine, public std::enabl
 private:
     std::shared_ptr<EventBaseWrap> base_;
     std::vector<std::shared_ptr<event>> events_; // only persist event need to add
-    std::map<std::string, std::shared_ptr<Connection>> ctxs_;
+    std::map<std::string, std::shared_ptr<ConnectionBaseEvent>> ctxs_;
     bool init_ = false;
 
     std::unique_ptr<BaseEngineDto> accept_dto_;
