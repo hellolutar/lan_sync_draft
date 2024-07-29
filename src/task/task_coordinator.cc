@@ -1,5 +1,6 @@
 #include "task/task_coordinator.h"
 #include "task_coordinator.h"
+#include "log/log.h"
 
 using namespace std;
 
@@ -9,7 +10,15 @@ void TaskCoordinator::analysis_resource(const ResourceInfo &info, const NetworkC
     auto r_iter = res_.find(uri);
 
     if (r_iter == res_.end()) // 为新资源
+    {
         res_.insert(std::pair<std::string, ResourceInfo>(info.getUri(), info));
+
+        DEBUG_F("TaskCoordinator::analysis_resource(): new resource : \n\t"
+                "uri: {} \n\t"
+                "range: {}",
+                info.getUri(),
+                info.getRange().to_string());
+    }
     else
     {
         // 找到了， 判断是否需要更新资源
@@ -19,9 +28,25 @@ void TaskCoordinator::analysis_resource(const ResourceInfo &info, const NetworkC
             tm_->cancelTask(uri);                                                   // 取消任务， todo 删除本地文件
             res_.erase(r_iter);                                                     // 资源表中移除
             res_.insert(std::pair<std::string, ResourceInfo>(info.getUri(), info)); // 向资源表插入新资源信息
+
+            DEBUG_F("TaskCoordinator::analysis_resource(): Discover the LATEST resource : \n\t"
+                    "uri: {} \n\t"
+                    "old: {} \n\t"
+                    "new: {}",
+                    info.getUri(),
+                    old_r.getRange().to_string(),
+                    info.getRange().to_string());
         }
         else if (old_r.getRange() == info.getRange())
+        {
             old_r.addNetCtx(ctx);
+
+            DEBUG_F("TaskCoordinator::analysis_resource(): new owner : \n\t"
+                    "uri: {} \n\t"
+                    "range: {}",
+                    info.getUri(),
+                    ctx.getPeer().str());
+        }
         else
             return; // 新资源为过时资源，故跳过
     }
@@ -35,7 +60,7 @@ void TaskCoordinator::assignTask(ResourceInfo &info)
     auto &ctxs = info.getNetCtxs();
     if (ctxs.size() == 0)
     {
-        // todo log_warn
+        WARN_F("TaskCoordinator::assignTask(): cannot assign task, because the contexts is empty!");
         return;
     }
 
@@ -45,7 +70,7 @@ void TaskCoordinator::assignTask(ResourceInfo &info)
     if (info.size() <= BLOCK_SIZE)
     {
         string uri = info.getUri();
-        auto &ctx = const_cast<NetworkContext &>(ctxs[who]); // 可能存在拷贝陷进
+        auto &ctx = const_cast<NetworkContext &>(ctxs[who]); // todo 可能存在拷贝陷进
         tm_->addTask({uri, info.size(), Block(0, info.size()), ctx, rm_});
     }
     else
@@ -109,6 +134,7 @@ void TaskCoordinator::reAssignTask(const std::string uri, const Block blk, const
             {
                 newctx = rs[i + 1];
             }
+            DEBUG_F("TaskCoordinator::reAssignTask(): {} {} | {} --> {} ", uri, blk.str(), ctx.getPeer().str(), newctx.getPeer().str());
             tm_->addTask({r.getUri(), r.size(), blk, newctx, rm_});
             break;
         }

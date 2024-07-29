@@ -8,6 +8,8 @@
 #include <net/if.h>
 #include <unistd.h>
 
+#include "log/log.h"
+
 using namespace std;
 
 std::vector<NetAddr> NetworkAdapter::query_local_ports()
@@ -100,20 +102,15 @@ std::vector<NetAddr> NetworkAdapter::query_broad_ports()
     return ports;
 }
 
-const ProtoSession &NetworkAdapter::findSession(const NetAddr &peer)
+const std::optional<std::shared_ptr<ProtoSession>> NetworkAdapter::findSession(const NetAddr &peer)
 {
     for (auto &&s : srvs_)
     {
-        try
-        {
-            auto &session = s->findSession(peer);
-            return session;
-        }
-        catch (const std::exception &e)
-        {
-        }
+        auto session_opt = s->findSession(peer);
+        if (session_opt.has_value())
+            return session_opt;
     }
-    throw NotFoundException("");
+    return nullopt;
 }
 
 void NetworkAdapter::start(std::shared_ptr<LogicWrite> core)
@@ -129,8 +126,11 @@ void NetworkAdapter::write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data,
 {
     if (peer.type() == TransportType::TCP)
     {
-        auto &session = findSession(peer);
-        session.write(data, size);
+        auto session = findSession(peer);
+        if (session.has_value())
+            session.value()->write(data, size);
+        else
+            WARN("NetworkAdapter::write() : can't send msg, because can not found session for {} ", peer.str());
     }
     else
     {

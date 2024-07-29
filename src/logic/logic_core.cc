@@ -96,6 +96,7 @@ void LogicCore::recvIdx(NetAbilityContext &ctx, const LanSyncPkt &pkt)
     // todo
     std::vector<Resource> tb = ResourceSerializer::deserialize(pkt.getPayload(), pkt.getPayloadSize());
     auto need_to_sync_rs = rm_->need_to_sync(tb);
+    DEBUG_F("LogicCore::recvIdx(): need to sync rs size : {}", need_to_sync_rs.size());
 
     for (auto &&r : need_to_sync_rs)
         coor_->add_resource(r.getUri(), {0, r.getSize()}, {adapter_, ctx.from()});

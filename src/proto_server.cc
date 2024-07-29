@@ -60,16 +60,16 @@ void ProtoServerRecv::recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> da
     }
 }
 
-const ProtoSession &ProtoServer::findSession(const NetAddr &peer)
+const std::optional<std::shared_ptr<ProtoSession>> ProtoServer::findSession(const NetAddr &peer)
 {
     for (uint64_t i = 0; i < sess_->size(); i++)
     {
         auto &s = sess_->at(i);
         if (s->isMe(peer))
-            return *(s.get());
+            return std::make_optional<std::shared_ptr<ProtoSession>>(s);
     }
 
-    throw NotFoundException("ProtoServer::findSession can not found the peer !");
+    return std::nullopt;
 }
 
 bool ProtoServer::rmSessionIfExist(const NetAddr &addr)

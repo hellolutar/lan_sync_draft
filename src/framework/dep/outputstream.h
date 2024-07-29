@@ -3,7 +3,7 @@
 
 class OutputStream
 {
-private:
+protected:
     bool closed_ = true;
 
 public:

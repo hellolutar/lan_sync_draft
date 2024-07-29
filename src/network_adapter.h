@@ -13,7 +13,7 @@ protected:
 
     virtual std::vector<NetAddr> query_broad_ports();
 
-    const ProtoSession &findSession(const NetAddr &peer);
+    const std::optional<std::shared_ptr<ProtoSession>>  findSession(const NetAddr &peer);
 
 
 public:

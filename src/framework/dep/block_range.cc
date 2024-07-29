@@ -27,6 +27,11 @@ const uint64_t Block::bitPos(uint64_t pos)
     return pos * BLOCK_SIZE;
 }
 
+const std::string Block::str() const
+{
+    return "[" + std::to_string(start) + ", " + std::to_string(end) + ")";
+}
+
 const uint64_t Block::size() const
 {
     return end - start;
@@ -64,6 +69,11 @@ const uint64_t Range::size() const
 // str like : 0-500
 // str like : 0-
 std::string Range::to_string()
+{
+    return static_cast<const Range &>(*this).to_string();
+}
+
+std::string Range::to_string() const
 {
     std::stringstream ss;
     ss << start_ << FLAG_XHEADER_CONTENT_BETWEEN;

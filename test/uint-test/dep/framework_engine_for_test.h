@@ -10,7 +10,7 @@
 #include "framework/itf/net/net_framework.h"
 #include "framework/itf/timer/timer_trigger_framework.h"
 #include "resource_manager.h"
-#include "dep/test_common.h"
+#include "uint-test/dep/test_common.h"
 
 using namespace std;
 

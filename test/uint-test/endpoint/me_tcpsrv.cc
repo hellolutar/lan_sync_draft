@@ -1,5 +1,5 @@
-#include "dep/setup_road_test.h"
-#include "dep/test_sync_proto.h"
+#include "uint-test/dep/setup_road_test.h"
+#include "uint-test/dep/test_sync_proto.h"
 
 uint16_t port = 58081;
 

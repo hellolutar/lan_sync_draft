@@ -25,6 +25,8 @@ public:
 
     static const uint64_t pos(uint64_t offset);
     static const uint64_t bitPos(uint64_t pos);
+
+    const std::string str() const;
 };
 
 class Range
@@ -42,6 +44,7 @@ public:
     bool operator<(const Range &r) const;
 
     const uint64_t size() const;
+    std::string to_string() const;
     std::string to_string();
 
     uint64_t getStart() const;

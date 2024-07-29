@@ -30,7 +30,11 @@ PropertiesParse::PropertiesParse(string filepath)
     while (ifs.getline(buf, LINE_LENGTH))
     {
         string line(buf);
+
         size_t eq_pos = line.find("=");
+        size_t comment_pos = line.find("#");
+        if (comment_pos < eq_pos)
+            continue;
         string key = line.substr(0, eq_pos);
         string value = line.substr(eq_pos + 1, line.size() - (eq_pos + 1));
         properties[trim(key)] = trim(value);

@@ -72,7 +72,7 @@ public:
         sess_ = nullptr;
     }
 
-    const ProtoSession &findSession(const NetAddr &peer);
+    const std::optional<std::shared_ptr<ProtoSession>> findSession(const NetAddr &peer);
 
     bool rmSessionIfExist(const NetAddr &);
 };

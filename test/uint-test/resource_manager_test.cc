@@ -4,11 +4,9 @@
 #include <algorithm>
 
 #include "resource_manager.h"
-#include "dep/test_common.h"
+#include "uint-test/dep/test_common.h"
 
 using namespace std;
-
-
 
 TEST(ResourceSerializer, serialize_single_resource)
 {

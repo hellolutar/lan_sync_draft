@@ -8,7 +8,6 @@ void Endpoint::registerTrg()
 {
     auto timer = TimerFramework::getEngine();
     timer->addTrg(hello_trg_); // todo cancel trigger when the connect was established.
-    timer->addTrg(hello_trg_);
     timer->addTrg(coor_trg_);
 }
 
@@ -44,7 +43,10 @@ void Endpoint::init()
     }
 
     if (coor_trg_ == nullptr)
-        coor_trg_ = make_shared<TaskCoordinatorTrigger>(Trigger::second(2), true, make_shared<TaskCoordinator>(tm_));
+        coor_trg_ = make_shared<TaskCoordinatorTrigger>(Trigger::second(5), true, make_shared<TaskCoordinator>(tm_));
+
+    if (rm_ == nullptr)
+        rm_ = make_shared<ResourceManagerBaseFilesystem>(conf_->query(PropertiesParse::RESOURCE_HOME));
 
     core_->setNetworkAdapter(na_);
     core_->setTaskCoordinator(coor_trg_->getTaskCoordinator());

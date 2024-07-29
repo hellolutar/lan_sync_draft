@@ -8,10 +8,10 @@
 #include <memory>
 #include <cstring>
 
-#include "dep/framework_engine_for_test.h"
+#include "uint-test/dep/framework_engine_for_test.h"
 #include "proto/lan_share_protocol.h"
 #include "buf/buf_base_on_event.h"
-#include "dep/test_sync_proto.h"
+#include "uint-test/dep/test_sync_proto.h"
 
 std::string genStr(uint32_t size);
 

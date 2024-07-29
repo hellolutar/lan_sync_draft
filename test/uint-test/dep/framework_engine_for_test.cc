@@ -260,13 +260,5 @@ std::vector<NetAddr> NetworkAdapterForTest::query_broad_ports()
 
 bool NetworkAdapterForTest::isSessionExists(const NetAddr &peer)
 {
-    try
-    {
-        findSession(peer);
-        return true;
-    }
-    catch (const std::exception &e)
-    {
-        return false;
-    }
+    return findSession(peer).has_value();
 }

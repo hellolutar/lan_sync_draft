@@ -11,8 +11,9 @@ private:
 
 public:
     OutputstreamBaseEvent(std::shared_ptr<BuffereventWrap> buf)
-        : buf_(buf) {}
-    ~OutputstreamBaseEvent() {
+        : buf_(buf), OutputStream(false) {}
+    ~OutputstreamBaseEvent()
+    {
         buf_ = nullptr;
     }
 

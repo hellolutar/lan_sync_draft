@@ -1,5 +1,5 @@
 
-#include "dep/test_common.h"
+#include "uint-test/dep/test_common.h"
 
 std::string dic = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

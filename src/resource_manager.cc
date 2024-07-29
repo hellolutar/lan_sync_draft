@@ -45,8 +45,7 @@ vector<Resource> ResourceManagerBaseFilesystem::recur_walk(filesystem::path p)
         // string hashRet = OpensslUtil::mdEncodeWithSHA3_512(pstr);
         // if (hashRet.size() == 0)
         //     return {};
-
-        Resource r{filename, path, path, "", size};
+        Resource r{filename, uri, path, "", size};
         return {r};
     }
 
@@ -79,32 +78,34 @@ std::vector<Resource> ResourceManagerBaseFilesystem::need_to_sync(std::vector<Re
 {
     map<string, Resource> filtered;
 
+    // 将peer_table全部放入filtered， 后续采用过滤的方法，将peer_table中过时的不需要同步的资源还是删除
     for (size_t i = 0; i < peer_table.size(); i++)
     {
-        if (peer_table[i].getUri().size())
+        if (peer_table[i].getUri().size() == 0)
             continue;
 
-        filtered[peer_table[i].getName()] = peer_table[i];
+        filtered[peer_table[i].getUri()] = peer_table[i];
     }
 
     if (filtered.size() == 0)
         return {};
 
+    // 将filtered与local_table进行比较，进行滤除
     vector<Resource> local_table = const_cast<ResourceManagerBaseFilesystem &>(*this).idx();
     for (size_t i = 0; i < local_table.size(); i++)
     {
         Resource local_rs = local_table[i];
-        Resource rs = filtered[local_rs.getName()];
-        if (rs.getName().size() == 0 || rs.getSize() < local_rs.getSize())
+        Resource rs = filtered[local_rs.getUri()];
+        if (rs.getUri().size() == 0 || rs.getSize() < local_rs.getSize())
         {
             // I have the resource or my resource should sync to peer.
-            filtered.erase(local_rs.getName());
+            filtered.erase(local_rs.getUri());
             continue;
         }
         else if (rs.getSize() == local_rs.getSize())
         {
             if (rs.getHash() == local_rs.getHash())
-                filtered.erase(local_rs.getName());
+                filtered.erase(local_rs.getUri());
             // else
             // LOG_DEBUG("ResourceManagerBaseFilesystem::cmpThenRetNeedToSyncTable() : uri[{}] need to add to synctable, reason:{}", rs.uri, "hash is not eq!");
         }
@@ -126,7 +127,7 @@ string ResourceManagerBaseFilesystem::mapping(string uri) const
 
 bool ResourceManagerBaseFilesystem::save(string uri, std::shared_ptr<uint8_t[]> data, uint64_t offset, uint64_t data_len)
 {
-    DEBUG("ResourceManagerBaseFilesystem::save() : URI:{} offset:{} data_len:{}", uri, offset, data_len);
+    DEBUG_F("ResourceManagerBaseFilesystem::save() : URI:{} offset:{} data_len:{}", uri, offset, data_len);
     string pathstr = mapping(uri);
 
     auto path = filesystem::path(pathstr);
