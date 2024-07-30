@@ -33,4 +33,3 @@ file(GLOB_RECURSE src_codes ${PROJECT_SOURCE_DIR}/src/*.cc)
 list(REMOVE_ITEM src_codes ${PROJECT_SOURCE_DIR}/src/main.cc)
 
 add_library(lansync_common_obj OBJECT ${src_codes})
-message("src_codes :" ${src_codes})

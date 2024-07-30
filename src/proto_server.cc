@@ -43,6 +43,11 @@ void ProtoServerRecv::recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> da
             a = sess_->size();
         }
     }
+    else if (pkt.getType() == lan_sync_type_enum::LAN_SYNC_TYPE_EXIT)
+    {
+        auto eg = Netframework::getEngine();
+        eg->shutdown();
+    }
     else
     {
         auto s = findSession(from);

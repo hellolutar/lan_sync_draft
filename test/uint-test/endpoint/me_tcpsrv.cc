@@ -43,6 +43,8 @@ TEST_F(EndPointTestCaseSimple, me_tcp_server_get_rs)
 
     assert_my_tcp_srv_sended_getrs_to(peer_tcp_cli_addr);
 
+    set_validres(true);
+    
     my_tcp_srv_receive_reply_rs_from(peer_tcp_cli_addr);
 
     ASSERT_GT(tm_->getSuccessTasks().size(), 0);

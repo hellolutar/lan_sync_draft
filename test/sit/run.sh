@@ -106,9 +106,9 @@ function setup_runtime_SIT_WORKSPACE(){
     mkdir -p ${RESOUCE_HOME_SRV}
     mkdir -p ${RESOUCE_HOME_CLI}
 
-    if [ ! -e ${SIT_WORKSPACE}/main.bin ]  
+    if [ ! -e ${SIT_WORKSPACE}/${PROGRAM_NAME} ]  
         then
-        echo "FAIL: ${${PROGRAM_NAME}} is not found!"
+        echo "FAIL: ${PROGRAM_NAME} is not found!"
         exit -1
     fi
 
@@ -165,11 +165,22 @@ setup(){
 }
 
 function prepareFile() {
-    mockFile ${RESOUCE_HOME_SRV}/srv_big.txt ${SIZE_100MB}
-    mockFile ${RESOUCE_HOME_SRV}/srv_small.txt ${SIZE_10MB}
 
-    mockFile ${RESOUCE_HOME_CLI}/cli_big.txt ${SIZE_100MB}
-    mockFile ${RESOUCE_HOME_CLI}/cli_small.txt ${SIZE_10MB}
+    if [ ! -f  ${RESOUCE_HOME_SRV}/srv_big.txt ]; then
+        mockFile ${RESOUCE_HOME_SRV}/srv_big.txt ${SIZE_100MB}
+    fi
+
+    if [ ! -f  ${RESOUCE_HOME_SRV}/srv_small.txt ]; then
+        mockFile ${RESOUCE_HOME_SRV}/srv_small.txt ${SIZE_10MB}
+    fi
+    
+    if [ ! -f  ${RESOUCE_HOME_CLI}/cli_big.txt ]; then
+        mockFile ${RESOUCE_HOME_CLI}/cli_big.txt ${SIZE_100MB}
+    fi
+    
+    if [ ! -f  ${RESOUCE_HOME_CLI}/cli_small.txt ]; then
+        mockFile ${RESOUCE_HOME_CLI}/cli_small.txt ${SIZE_10MB}
+    fi
 }
 
 function valid_sync_result() {
@@ -177,7 +188,6 @@ function valid_sync_result() {
     check_hash ${RESOUCE_HOME_CLI}/srv_small.txt    ${RESOUCE_HOME_SRV}/srv_small.txt 
     check_hash ${RESOUCE_HOME_CLI}/cli_big.txt      ${RESOUCE_HOME_SRV}/cli_big.txt 
     check_hash ${RESOUCE_HOME_CLI}/cli_small.txt    ${RESOUCE_HOME_SRV}/cli_small.txt 
-
 }
 
 function runApp(){
@@ -187,7 +197,7 @@ function runApp(){
     echo -e "\t[DEBUG] run [${netns_name}] [${where_want}]"
 
     cd ${where_want}
-    ip netns exec ${netns_name} ./${PROGRAM_NAME} -c properties.properties > stdout.log 2>&1 &
+    ip netns exec ${netns_name} ./${PROGRAM_NAME} -config_path properties.properties > stdout.log 2>&1 &
     cd ${where_before}
 }
 
@@ -197,7 +207,7 @@ run(){
     # 后台运行程序
     runApp ${SIT_WORKSPACE} ${HOME_CLI} ns0
     runApp ${SIT_WORKSPACE} ${HOME_SRV} ns1
-    sleep 60s
+    sleep 30s
 
     echo -e "\t[DEBUG] app exit"
     echo -n -e "\x01\xff\x00\x08\x00\x00\x00\x08" | nc ${VETH_0_IP} 58081
@@ -211,7 +221,7 @@ run(){
 
 main() {
    setup
-#    run
+   run
 }
 
 main

@@ -116,6 +116,8 @@ public:
 
     void assert_my_tcp_cli_sended_to(const NetAddr &peer, LanSyncPkt &&pkt);
 
+    void set_validres(bool b);
+
     void assert_my_tcp_cli_notsend_any_pkt_to(const NetAddr &peer);
 
     void assert_my_tcp_cli_sended_replyRs_to(const NetAddr &peer);

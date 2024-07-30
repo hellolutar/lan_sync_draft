@@ -232,3 +232,8 @@ void EndPointTestCaseSimple::renderReadFrom()
         }
     }
 }
+
+
+void EndPointTestCaseSimple::set_validres(bool b){
+    rm_->setValidRes(b);
+}

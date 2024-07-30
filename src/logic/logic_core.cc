@@ -144,6 +144,7 @@ void LogicCore::recvRs(NetAbilityContext &ctx, const LanSyncPkt &pkt)
                 tm->cancelTask(uri); // 清理
             }
         }
+        coor_->tick(0); // just quick req next task
     }
 }
 
