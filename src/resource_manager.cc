@@ -68,12 +68,12 @@ bool ResourceManagerBaseFilesystem::validRes(const string &uri, const string &ha
     auto rs_opt = query(uri);
     if (rs_opt.has_value())
     {
-        DEBUG_F("ResourceManagerBaseFilesystem::validRes():[{}]\n\t[{}]  \n\t[{}]", uri, hash, rs_opt.value().getHash());
+        DEBUG_F("ResourceManagerBaseFilesystem::validRes()", "[{}]\n\t[{}]  \n\t[{}]", uri, hash, rs_opt.value().getHash());
         return hash.compare(rs_opt.value().getHash()) == 0;
     }
     else
     {
-        WARN_F("ResourceManagerBaseFilesystem::validRes(): [{}] is not found in local filesystem!", uri);
+        WARN_F("ResourceManagerBaseFilesystem::validRes()", " [{}] is not found in local filesystem!", uri);
         return false;
     }
 }
@@ -141,10 +141,10 @@ bool ResourceManagerBaseFilesystem::save(const string &uri, std::shared_ptr<uint
     auto peg = PersistFramework::getEngine();
     if (peg->saveTo(path.string(), offset, data, data_len) == data_len)
     {
-        DEBUG_F("ResourceManagerBaseFilesystem::save() :URI:{} offset:{} data_len:{} SUCCESS ", uri, offset, data_len);
+        DEBUG_F("ResourceManagerBaseFilesystem::save() ", "URI:{} offset:{} data_len:{} SUCCESS ", uri, offset, data_len);
         return true;
     }
-    DEBUG_F("ResourceManagerBaseFilesystem::save() : URI:{} offset:{} data_len:{} FAIL", uri, offset, data_len);
+    DEBUG_F("ResourceManagerBaseFilesystem::save() ", " URI:{} offset:{} data_len:{} FAIL", uri, offset, data_len);
     return false;
 }
 

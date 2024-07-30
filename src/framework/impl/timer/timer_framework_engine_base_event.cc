@@ -62,7 +62,7 @@ void timeout_cb(evutil_socket_t, short, void *arg)
 
 TimerFrameworkEngineBaseEvent::~TimerFrameworkEngineBaseEvent()
 {
-    DEBUG("TimerFrameworkEngineBaseEvent::~TimerFrameworkEngineBaseEvent()");
+    DEBUG_F("TimerFrameworkEngineBaseEvent::~TimerFrameworkEngineBaseEvent()","");
     trg_map_.clear();
     once_trg_.clear();
 }

@@ -52,19 +52,19 @@ std::shared_ptr<OutputStream> ConnCli::os()
 
 UdpCli::~UdpCli()
 {
-    DEBUG("UdpCli::~UdpCli(): destroy (", peer_.str(), ")");
+    DEBUG_F("UdpCli::~UdpCli()", " destroy (", peer_.str(), ")");
 }
 
 TcpCli::~TcpCli()
 {
     logic_ = nullptr;
-    DEBUG("TcpCli::~TcpCli(): destroy (", peer_.str(), ")");
+    DEBUG_F("TcpCli::~TcpCli()", " destroy (", peer_.str(), ")");
 }
 
 TcpServer::~TcpServer()
 {
     logic_ = nullptr;
-    DEBUG("TcpServer::~TcpServer(): destroy (", port_.str(), ")");
+    DEBUG_F("TcpServer::~TcpServer()", " destroy (", port_.str(), ")");
 }
 
 const std::shared_ptr<LogicProto> TcpServer::getLogic() const
@@ -75,7 +75,7 @@ const std::shared_ptr<LogicProto> TcpServer::getLogic() const
 UdpServer::~UdpServer()
 {
     logic_ = nullptr;
-    DEBUG("UdpServer::~UdpServer(): destroy (", port_.str(), ")");
+    DEBUG_F("UdpServer::~UdpServer()", " destroy (", port_.str(), ")");
 }
 
 void NetAbilityContext::write(std::shared_ptr<uint8_t[]> data, uint64_t size)

@@ -130,7 +130,7 @@ void NetworkAdapter::write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data,
         if (session.has_value())
             session.value()->write(data, size);
         else
-            WARN("NetworkAdapter::write() : can't send msg, because can not found session for {} ", peer.str());
+            WARN_F("NetworkAdapter::write() ", " can't send msg, because can not found session for {} ", peer.str());
     }
     else
     {

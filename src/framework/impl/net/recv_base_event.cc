@@ -21,28 +21,28 @@ void event_cb(struct bufferevent *bev, short events, void *ctx)
     switch (events)
     {
     case BEV_EVENT_EOF:
-        ERROR("event_cb() : BEV_EVENT_EOF : {}", strerror(errno));
+        ERROR_F("event_cb() : BEV_EVENT_EOF ", " {}", strerror(errno));
         ng->unRegister(peer);
         break;
     case BEV_EVENT_ERROR:
-        ERROR("event_cb() : BEV_EVENT_ERROR : {}", strerror(errno));
+        ERROR_F("event_cb() : BEV_EVENT_ERROR ", " {}", strerror(errno));
         ng->unRegister(peer);
         break;
     case BEV_EVENT_TIMEOUT:
-        ERROR("event_cb() : BEV_EVENT_TIMEOUT : {}", strerror(errno));
+        ERROR_F("event_cb() : BEV_EVENT_TIMEOUT ", " {}", strerror(errno));
         ng->unRegister(peer);
         break;
     case BEV_EVENT_CONNECTED:
-        ERROR("event_cb() : BEV_EVENT_CONNECTED : {}", strerror(errno));
+        ERROR_F("event_cb() : BEV_EVENT_CONNECTED ", " {}", strerror(errno));
         break;
     case BEV_EVENT_READING:
-        ERROR("event_cb() : BEV_EVENT_READING : {}", strerror(errno));
+        ERROR_F("event_cb() : BEV_EVENT_READING ", " {}", strerror(errno));
         break;
     case BEV_EVENT_WRITING:
-        ERROR("event_cb() : BEV_EVENT_WRITING : {}", strerror(errno));
+        ERROR_F("event_cb() : BEV_EVENT_WRITING ", " {}", strerror(errno));
         break;
     default:
-        ERROR("event_cb() : OTHER : {}", strerror(errno));
+        ERROR_F("event_cb() : OTHER : {}", strerror(errno));
         ng->unRegister(peer);
         break;
     }
@@ -147,7 +147,7 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
     auto bevp = bufferevent_socket_new(base->getBase(), peer_sock, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
     if (bevp == nullptr)
     {
-        ERROR("NetFrameworkEngineBaseEvent::tcp_accept(): bufferevent_socket_new has a error", strerror(errno));
+        ERROR_F("NetFrameworkEngineBaseEvent::tcp_accept()", " bufferevent_socket_new has a error", strerror(errno));
         delete dto;
         exit(-1);
     }
@@ -175,7 +175,7 @@ void tcp_accept(evutil_socket_t listener, short event, void *ctx)
 
 BaseEngineDto::~BaseEngineDto()
 {
-    DEBUG("BaseEngineDto::~BaseEngineDto()");
+    DEBUG_F("BaseEngineDto::~BaseEngineDto()","");
 
     base_ = nullptr;
     engine_ = nullptr;
@@ -184,5 +184,5 @@ BaseEngineDto::~BaseEngineDto()
 
 TcpConn::~TcpConn()
 {
-    DEBUG_F("TcpConn::~TcpConn() : {}", addr_.str());
+    DEBUG_F("TcpConn::~TcpConn() ", " {}", addr_.str());
 }

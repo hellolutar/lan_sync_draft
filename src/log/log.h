@@ -7,65 +7,30 @@
 #include <iomanip>
 #include <vector>
 
-template <typename S>
-void _log(S &ss)
+class FormatLog
 {
-}
+private:
+    uint8_t interval_ = 5;
 
-template <typename S, typename A, typename... Args>
-void _log(S &ss, A a, Args... arg)
-{
-    ss << a << " ";
-    _log(ss, arg...);
-}
+public:
+    FormatLog(int i) : interval_(i) {}
+    ~FormatLog() {}
+
+    std::string red(const std::string &str);
+    std::string green(const std::string &str);
+    std::string yellow(const std::string &str);
+    std::string blue(const std::string &str);
+    std::string gray(const std::string &str);
+
+    std::string space(const std::string &, int i);
+};
+
+extern FormatLog formatlog_;
 
 void _append_timestamp(std::stringstream &ss);
 
 template <typename... Args>
-void _append_flag(std::stringstream &ss, std::string &flag, Args... arg)
-{
-    _append_timestamp(ss);
-    ss << flag;
-
-    _log(ss, arg...);
-
-    std::cout << ss.str() << std::endl;
-}
-
-template <typename... Args>
-void _error_log(Args... arg)
-{
-    std::stringstream ss;
-    std::string flag(" [ERROR] ");
-    _append_flag(ss, flag, arg...);
-}
-
-template <typename... Args>
-void _warn_log(Args... arg)
-{
-    std::stringstream ss;
-    std::string flag(" [WARN] ");
-    _append_flag(ss, flag, arg...);
-}
-
-template <typename... Args>
-void _info_log(Args... arg)
-{
-    std::stringstream ss;
-    std::string flag(" [INFO] ");
-    _append_flag(ss, flag, arg...);
-}
-
-template <typename... Args>
-void _debug_log(Args... arg)
-{
-    std::stringstream ss;
-    std::string flag(" [DEBUG] ");
-    _append_flag(ss, flag, arg...);
-}
-
-template <typename... Args>
-void _format_log(std::string &format, Args... args)
+void _format_log(std::string &prefix, const std::string &position, std::string &format, Args... args)
 {
     std::vector<std::string> v;
     std::stringstream ss;
@@ -75,62 +40,64 @@ void _format_log(std::string &format, Args... args)
 
     (..., concat_str(args));
 
+    prefix += formatlog_.space(position, 40);
+
     int last_idx = 0;
-    for (auto &&s : v)
+    for (int64_t i = 0; i < v.size(); i++)
     {
+        std::string s = v[i];
         last_idx = format.find_first_of("{}", last_idx);
-        format = format.replace(last_idx, 2, s);
+        if (last_idx == std::string::npos)
+            format += s;
+        else
+            format = format.replace(last_idx, 2, s);
     }
-    std::cout << format << std::endl;
+
+    // printf(format.data());
+    std::cout << prefix << format << std::endl;
 }
 
 template <typename... Args>
-void _prefix_format_log(std::string &tip, std::string &format, Args... args)
+void _prefix_format_log(std::string &tip, const std::string &position, std::string &format, Args... args)
 {
     std::stringstream ss;
     _append_timestamp(ss);
     ss << " " << tip;
-    ss << format;
-    format = ss.str();
-    _format_log(format, args...);
+    auto prefix = ss.str();
+    _format_log(prefix, position, format, args...);
 }
 
 template <typename... Args>
-void ERROR_F(std::string format, Args... args)
+void ERROR_F(std::string position, std::string format, Args... args)
 {
-    std::string tip = "[ERROR] ";
-    _prefix_format_log(tip, format, args...);
+    std::string tip = formatlog_.red("[ERROR]");
+    _prefix_format_log(tip, position, format, args...);
 }
 
 template <typename... Args>
-void WARN_F(std::string format, Args... args)
+void WARN_F(std::string position, std::string format, Args... args)
 {
-    std::string tip = "[WARN] ";
-    _prefix_format_log(tip, format, args...);
+    std::string tip = formatlog_.yellow("[WARN]");
+    _prefix_format_log(tip, position, format, args...);
 }
 
 template <typename... Args>
-void INFO_F(std::string format, Args... args)
+void INFO_F(std::string position, std::string format, Args... args)
 {
-    std::string tip = "[INFO] ";
-    _prefix_format_log(tip, format, args...);
+    std::string tip = formatlog_.green("[INFO]");
+    _prefix_format_log(tip, position, format, args...);
 }
 
 template <typename... Args>
-void DEBUG_F(std::string format, Args... args)
+void DEBUG_F(std::string position, std::string format, Args... args)
 {
-    std::string tip = "[DEBUG] ";
-    _prefix_format_log(tip, format, args...);
+    std::string tip = formatlog_.blue("[DEBUG]");
+    _prefix_format_log(tip, position, format, args...);
 }
 
 #endif
 
 #ifndef __LANSYNC_LOG_MACRO_
 #define __LANSYNC_LOG_MACRO_
-
-#define ERROR(...) _error_log(__VA_ARGS__)
-#define WARN(...) _warn_log(__VA_ARGS__)
-#define INFO(...) _info_log(__VA_ARGS__)
-#define DEBUG(...) _debug_log(__VA_ARGS__)
 
 #endif

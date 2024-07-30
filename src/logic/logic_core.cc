@@ -16,7 +16,7 @@ void LogicCore::helloAck(NetAbilityContext &ctx, const LanSyncPkt &pkt)
     NetAddr wantoDel(discover_ip + ":" + discover_port, TransportType::UDP);
     hello_trg_->delCtx(wantoDel);
 
-    DEBUG_F("LogicCore::helloAck(): send get idx pkt!");
+    DEBUG_F("LogicCore::helloAck()", " send get idx pkt!");
 
     BufBaseonEvent buf;
     p.writeTo(buf);
@@ -96,7 +96,7 @@ void LogicCore::recvIdx(NetAbilityContext &ctx, const LanSyncPkt &pkt)
     // todo
     std::vector<Resource> tb = ResourceSerializer::deserialize(pkt.getPayload(), pkt.getPayloadSize());
     auto need_to_sync_rs = rm_->need_to_sync(tb);
-    DEBUG_F("LogicCore::recvIdx(): need to sync rs size : {}", need_to_sync_rs.size());
+    DEBUG_F("LogicCore::recvIdx()", " need to sync rs size : {}", need_to_sync_rs.size());
 
     for (auto &&r : need_to_sync_rs)
         coor_->add_resource(r, {adapter_, ctx.from()});
@@ -129,18 +129,18 @@ void LogicCore::recvRs(NetAbilityContext &ctx, const LanSyncPkt &pkt)
             {
                 if (rm_->validRes(uri, ri_opt.value().getHash()))
                 {
-                    WARN_F("LogicCore::recvRs(): [{}] VALID SUCCESS!", uri);
+                    WARN_F("LogicCore::recvRs()", " [{}] VALID SUCCESS!", uri);
                     tm->cancelTask(uri); // 清理
                 }
                 else
                 {
-                    WARN_F("LogicCore::recvRs(): [{}] VALID FAILED!", uri);
+                    WARN_F("LogicCore::recvRs()", " [{}] VALID FAILED!", uri);
                     tm->fail(uri);
                 }
             }
             else
             {
-                WARN_F("LogicCore::recvRs(): [{}] not found in coor, so can not valid the hash!", uri);
+                WARN_F("LogicCore::recvRs()", " [{}] not found in coor, so can not valid the hash!", uri);
                 tm->cancelTask(uri); // 清理
             }
         }
@@ -167,7 +167,7 @@ void LogicCore::recv(NetAbilityContext &ctx, std::shared_ptr<uint8_t[]> data, ui
     LanSyncPkt pkt(data);
     NetAddr peer = ctx.from();
 
-    DEBUG_F("LogicCore::recv(): from:{}\ttype:{}", peer.str(), convert_lan_sync_type_enum(pkt.getType()));
+    DEBUG_F("LogicCore::recv()", " from:{}\ttype:{}", peer.str(), convert_lan_sync_type_enum(pkt.getType()));
 
     switch (pkt.getType())
     {

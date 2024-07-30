@@ -31,7 +31,7 @@ void Task::req()
 
     try
     {
-        DEBUG_F("Task::req(): {} {} {} ", uri_, block_.str(), ctx_.getPeer().str());
+        DEBUG_F("Task::req()", " {} {} {} ", uri_, block_.str(), ctx_.getPeer().str());
         ctx_.write(buf.data(), buf.size());
     }
     catch (const std::exception &e)
@@ -53,7 +53,7 @@ void Task::tick(uint64_t t)
     }
     if (retry_ >= MAX_RETRY)
     {
-        DEBUG_F("Task::tick(): tag Failed: {} {} {} ", uri_, block_.str(), ctx_.getPeer().str());
+        DEBUG_F("Task::tick()", " tag Failed: {} {} {} ", uri_, block_.str(), ctx_.getPeer().str());
         status_ = TaskStatusEnum::Failed;
     }
 }
@@ -125,7 +125,7 @@ void TaskManager::addTask(const Task &t)
             tasks_[uri][pos] = t;
         }
     }
-    DEBUG_F("TaskManager::addTask(): {} | {} | {}", uri, t.getBlock().str(), t.getNetCtx().getPeer().str());
+    DEBUG_F("TaskManager::addTask()", " {} | {} | {}", uri, t.getBlock().str(), t.getNetCtx().getPeer().str());
 }
 
 void TaskManager::cancelTask(std::string uri)
@@ -135,7 +135,7 @@ void TaskManager::cancelTask(std::string uri)
     {
         // todo( lutar,20240701) remove local tmp file
         tasks_.erase(iter);
-        DEBUG_F("TaskManager::cancelTask(): {} ", uri);
+        DEBUG_F("TaskManager::cancelTask()", " {} ", uri);
     }
 }
 
@@ -218,7 +218,7 @@ void TaskManager::success(const std::string &uri, Block block)
         if (ts[i].getBlock() == block)
         {
             ts[i].setStatus(TaskStatusEnum::Success);
-            DEBUG_F("TaskManager::success(): {} {}", uri, block.str());
+            DEBUG_F("TaskManager::success()", " {} {}", uri, block.str());
             download_num_--;
         }
     }
@@ -234,7 +234,7 @@ void TaskManager::fail(const std::string &uri)
     for (uint64_t i = 0; i < ts.size(); i++)
     {
         ts[i].setStatus(TaskStatusEnum::Failed);
-        DEBUG_F("TaskManager::fail(): {} ", uri);
+        DEBUG_F("TaskManager::fail()", " {} ", uri);
         download_num_--;
     }
 }

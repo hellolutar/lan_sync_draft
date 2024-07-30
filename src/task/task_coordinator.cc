@@ -13,7 +13,7 @@ void TaskCoordinator::analysis_resource(const ResourceInfo &info, const NetworkC
     {
         res_.insert(std::pair<std::string, ResourceInfo>(info.getUri(), info));
 
-        DEBUG_F("TaskCoordinator::analysis_resource(): new resource : \n\t"
+        DEBUG_F("TaskCoordinator::analysis_resource()", " new resource : \n\t"
                 "uri: {} \n\t"
                 "range: {}",
                 info.getUri(),
@@ -29,7 +29,7 @@ void TaskCoordinator::analysis_resource(const ResourceInfo &info, const NetworkC
             res_.erase(r_iter);                                                     // 资源表中移除
             res_.insert(std::pair<std::string, ResourceInfo>(info.getUri(), info)); // 向资源表插入新资源信息
 
-            DEBUG_F("TaskCoordinator::analysis_resource(): Discover the LATEST resource : \n\t"
+            DEBUG_F("TaskCoordinator::analysis_resource()", " Discover the LATEST resource : \n\t"
                     "uri: {} \n\t"
                     "old: {} \n\t"
                     "new: {}",
@@ -41,7 +41,7 @@ void TaskCoordinator::analysis_resource(const ResourceInfo &info, const NetworkC
         {
             old_r.addNetCtx(ctx);
 
-            DEBUG_F("TaskCoordinator::analysis_resource(): new owner : \n\t"
+            DEBUG_F("TaskCoordinator::analysis_resource()", " new owner : \n\t"
                     "uri: {} \n\t"
                     "range: {}",
                     info.getUri(),
@@ -60,7 +60,7 @@ void TaskCoordinator::assignTask(ResourceInfo &info)
     auto &ctxs = info.getNetCtxs();
     if (ctxs.size() == 0)
     {
-        WARN_F("TaskCoordinator::assignTask(): cannot assign task, because the contexts is empty!");
+        WARN_F("TaskCoordinator::assignTask()", " cannot assign task, because the contexts is empty!");
         return;
     }
 
@@ -134,7 +134,7 @@ void TaskCoordinator::reAssignTask(const std::string uri, const Block blk, const
             {
                 newctx = rs[i + 1];
             }
-            DEBUG_F("TaskCoordinator::reAssignTask(): {} {} | {} --> {} ", uri, blk.str(), ctx.getPeer().str(), newctx.getPeer().str());
+            DEBUG_F("TaskCoordinator::reAssignTask()", " {} {} | {} --> {} ", uri, blk.str(), ctx.getPeer().str(), newctx.getPeer().str());
             tm_->addTask({r.getUri(), r.size(), blk, newctx, rm_});
             break;
         }

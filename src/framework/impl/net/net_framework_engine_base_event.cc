@@ -29,7 +29,7 @@ std::shared_ptr<TcpServer> NetFrameworkEngineBaseEvent::addTcpServer(const NetAd
     int tcp_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (tcp_sock < 0)
     {
-        ERROR("NetFrameworkEngineBaseEvent::addTcpServer :", strerror(errno));
+        ERROR_F("NetFrameworkEngineBaseEvent::addTcpServer ","{}", strerror(errno));
         shutdown();
         return nullptr;
     }
@@ -45,7 +45,7 @@ std::shared_ptr<TcpServer> NetFrameworkEngineBaseEvent::addTcpServer(const NetAd
 
     if (bind(tcp_sock, (struct sockaddr *)&be_addr, sizeof(struct sockaddr_in)) != 0)
     {
-        ERROR("NetFrameworkEngineBaseEvent::addTcpServer :", strerror(errno));
+        ERROR_F("NetFrameworkEngineBaseEvent::addTcpServer ","{}", strerror(errno));
         shutdown();
         return nullptr;
     }
@@ -53,11 +53,11 @@ std::shared_ptr<TcpServer> NetFrameworkEngineBaseEvent::addTcpServer(const NetAd
     int res = listen(tcp_sock, 100);
     if (res == -1)
     {
-        ERROR("NetFrameworkEngineBaseEvent::addTcpServer :", strerror(errno));
+        ERROR_F("NetFrameworkEngineBaseEvent::addTcpServer ","{}", strerror(errno));
         shutdown();
         return nullptr;
     }
-    INFO("TCP listen: ", addr.str());
+    INFO_F("TCP listen", "{}", addr.str());
     auto srv = std::make_shared<TcpServer>(addr);
     accept_dto_ = std::make_unique<BaseEngineDto>(base_, shared_from_this(), srv);
     auto accept_event_persist = event_new(base_->getBase(), tcp_sock, EV_READ | EV_PERSIST, tcp_accept, accept_dto_.get());
@@ -78,7 +78,7 @@ std::shared_ptr<UdpServer> NetFrameworkEngineBaseEvent::addUdpServer(const NetAd
     int udp_sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (udp_sock <= 0)
     {
-        ERROR("NetFrameworkEngineBaseEvent::addUdpServer :", strerror(errno));
+        ERROR_F("NetFrameworkEngineBaseEvent::addUdpServer ","{}", strerror(errno));
         shutdown();
         return nullptr;
     }
@@ -94,14 +94,14 @@ std::shared_ptr<UdpServer> NetFrameworkEngineBaseEvent::addUdpServer(const NetAd
     int udpret = bind(udp_sock, (struct sockaddr *)&be_addr, sizeof(struct sockaddr_in));
     if (udpret != 0)
     {
-        ERROR("NetFrameworkEngineBaseEvent::addUdpServer :", strerror(errno));
+        ERROR_F("NetFrameworkEngineBaseEvent::addUdpServer ","{}", strerror(errno));
         shutdown();
         return nullptr;
     }
 
     NetAddr addr_will_be_udpate_follow;
 
-    INFO("UDP listen: ", addr.str());
+    INFO_F("UDP listen","{}", addr.str());
     auto srv = std::make_shared<UdpServer>(addr);
 
     auto conn = std::make_shared<UdpConn>(addr, srv, udp_sock);
@@ -120,7 +120,7 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::connectWithTcp(const NetAdd
 {
     init_check();
 
-    INFO("TCP connect : ", peer.str());
+    INFO_F("TCP connect","{}", peer.str());
 
     auto it = ctxs_.find(peer.str());
     if (it != ctxs_.end())
@@ -137,14 +137,14 @@ std::shared_ptr<TcpCli> NetFrameworkEngineBaseEvent::connectWithTcp(const NetAdd
     int ret = connect(peer_sock, (struct sockaddr *)&be_addr, sizeof(struct sockaddr_in));
     if (ret < 0)
     {
-        ERROR("NetFrameworkEngineBaseEvent::connectWithTcp :", peer.str(), strerror(errno));
+        ERROR_F("NetFrameworkEngineBaseEvent::connectWithTcp ","{}", peer.str(), strerror(errno));
         return nullptr;
     }
 
     auto bevp = bufferevent_socket_new(base_->getBase(), peer_sock, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
     if (bevp == nullptr)
     {
-        ERROR("NetFrameworkEngineBaseEvent::connectWithTcp: bufferevent_socket_new has a error:", strerror(errno));
+        ERROR_F("NetFrameworkEngineBaseEvent::connectWithTcp", " bufferevent_socket_new has a error:", strerror(errno));
         exit(-1);
     }
 
@@ -171,7 +171,7 @@ std::shared_ptr<UdpCli> NetFrameworkEngineBaseEvent::connectWithUdp(const NetAdd
 {
     init_check();
 
-    INFO("UDP connect :", peer.str().data());
+    INFO_F("UDP connect","{}", peer.str().data());
 
     auto it = ctxs_.find(peer.str());
     if (it != ctxs_.end())
@@ -185,7 +185,7 @@ std::shared_ptr<UdpCli> NetFrameworkEngineBaseEvent::connectWithUdp(const NetAdd
     int peer_sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (peer_sock <= 0)
     {
-        ERROR("NetFrameworkEngineBaseEvent::connectWithUdp :", peer.str(), strerror(errno));
+        ERROR_F("NetFrameworkEngineBaseEvent::connectWithUdp ","{}", peer.str(), strerror(errno));
         return nullptr;
     }
 
@@ -247,7 +247,7 @@ void NetFrameworkEngineBaseEvent::unRegister(const NetAddr &addr)
     if (iter != ctxs_.end())
     {
         // 取消事件
-        DEBUG_F("NetFrameworkEngineBaseEvent::unRegister(): {}", addr.str());
+        DEBUG_F("NetFrameworkEngineBaseEvent::unRegister()", " {}", addr.str());
         if (addr.type() == TransportType::TCP && tcp_disconn_cb_ != nullptr)
             tcp_disconn_cb_(addr);
 

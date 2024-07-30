@@ -12,7 +12,7 @@ const uint16_t genSeesionId(uint16_t server_id)
 
 ProtoSession::~ProtoSession()
 {
-    DEBUG_F("ProtoSession::~ProtoSession()" );
+    DEBUG_F("ProtoSession::~ProtoSession()", "");
     tcli_ = nullptr;
     core_logic_ = nullptr;
 }
@@ -72,7 +72,7 @@ bool ProtoSession::bind(const NetAddr &from, const LanSyncPkt &pkt)
 {
     if (tcli_ != nullptr)
     {
-        WARN_F("ProtoSession::bind() : repetitive bind tcli!");
+        WARN_F("ProtoSession::bind() ", " repetitive bind tcli!");
         return false;
     }
 
@@ -83,7 +83,7 @@ bool ProtoSession::bind(const NetAddr &from, const LanSyncPkt &pkt)
     tcli_ = eg->findTcpCli(peer);
     if (tcli_ == nullptr)
     {
-        WARN_F("ProtoSession::bind() : call findTcpCli, but no tcpcli be found.");
+        WARN_F("ProtoSession::bind() ", " call findTcpCli, but no tcpcli be found.");
         return false;
     }
 
