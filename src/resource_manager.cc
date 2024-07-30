@@ -133,15 +133,16 @@ bool ResourceManagerBaseFilesystem::save(string uri, std::shared_ptr<uint8_t[]> 
     auto path = filesystem::path(pathstr);
     auto ppath = filesystem::absolute(path).parent_path();
     if (!filesystem::exists(ppath))
-    {
         filesystem::create_directories(path.parent_path());
+
+    auto peg = PersistFramework::getEngine();
+    if (peg->saveTo(path.string(), offset, data, data_len) == data_len)
+    {
+        DEBUG_F("ResourceManagerBaseFilesystem::save() : SUCCESS");
+        return true;
     }
-
-    // uint64_t ret = io.writeFile(pathstr, offset, data, data_len);
-    // if (ret < 0)
-    //     return false;
-
-    return true;
+    DEBUG_F("ResourceManagerBaseFilesystem::save() : FAIL");
+    return false;
 }
 
 std::optional<std::shared_ptr<uint8_t[]>> ResourceManagerBaseFilesystem::readFrom(std::string uri, const Block &blk) const

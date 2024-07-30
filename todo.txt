@@ -1,3 +1,6 @@
+1. todo 建立连接后，应定期请求对方索引
+
+
 1. 同步过程中 peer_tcp 断开连接
     - me.tcp_srv 会如何做
     - me.tcp_cli 会如何做
