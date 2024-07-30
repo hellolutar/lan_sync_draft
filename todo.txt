@@ -1,0 +1,20 @@
+1. todo 建立连接后，应定期请求对方索引
+
+
+1. 同步过程中 peer_tcp 断开连接
+    - me.tcp_srv 会如何做
+    - me.tcp_cli 会如何做
+2. 同步过程中同一资源加入新的peer_tcp
+    - me.tcp_srv 会如何做
+    - me.tcp_cli 会如何做
+3. 同步过程中，一个资源同步失败了，如hash校验失败
+    - me.tcp_srv 会如何做 
+    - me.tcp_cli 会如何做
+
+
+bug
+- core_logic 只有一个，而session有多个（即多个outputstream），所以会出现outputstream覆盖的问题。
+
+- 存放依赖循环的问题：
+    - core-logic 依赖network_adapter
+    - network_adapter中的server、session依赖core_logic

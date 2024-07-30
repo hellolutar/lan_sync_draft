@@ -2,6 +2,5 @@
 
 AbsBuf::~AbsBuf()
 {
-    if (d != nullptr)
-        delete[] d;
+    d = nullptr;
 }

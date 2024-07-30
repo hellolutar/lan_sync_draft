@@ -10,6 +10,7 @@ include_directories(
   /usr/local/include
   /usr/include
   ${PROJECT_SOURCE_DIR}/src
+  ${PROJECT_SOURCE_DIR}/example
   ${PROJECT_SOURCE_DIR}/libs/include
 )
 
@@ -17,16 +18,18 @@ find_package(Libevent REQUIRED)
 # find_library(SPDLOG_LIBRARY libspdlog.so REQUIRED)
 
 # openssl
-# find_package(OpenSSL REQUIRED)
+find_package(OpenSSL REQUIRED)
 
-# if(OPENSSL_FOUND)
-#   include_directories(${OPENSSL_INCLUDE_DIRS})
-#   message(STATUS "OpenSSL Found!")
-# endif()
+if(OPENSSL_FOUND)
+  include_directories(${OPENSSL_INCLUDE_DIRS})
+  message(STATUS "OpenSSL Found!")
+endif()
+
+find_package(gflags REQUIRED)
 
 add_compile_options(-Wno-format-contains-nul -DRELEASE)
 
 file(GLOB_RECURSE src_codes ${PROJECT_SOURCE_DIR}/src/*.cc)
 list(REMOVE_ITEM src_codes ${PROJECT_SOURCE_DIR}/src/main.cc)
 
-add_library(lansync_common_obj STATIC ${src_codes})
+add_library(lansync_common_obj OBJECT ${src_codes})
