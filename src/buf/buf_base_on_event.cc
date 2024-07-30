@@ -7,7 +7,7 @@ BufBaseonEvent::BufBaseonEvent(/* args */)
 
 BufBaseonEvent::~BufBaseonEvent()
 {
-     if (buf != nullptr)
+    if (buf != nullptr)
         evbuffer_free(buf);
 }
 
@@ -20,16 +20,16 @@ uint64_t BufBaseonEvent::add(uint8_t *data_in, uint64_t len)
     return len;
 }
 
-void *BufBaseonEvent::data()
+std::shared_ptr<uint8_t[]> BufBaseonEvent::data()
 {
     if (d != nullptr)
-    {
-        delete[] d;
-    }
+        d = nullptr;
 
     uint64_t len = evbuffer_get_length(buf);
-    d = new uint8_t[len];
-    uint64_t act_len = evbuffer_copyout(buf, d, len);
+
+    std::shared_ptr<uint8_t[]> p(new uint8_t[len]());
+    d = std::move(p);
+    uint64_t act_len = evbuffer_copyout(buf, d.get(), len);
     if (act_len != len)
     {
         // LOG_WARN("BufBaseonEvent::data():  act_len != len : {} != {}", act_len, len);
@@ -39,5 +39,5 @@ void *BufBaseonEvent::data()
 
 uint64_t BufBaseonEvent::size()
 {
-    return  evbuffer_get_length(buf);
+    return evbuffer_get_length(buf);
 }

@@ -11,12 +11,10 @@ private:
 
 public:
     uint64_t add(uint8_t *data, uint64_t len) override;
-    void *data() override;
+    std::shared_ptr<uint8_t[]> data() override;
     uint64_t size() override;
     BufBaseonEvent();
     ~BufBaseonEvent();
 };
-
-
 
 #endif

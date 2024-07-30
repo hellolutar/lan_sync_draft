@@ -1,34 +1,35 @@
 #ifndef __NETWORK_ADAPTER_H_
 #define __NETWORK_ADAPTER_H_
 
-#include "net/net_addr.h"
-#include "proto_session_manager.h"
+#include "framework/dep/net_addr.h"
+#include "proto_server.h"
 
 class NetworkAdapter
 {
-private:
-    std::vector<std::shared_ptr<ProtoSessionManager>> sess_;
+protected:
+    std::vector<std::shared_ptr<ProtoServer>> srvs_;
 
-    std::vector<NetAddr> query_local_ports();
+    virtual std::vector<NetAddr> query_local_ports();
 
-    std::function<void(uint32_t, uint8_t *, uint64_t)> logic_recv_f_;
+    virtual std::vector<NetAddr> query_broad_ports();
 
-    const std::shared_ptr<ProtoSessionManager> findSession(uint32_t road_id);
+    const std::optional<std::shared_ptr<ProtoSession>>  findSession(const NetAddr &peer);
+
 
 public:
     NetworkAdapter(){};
-    NetworkAdapter(std::function<void(uint32_t, uint8_t *, uint64_t)> f) : logic_recv_f_(f) {}
-    ~NetworkAdapter() {}
+    virtual ~NetworkAdapter()
+    {
+        srvs_.clear();
+    };
 
-    void setLogicRecvFunc(std::function<void(uint32_t, uint8_t *, uint64_t)> logic_recv_f);
+    void start(std::shared_ptr<LogicWrite> core);
 
-    void recv(uint32_t road_id, uint8_t *data, uint64_t size);
+    void write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
 
-    void start();
-
-    void connPeer(const NetAddr &peer);
-
-    void write(uint32_t road_id, uint8_t* data, uint64_t size);
+    void udp_write(const NetAddr &peer, std::shared_ptr<uint8_t[]> data, uint64_t size);
+    
+    void rmSessionCallBack(const NetAddr &addr);
 };
 
 #endif

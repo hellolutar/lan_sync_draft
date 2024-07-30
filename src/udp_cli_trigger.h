@@ -1,28 +1,33 @@
 #ifndef __UDP_CLI_TRIGGER_H_
 #define __UDP_CLI_TRIGGER_H_
 
-#include <cstdint>
+#include "network_context.h"
+#include "buf/buf_base_on_event.h"
+#include "framework/itf/net/transport_proto.h"
+#include "framework/itf/net/net_framework.h"
+#include "framework/itf/timer/timer_trigger.h"
 
-#include "net/transport_proto.h"
-
-
-class UdpCliTrigger
+class UdpCliTrigger : public Trigger
 {
 private:
-    std::uint16_t id_;
-    std::uint32_t road_id_;
-    
-    UdpCli cli_;
+    std::vector<NetworkContext> ctxs_;
     bool running_ = false;
-    
+
 public:
-    UdpCliTrigger(/* args */) {}
+    UdpCliTrigger(struct timeval period, bool persist)
+        : Trigger(period, persist)
+    {
+    }
     ~UdpCliTrigger() {}
+
+    void trigger() override;
+
     const bool isRunning() const;
     std::uint16_t getId() const;
 
-    const UdpCli& getUdpCli() const;
+    void addCtx(const NetworkContext &ctx);
+    void delCtx(const NetAddr &addr);
+    uint64_t ctxSize();
 };
-
 
 #endif
