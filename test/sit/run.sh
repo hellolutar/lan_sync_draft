@@ -120,6 +120,9 @@ function setup_runtime_SIT_WORKSPACE(){
 
     echo "resource.home=${RESOUCE_HOME_CLI}" >> ${HOME_CLI}/properties.properties
     echo "resource.home=${RESOUCE_HOME_SRV}" >> ${HOME_SRV}/properties.properties
+
+    cp ${SIT_WORKSPACE}/Makefile ${HOME_CLI}
+    cp ${SIT_WORKSPACE}/Makefile ${HOME_SRV}
 }
 
 

@@ -99,7 +99,7 @@ void LogicCore::recvIdx(NetAbilityContext &ctx, const LanSyncPkt &pkt)
     DEBUG_F("LogicCore::recvIdx(): need to sync rs size : {}", need_to_sync_rs.size());
 
     for (auto &&r : need_to_sync_rs)
-        coor_->add_resource(r.getUri(), {0, r.getSize()}, {adapter_, ctx.from()});
+        coor_->add_resource(r, {adapter_, ctx.from()});
 }
 
 void LogicCore::recvRs(NetAbilityContext &ctx, const LanSyncPkt &pkt)
@@ -120,7 +120,30 @@ void LogicCore::recvRs(NetAbilityContext &ctx, const LanSyncPkt &pkt)
     if (rm_->save(uri, data, r.getStart(), r.size()))
     {
         Block blk(r.getStart(), r.getEnd());
-        coor_->taskManager()->success(uri, blk);
+        auto tm = coor_->taskManager();
+        tm->success(uri, blk);
+        if (tm->isSuccess(uri))
+        {
+            auto ri_opt = coor_->queryResource(uri);
+            if (ri_opt.has_value())
+            {
+                if (rm_->validRes(uri, ri_opt.value().getHash()))
+                {
+                    WARN_F("LogicCore::recvRs(): [{}] VALID SUCCESS!", uri);
+                    tm->cancelTask(uri); // 清理
+                }
+                else
+                {
+                    WARN_F("LogicCore::recvRs(): [{}] VALID FAILED!", uri);
+                    tm->fail(uri);
+                }
+            }
+            else
+            {
+                WARN_F("LogicCore::recvRs(): [{}] not found in coor, so can not valid the hash!", uri);
+                tm->cancelTask(uri); // 清理
+            }
+        }
     }
 }
 

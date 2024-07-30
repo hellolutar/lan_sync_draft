@@ -76,10 +76,11 @@ public:
     void tick(std::function<void(const std::string uri, const Block blk, const NetworkContext &oldCtx)> reAssignTaskFunc);
     void tick(uint64_t t, std::function<void(const std::string uri, const Block blk, const NetworkContext &oldCtx)> reAssignTaskFunc);
 
-    uint64_t stopPendingTask(std::string);
-    uint64_t pendingStopTask(std::string);
+    uint64_t stopPendingTask(const std::string &);
+    uint64_t pendingStopTask(const std::string &);
 
-    void success(std::string uri, Block block);
+    void success(const std::string & uri, Block block);
+    void fail(const std::string & uri);
 
     const bool isSuccess(std::string uri) const;
 

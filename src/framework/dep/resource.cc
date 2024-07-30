@@ -20,6 +20,10 @@ const std::uint64_t Resource::getSize() const
     return size_;
 }
 
+void Resource::setHash(std::string h) {
+    hash_ = h;
+}
+
 bool Resource::operator==(const Resource &r) const
 {
     return name_ == r.name_ &&
@@ -51,6 +55,11 @@ void ResourceInfo::addNetCtx(const NetworkContext& ctx)
 const std::vector<NetworkContext> &ResourceInfo::getNetCtxs() const
 {
     return ctxs_;
+}
+
+const std::string &ResourceInfo::getHash() const
+{
+    return hash_;
 }
 
 const uint64_t ResourceInfo::size() const

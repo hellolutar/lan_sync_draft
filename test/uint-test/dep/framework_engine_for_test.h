@@ -188,18 +188,18 @@ public:
 
   std::vector<Resource> idx() override { return table_; };
 
-  const Resource &query(std::string uri) const override
+  std::optional<Resource> query(const std::string &uri) const override
   {
     for (size_t i = 0; i < table_.size(); i++)
     {
       if (table_[i].getUri() == uri)
       {
-        return table_[i];
+        return make_optional<Resource>(table_[i]);
       }
     }
-    throw NotFoundException("ResourceManagerForTest:query()! uri:", uri);
+    return nullopt;
   };
-  bool validRes(std::string uri, std::string hash) const override
+  bool validRes(const std::string &uri, const std::string &hash) const override
   {
     return validres_;
   };
@@ -208,7 +208,7 @@ public:
   {
     return need_to_sync_;
   };
-  bool save(std::string uri, std::shared_ptr<uint8_t[]> data, uint64_t offset,
+  bool save(const std::string &uri, std::shared_ptr<uint8_t[]> data, uint64_t offset,
             uint64_t data_len) override
   {
     return true;

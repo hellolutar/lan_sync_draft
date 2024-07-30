@@ -5,6 +5,8 @@ macro(compile_example name)
     target_link_libraries( ${name}
         libevent::core
         libevent::pthreads
+        OpenSSL::Crypto
+        OpenSSL::SSL
         ${gflags_TARGET}
         $<TARGET_OBJECTS:lansync_common_obj>
     )

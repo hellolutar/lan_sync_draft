@@ -5,11 +5,11 @@
             "name": "(gdb) test",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/lutar/code/c/demo/build/${fileBasenameNoExtension}",
+            "program": "${workspaceFolder}/build/${fileBasenameNoExtension}",
             "args": [],
             "stopAtEntry": false,
             // "cwd": "${fileDirname}",
-            "cwd": "/home/lutar/code/c/demo/build/",
+            "cwd": "${workspaceFolder}/build/",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -25,7 +25,32 @@
                     "ignoreFailures": true
                 }
             ]
-        }
-        
+        },
+        {
+            "name": "(gdb) veth0",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/test/sit/veth0/main",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/test/sit/veth0/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "miDebuggerServerAddress": "192.168.233.100:8080",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
     ]
 }

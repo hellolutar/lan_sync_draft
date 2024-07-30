@@ -10,10 +10,40 @@
 
 using namespace std;
 
+class PersistFrameworkEgineForTest : public PersistFrameworkEgine
+{
+private:
+    /* data */
+public:
+    PersistFrameworkEgineForTest(/* args */) {}
+    ~PersistFrameworkEgineForTest() {}
+
+    virtual void addReadMonitor(std::shared_ptr<PersistMonitor> monitor)
+    {
+    }
+
+    virtual std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string path, uint64_t &ret_len)
+    {
+        return nullopt;
+    };
+
+    virtual std::optional<std::shared_ptr<uint8_t[]>> readFrom(std::string path, uint64_t offset, uint64_t size, uint64_t &ret_len)
+    {
+        return nullopt;
+    };
+
+    virtual uint64_t saveTo(std::string path, uint64_t offset, std::shared_ptr<uint8_t[]> data, uint64_t size)
+    {
+        return size;
+    }
+};
+
 class ResourceManagerBaseFilesystemTest : public testing::Test
 {
     void SetUp() override
     {
+        auto peg = make_shared<PersistFrameworkEgineForTest>();
+        PersistFramework::init(peg);
     }
 
     void TearDown() override {

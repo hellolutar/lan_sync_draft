@@ -110,9 +110,9 @@ std::shared_ptr<TaskManager> TaskCoordinator::taskManager()
     return tm_;
 }
 
-void TaskCoordinator::add_resource(std::string uri, Range range, const NetworkContext &ctx)
+void TaskCoordinator::add_resource(const Resource &res, const NetworkContext &ctx)
 {
-    ResourceInfo r{uri, range};
+    ResourceInfo r{res.getUri(), res.getHash(), {0, res.getSize()}};
     r.addNetCtx(ctx);
     analysis_resource(r, ctx);
 }
@@ -149,4 +149,13 @@ void TaskCoordinator::setNetworkAdapter(std::shared_ptr<NetworkAdapter> na)
 void TaskCoordinator::setResourceManager(std::shared_ptr<ResourceManager> rm)
 {
     rm_ = rm;
+}
+
+std::optional<const ResourceInfo> TaskCoordinator::queryResource(const std::string &uri) const
+{
+    auto it = res_.find(uri);
+    if (it == res_.end())
+        return nullopt;
+
+    return make_optional<const ResourceInfo>(it->second);
 }

@@ -175,12 +175,12 @@ void TaskManager::tick(uint64_t t, std::function<void(const std::string uri, con
     }
 }
 
-uint64_t TaskManager::stopPendingTask(std::string uri)
+uint64_t TaskManager::stopPendingTask(const std::string &uri)
 {
     return replaceStatusByStatus(uri, TaskStatusEnum::Pendding, TaskStatusEnum::Stop);
 }
 
-uint64_t TaskManager::pendingStopTask(std::string uri)
+uint64_t TaskManager::pendingStopTask(const std::string &uri)
 {
     return replaceStatusByStatus(uri, TaskStatusEnum::Stop, TaskStatusEnum::Pendding);
 }
@@ -206,7 +206,7 @@ uint64_t TaskManager::replaceStatusByStatus(std::string uri, TaskStatusEnum olds
     return i;
 }
 
-void TaskManager::success(std::string uri, Block block)
+void TaskManager::success(const std::string &uri, Block block)
 {
     auto uri_iter = tasks_.find(uri);
     if (uri_iter == tasks_.end())
@@ -221,6 +221,21 @@ void TaskManager::success(std::string uri, Block block)
             DEBUG_F("TaskManager::success(): {} {}", uri, block.str());
             download_num_--;
         }
+    }
+}
+
+void TaskManager::fail(const std::string &uri)
+{
+    auto uri_iter = tasks_.find(uri);
+    if (uri_iter == tasks_.end())
+        return;
+
+    std::vector<Task> &ts = uri_iter->second;
+    for (uint64_t i = 0; i < ts.size(); i++)
+    {
+        ts[i].setStatus(TaskStatusEnum::Failed);
+        DEBUG_F("TaskManager::fail(): {} ", uri);
+        download_num_--;
     }
 }
 

@@ -4,20 +4,21 @@
 #include <cstring>
 
 #include "buf/buf_base_on_event.h"
+#include "utils/openssl_utils.h"
 #include "log/log.h"
 
 using namespace std;
 
-const Resource &ResourceManagerBaseFilesystem::query(string uri) const
+std::optional<Resource> ResourceManagerBaseFilesystem::query(const string &uri) const
 {
     if (table_.size() == 0)
         const_cast<ResourceManagerBaseFilesystem &>(*this).idx();
 
     auto iter = table_.find(uri);
     if (iter == table_.end())
-        throw NotFoundException("ResourceManagerBaseFilesystem::query()! uri:", uri);
+        return nullopt;
 
-    return iter->second;
+    return make_optional<Resource>(iter->second);
 }
 
 vector<Resource> ResourceManagerBaseFilesystem::idx()
@@ -42,10 +43,8 @@ vector<Resource> ResourceManagerBaseFilesystem::recur_walk(filesystem::path p)
         int index = path.find(rsHome) + rsHome.size();
         string uri = path.substr(index);
 
-        // string hashRet = OpensslUtil::mdEncodeWithSHA3_512(pstr);
-        // if (hashRet.size() == 0)
-        //     return {};
-        Resource r{filename, uri, path, "", size};
+        string hashRet = OpensslUtil::mdEncodeWithSHA3_512(pstr);
+        Resource r{filename, uri, path, hashRet, size};
         return {r};
     }
 
@@ -62,16 +61,21 @@ vector<Resource> ResourceManagerBaseFilesystem::recur_walk(filesystem::path p)
     return {};
 }
 
-bool ResourceManagerBaseFilesystem::validRes(string uri, string hash) const
+bool ResourceManagerBaseFilesystem::validRes(const string &uri, const string &hash) const
 {
-    const Resource rs = query(uri);
+    const_cast<ResourceManagerBaseFilesystem &>(*this).idx();
 
-    if (hash.compare(rs.getHash()) == 0)
+    auto rs_opt = query(uri);
+    if (rs_opt.has_value())
     {
-        return true;
+        DEBUG_F("ResourceManagerBaseFilesystem::validRes():[{}]\n\t[{}]  \n\t[{}]", uri, hash, rs_opt.value().getHash());
+        return hash.compare(rs_opt.value().getHash()) == 0;
     }
     else
+    {
+        WARN_F("ResourceManagerBaseFilesystem::validRes(): [{}] is not found in local filesystem!", uri);
         return false;
+    }
 }
 
 std::vector<Resource> ResourceManagerBaseFilesystem::need_to_sync(std::vector<Resource> peer_table) const
@@ -120,14 +124,13 @@ std::vector<Resource> ResourceManagerBaseFilesystem::need_to_sync(std::vector<Re
     return want_to_sync;
 }
 
-string ResourceManagerBaseFilesystem::mapping(string uri) const
+string ResourceManagerBaseFilesystem::mapping(const string &uri) const
 {
     return rsHome + uri;
 }
 
-bool ResourceManagerBaseFilesystem::save(string uri, std::shared_ptr<uint8_t[]> data, uint64_t offset, uint64_t data_len)
+bool ResourceManagerBaseFilesystem::save(const string &uri, std::shared_ptr<uint8_t[]> data, uint64_t offset, uint64_t data_len)
 {
-    DEBUG_F("ResourceManagerBaseFilesystem::save() : URI:{} offset:{} data_len:{}", uri, offset, data_len);
     string pathstr = mapping(uri);
 
     auto path = filesystem::path(pathstr);
@@ -138,10 +141,10 @@ bool ResourceManagerBaseFilesystem::save(string uri, std::shared_ptr<uint8_t[]> 
     auto peg = PersistFramework::getEngine();
     if (peg->saveTo(path.string(), offset, data, data_len) == data_len)
     {
-        DEBUG_F("ResourceManagerBaseFilesystem::save() : SUCCESS");
+        DEBUG_F("ResourceManagerBaseFilesystem::save() :URI:{} offset:{} data_len:{} SUCCESS ", uri, offset, data_len);
         return true;
     }
-    DEBUG_F("ResourceManagerBaseFilesystem::save() : FAIL");
+    DEBUG_F("ResourceManagerBaseFilesystem::save() : URI:{} offset:{} data_len:{} FAIL", uri, offset, data_len);
     return false;
 }
 
