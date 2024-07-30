@@ -1,0 +1,76 @@
+func read_cb( engine, peer ){
+    ctx = engine.findCtx( peer )
+    ctx.recv( data );
+}
+
+func write_cb(){ }
+
+func event_cb(){
+    //
+}
+
+
+func tcp_accept( engine, ne ){
+    ...
+    NetAddr peer = accept();
+    bufferevent bind read_cb, write_cb, event_cb
+    OutputStream os( bufferevent );
+    ne.bind(os);
+    cli = TcpCli( peer );
+    engine.addCtx( cli );
+    ...
+}
+
+
+func udp_read_cb(  ){
+    NetAddr peer = recvfrom();
+    UdpCli cli( peer );
+    cli.recv( data )
+}
+
+
+NetFrameworkEngineBaseEvent{
+    func addTcpServer(const NetAddr &addr){
+        ...
+        srv = TcpSrv;
+        new event bind tcp_accept( srv );  
+        addCtx( addr );
+        ...
+        return ;
+    }
+
+
+    func addUdpServer(const NetAddr &addr){
+        ...
+        srv = UdpSrv;
+        OutputStream os;
+        srv.bind(os);
+        new event bind udp_read_cb( srv );
+        ...
+        return srv;
+    }
+
+
+    func connectWithTcp(const NetAddr &peer){
+        ...
+        cli = TcpCli;
+        OutputStream os;
+        cli.bind(os);
+        bufferevent bind read_cb( cli ), write_cb( cli ), event_cb( cli )
+        ...
+        return cli;
+    }
+
+
+    func connectWithUdp(const NetAddr &peer){
+        ...
+        cli = UdpCli( peer );
+        OutputStream os;
+        cli.bind(os);
+        new event bind udp_read_cb();
+        ...
+        return cli;
+    }
+
+
+}

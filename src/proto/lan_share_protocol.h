@@ -1,49 +1,14 @@
 #ifndef __LAN_SHARE_PROTOCOL_H
 #define __LAN_SHARE_PROTOCOL_H
 
-#include <cstdint>
-#include <cstring>
-
-#include <string>
-#include <vector>
+#include <optional>
 #include <map>
-#include <sstream>
-
-#include <arpa/inet.h>
 
 #include "buf/abs_buf.h"
+#include "constants/proto_constants.h"
 
-const std::uint8_t FLAG_KEY_VALUE_SPLIT = 2; // 2 is: ':' and '\0'
-
-const std::string XHEADER_URI = "uri";
-const std::string XHEADER_HASH = "hash";
-const std::string XHEADER_TCPPORT = "tcpport";
-/**
- * format:
- *      content-range:${first byte pos}-${last byte pos}\0
- * example:
- *      range:0-500\0                   want to get [0, 500)
- *      range:0-\0                      want to get [0, total_size)
- */
-const std::string XHEADER_RANGE = "range";
-
-/**
- * format:
- *      content-range:${first byte pos}-${last byte pos + 1 }/${entity legth}\0
- * example:
- *      content-range:0-500/500/last\0     reply[0,500), total size for the file is 500, this pkt is the last pkt
- *      content-range:0-500/22400/more\0     reply[0,500), total size for the file is 22400, the pkt is one of the many pkts sent by the server.
- */
-const std::string XHEADER_CONTENT_RANGE = "content-range";
-
-const std::string FLAG_XHEADER_CONTENT_RANGE_LAST = "last";
-const std::string FLAG_XHEADER_CONTENT_RANGE_MORE = "more";
-const std::string FLAG_XHEADER_CONTENT_SEPERATE = "/";
-const char FLAG_XHEADER_CONTENT_SEPERATE_CHAR = '/';
-const std::string FLAG_XHEADER_CONTENT_BETWEEN = "-";
-const char FLAG_XHEADER_CONTENT_BETWEEN_CHAR = '-';
-
-const std::uint16_t SIZE_1Kbit = 8196;
+const std::uint16_t default_udp_srv_port = 58080;
+const std::uint16_t default_tcp_srv_port = 58081;
 
 enum class lan_sync_version : uint8_t
 {
@@ -80,7 +45,7 @@ class LanSyncPkt
 {
 private:
     std::map<std::string, std::string> xheader;
-    void *payload = nullptr; //  ~LanSyncPkt()
+    std::shared_ptr<uint8_t[]> payload = nullptr; //  ~LanSyncPkt()
     uint16_t header_len = 0;
     uint32_t total_len = 0;
 
@@ -90,25 +55,26 @@ public:
     LanSyncPkt(enum lan_sync_version version, enum lan_sync_type_enum type)
         : version(version), type(type), header_len(LEN_LAN_SYNC_HEADER_T), total_len(LEN_LAN_SYNC_HEADER_T), payload(nullptr){};
     LanSyncPkt(lan_sync_header_t *header);
-    LanSyncPkt(void *header);
+    LanSyncPkt(std::shared_ptr<uint8_t[]> header);
     ~LanSyncPkt();
 
     void writeTo(AbsBuf &buf);
 
     void addXheader(const std::string key, const std::string value);
 
-    std::string queryXheader(std::string key);
+    const std::optional<std::string> queryXheader(std::string key) const;
 
-    void *getPayload();
+    std::shared_ptr<uint8_t[]> getPayload();
+    std::shared_ptr<uint8_t[]> getPayload() const;
 
-    void setPayload(void *data, uint32_t datalen);
+    void setPayload(void *data, uint64_t datalen);
 
-    uint16_t getHeaderLen();
-    uint32_t getTotalLen();
-    uint32_t getPayloadSize();
-    enum lan_sync_version getVersion();
-    enum lan_sync_type_enum getType();
-    const std::map<std::string, std::string> getXheaders();
+    uint16_t getHeaderLen() const;
+    uint32_t getTotalLen() const;
+    uint32_t getPayloadSize() const;
+    enum lan_sync_version getVersion() const;
+    enum lan_sync_type_enum getType() const;
+    const std::map<std::string, std::string> getXheaders() const;
 
     bool operator==(const LanSyncPkt &p) const;
 };
@@ -135,23 +101,6 @@ public:
     uint64_t getTotalSize();
     bool isLast();
     std::string to_string();
-};
-
-class Range
-{
-private:
-    uint64_t start_pos;
-    uint64_t size;
-
-public:
-    Range(std::string str);
-    Range(uint64_t start_pos, uint64_t size) : start_pos(start_pos), size(size){};
-    ~Range();
-    uint64_t getStartPos();
-    uint64_t getSize();
-    std::string to_string();
-
-    static std::string defaultStr;
 };
 
 #endif

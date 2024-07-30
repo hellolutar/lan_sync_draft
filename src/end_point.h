@@ -1,24 +1,40 @@
 #ifndef __END_POINT_H_
 #define __END_POINT_H_
 
-#include "logic_core.h"
+#include "framework/itf/net/net_framework.h"
+#include "framework/itf/timer/timer_trigger_framework.h"
+#include "logic/logic_core.h"
+#include "task/task_coordinator_trigger.h"
+#include "udp_cli_trigger.h"
 
 class Endpoint
 {
 private:
-    LogicCore core_;
-    NetworkAdapter ad_;
+    void registerTrg();
+
+protected:
+    std::shared_ptr<NetworkAdapter> na_;
+    std::shared_ptr<LogicCore> core_;
+    std::shared_ptr<UdpCliTrigger> hello_trg_;
+    std::shared_ptr<TaskCoordinatorTrigger> coor_trg_;
+    std::shared_ptr<TaskManager> tm_;
+    std::shared_ptr<ResourceManager> rm_;
+    std::shared_ptr<PropertiesParse> conf_;
 
 public:
-    Endpoint() : core_(ad_)
-    {
-        auto f = bind(&LogicCore::recv, &core_, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        ad_.setLogicRecvFunc(f);
-    };
-    
-    ~Endpoint() {}
+    Endpoint() {}
+    virtual ~Endpoint() {}
 
-    void run();
+    virtual void init();
+    virtual void run();
+
+    void setTaskManager(std::shared_ptr<TaskManager> tm);
+    void setNetworkAdapter(std::shared_ptr<NetworkAdapter> tm);
+    void setResourceManager(std::shared_ptr<ResourceManager> rm);
+    void setPropertiesParse(std::shared_ptr<PropertiesParse> conf);
+
+    std::shared_ptr<UdpCliTrigger> getUdpCliTrigger();
+    
 };
 
 #endif
